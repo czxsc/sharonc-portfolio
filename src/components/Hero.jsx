@@ -1,6 +1,7 @@
 import { hero, meta } from '../data/content.js';
 import { Coffee, ArrowDown } from './Doodles.jsx';
-import portrait from '../assets/portrait.png';
+import portrait from '../assets/portrait_tailless.png';
+import catAnim from '../assets/cat_animation.gif';
 import './Hero.css';
 
 export default function Hero() {
@@ -52,7 +53,12 @@ export default function Hero() {
         {/* side column — portrait */}
         <div className="hero-side">
           <figure className="hero-portrait hero-anim" style={{ '--i': 2 }}>
-            <img src={portrait} alt={`${meta.name}, illustrated portrait`} />
+            <img
+              className="hero-portrait-img"
+              src={portrait}
+              alt={`${meta.name}, illustrated portrait`}
+            />
+            <img className="hero-cat-anim" src={catAnim} alt="" aria-hidden="true" />
             <figcaption className="hero-hand">say hi&nbsp;→</figcaption>
           </figure>
         </div>

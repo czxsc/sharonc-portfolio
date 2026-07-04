@@ -94,43 +94,14 @@ export const experience = [
   },
 ];
 
+// Hover a project to preview it. Case-study subpages + real imagery TODO.
 export const projects = [
-  {
-    index: '01',
-    name: 'Sentari AI',
-    tagline: 'A design system that listens.',
-    description:
-      'A scalable, token-driven design system for an AI journaling product that remembers and grows with the person using it. Built the component library, theming, and documentation from first principles.',
-    role: 'Design systems & front-end',
-    stack: ['React', 'Design tokens', 'TypeScript', 'Storybook'],
-    year: '2026',
-    tone: ['var(--tone-b1)', 'var(--tone-b2)'],
-    links: { study: '#', repo: '#' }, // TODO
-  },
-  {
-    index: '02',
-    name: 'CornellGO',
-    tagline: 'Gamifying campus exploration.',
-    description:
-      'A campus-exploration app that turns the map into a game. Led three new gamified features end to end, with accessibility and playful engagement treated as first-class, not afterthoughts.',
-    role: 'Product & engineering lead',
-    stack: ['React Native', 'Accessibility', 'Node.js'],
-    year: '2025',
-    tone: ['var(--tone-a1)', 'var(--tone-a2)'],
-    links: { study: '#', repo: '#' }, // TODO
-  },
-  {
-    index: '03',
-    name: 'Souvenir',
-    tagline: 'Authentic social journaling, in the age of AI.',
-    description:
-      'A concept exploring how social journaling can foster genuine connection rather than performance. Named an 8th-of-150 finalist at the Rice 2025 Design-a-thon.',
-    role: 'Product designer',
-    stack: ['Figma', 'Prototyping', 'Research'],
-    year: '2025',
-    tone: ['var(--tone-c1)', 'var(--tone-c2)'],
-    links: { study: '#', repo: '#' }, // TODO
-  },
+  { index: '01', name: 'Artificer', category: 'Design engineering', year: '2026', tone: ['var(--tone-b1)', 'var(--tone-b2)'], href: '#work' },
+  { index: '02', name: 'Portfolio', category: 'Web · this site', year: '2026', tone: ['var(--tone-a1)', 'var(--tone-a2)'], href: '#work' },
+  { index: '03', name: 'Project DPK', category: 'Software', year: '2025', tone: ['var(--tone-c1)', 'var(--tone-c2)'], href: '#work' },
+  { index: '04', name: 'Little Wonder', category: 'Product design', year: '2025', tone: ['var(--tone-e1)', 'var(--tone-e2)'], href: '#work' },
+  { index: '05', name: 'Dishcovery', category: 'Mobile app', year: '2025', tone: ['var(--tone-d1)', 'var(--tone-d2)'], href: '#work' },
+  { index: '06', name: 'Another', category: 'Experiment', year: '2024', tone: ['var(--tone-f1)', 'var(--tone-f2)'], href: '#work' },
 ];
 
 export const interests = [

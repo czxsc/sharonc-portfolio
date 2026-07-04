@@ -9,7 +9,6 @@ export default function Play() {
     <section id="play" className="section play">
       <div className="container">
         <div className="section-head reveal">
-          <span className="folio">04</span>
           <h2>Off the Clock</h2>
           <p className="head-note">
             The small things that keep the work human.

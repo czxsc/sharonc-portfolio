@@ -6,7 +6,6 @@ export default function About() {
     <section id="about" className="section about">
       <div className="container">
         <div className="section-head reveal">
-          <span className="folio">01</span>
           <h2>About</h2>
         </div>
 

@@ -7,7 +7,6 @@ export default function Craft() {
     <section id="craft" className="section craft">
       <div className="container">
         <div className="section-head reveal">
-          <span className="folio">02</span>
           <h2>Craft &amp; Experience</h2>
           <p className="head-note">The tools I reach for — and where I&rsquo;ve put them to work.</p>
         </div>

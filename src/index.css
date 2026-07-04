@@ -29,7 +29,7 @@ body {
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
   /* custom latte-art cursor — a small 10% detail */
-  cursor: url('/latte-cursor.png?v=2') 5 5, auto;
+  cursor: url('/latte-cursor.png?v=3') 7 7, auto;
 }
 /* interactive elements keep a clear click affordance */
 a[href],
@@ -41,13 +41,13 @@ label {
 }
 /* dark theme gets the inverted (cream) cursor for contrast */
 @media (prefers-color-scheme: dark) {
-  body { cursor: url('/latte-cursor-light.png?v=2') 5 5, auto; }
+  body { cursor: url('/latte-cursor-light.png?v=3') 7 7, auto; }
 }
 :root[data-theme='dark'] body {
-  cursor: url('/latte-cursor-light.png?v=2') 5 5, auto;
+  cursor: url('/latte-cursor-light.png?v=3') 7 7, auto;
 }
 :root[data-theme='light'] body {
-  cursor: url('/latte-cursor.png?v=2') 5 5, auto;
+  cursor: url('/latte-cursor.png?v=3') 7 7, auto;
 }
 img,
 svg {

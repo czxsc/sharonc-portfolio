@@ -25,6 +25,8 @@
   --tone-b1: #5a4636; --tone-b2: #8a7159;
   --tone-c1: #2c3a4a; --tone-c2: #4a6274;
   --tone-d1: #4a463f; --tone-d2: #6b5f52;
+  --tone-e1: #3f4a3e; --tone-e2: #5a4636;
+  --tone-f1: #2c3a4a; --tone-f2: #3f4a3e;
 
   /* — Type families — */
   --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
@@ -47,8 +49,8 @@
   --sp-5: 48px; --sp-6: 96px; --sp-7: 128px;
 
   /* — Layout — */
-  --maxw: 1160px;
-  --gutter: clamp(20px, 5vw, 64px);
+  --maxw: 1280px;
+  --gutter: clamp(18px, 3.5vw, 40px);
   --section-y: clamp(72px, 12vh, 148px);
 
   /* — Motion — */
@@ -81,5 +83,7 @@
     --tone-b1: #5a4636; --tone-b2: #7c6650;
     --tone-c1: #2c3a4a; --tone-c2: #3d5364;
     --tone-d1: #443f38; --tone-d2: #5f5347;
+    --tone-e1: #3f4a3e; --tone-e2: #5a4636;
+    --tone-f1: #2c3a4a; --tone-f2: #3f4a3e;
   }
 }

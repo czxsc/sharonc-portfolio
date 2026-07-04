@@ -14,7 +14,6 @@ export default function Contact() {
     <section id="contact" className="section contact">
       <div className="container">
         <div className="section-head reveal">
-          <span className="folio">05</span>
           <h2>Contact</h2>
           <p className="head-note">{meta.status}</p>
         </div>

@@ -9,7 +9,7 @@
 }
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.55fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.4fr) minmax(0, 1.2fr);
   gap: clamp(20px, 3vw, 48px);
   align-items: center;
   width: 100%;
@@ -111,12 +111,25 @@
 .hero-portrait {
   position: relative;
   width: 100%;
-  max-width: 330px;
+  max-width: 440px;
 }
-.hero-portrait img {
+.hero-portrait-img {
+  display: block;
   width: 100%;
   height: auto;
   filter: drop-shadow(0 24px 34px rgba(40, 30, 20, 0.16));
+}
+
+/* animated cat (GIF) overlaid exactly over the static cat — its transparent
+   eye-holes reveal the static cat's eyes beneath, and it adds the swishing tail.
+   Positioned by aligning the eyes to the static cat. */
+.hero-cat-anim {
+  position: absolute;
+  left: -3.2%;
+  top: 45.3%;
+  width: 55.8%;
+  height: auto;
+  pointer-events: none;
 }
 .hero-hand {
   position: absolute;
@@ -199,4 +212,5 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-anim { opacity: 1; transform: none; animation: none; }
   .hero-scroll svg { animation: none; }
+  .hero-cat-anim { display: none; } /* fall back to the static cat beneath */
 }
