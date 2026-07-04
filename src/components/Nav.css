@@ -1,0 +1,107 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  border-bottom: 1px solid transparent;
+}
+.nav.is-scrolled {
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: saturate(120%) blur(10px);
+  -webkit-backdrop-filter: saturate(120%) blur(10px);
+  border-bottom-color: var(--line);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+
+/* wordmark */
+.nav-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.nav-mark-cat {
+  height: 26px;
+  width: auto;
+  transition: transform var(--dur) var(--ease);
+}
+.nav-mark:hover .nav-mark-cat {
+  transform: rotate(-6deg) scale(1.06);
+}
+@media (prefers-color-scheme: dark) {
+  .nav-mark-cat { filter: invert(0.92) sepia(0.12); }
+}
+:root[data-theme='dark'] .nav-mark-cat { filter: invert(0.92) sepia(0.12); }
+:root[data-theme='light'] .nav-mark-cat { filter: none; }
+.nav-mark-name {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.06rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.nav-mark-role {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* links */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.4vw, 34px);
+}
+.nav-link {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 0;
+  transition: color var(--dur) var(--ease);
+}
+.nav-link-idx {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-faint);
+  transition: all var(--dur) var(--ease);
+}
+.nav-link:hover {
+  color: var(--ink);
+}
+.nav-link.is-active {
+  color: var(--ink);
+}
+.nav-link.is-active .nav-link-idx {
+  background: var(--espresso);
+  border-color: var(--espresso);
+}
+
+@media (max-width: 720px) {
+  .nav-mark-role { display: none; }
+  .nav-link { font-size: 0.66rem; }
+  .nav-link-idx { display: none; }
+  .nav-links { gap: 16px; }
+}
+@media (max-width: 460px) {
+  /* keep only a couple of links legible; wordmark is the anchor */
+  .nav-links { gap: 12px; }
+  .nav-mark-name { font-size: 0.98rem; }
+}

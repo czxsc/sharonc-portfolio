@@ -1,0 +1,122 @@
+.craft-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(32px, 6vw, 92px);
+  align-items: start;
+}
+
+.col-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-bottom: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--ink);
+}
+
+/* ---- toolkit ---- */
+.chips {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chips li {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 13px;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+.chips li:hover {
+  color: var(--ink);
+  border-color: var(--espresso);
+  transform: translateY(-2px);
+}
+
+/* ---- education ---- */
+.edu-label {
+  margin-top: var(--sp-5);
+}
+.edu-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.edu-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.edu-school {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.12rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.edu-mark {
+  color: var(--espresso);
+  flex: none;
+}
+.edu-detail {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--espresso);
+  padding-left: 22px;
+}
+
+/* ---- experience ---- */
+.exp-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 3vw, 38px);
+}
+.exp-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.exp-date {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: var(--espresso);
+  font-variant-numeric: tabular-nums;
+}
+.exp-org {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.exp-role {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 820px) {
+  .craft-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+  }
+}
