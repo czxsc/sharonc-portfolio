@@ -29,7 +29,7 @@ body {
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
   /* custom latte-art cursor — a small 10% detail */
-  cursor: url('/latte-cursor.png?v=3') 7 7, auto;
+  cursor: url('/latte-cursor-sm.png') 4 4, auto;
 }
 /* interactive elements keep a clear click affordance */
 a[href],
@@ -41,13 +41,18 @@ label {
 }
 /* dark theme gets the inverted (cream) cursor for contrast */
 @media (prefers-color-scheme: dark) {
-  body { cursor: url('/latte-cursor-light.png?v=3') 7 7, auto; }
+  body { cursor: url('/latte-cursor-light-sm.png') 4 4, auto; }
 }
 :root[data-theme='dark'] body {
-  cursor: url('/latte-cursor-light.png?v=3') 7 7, auto;
+  cursor: url('/latte-cursor-light-sm.png') 4 4, auto;
 }
 :root[data-theme='light'] body {
-  cursor: url('/latte-cursor.png?v=3') 7 7, auto;
+  cursor: url('/latte-cursor-sm.png') 4 4, auto;
+}
+/* espresso surfaces flip to the cream cursor for contrast */
+.pour-about,
+.pour-static {
+  cursor: url('/latte-cursor-light-sm.png') 4 4, auto;
 }
 img,
 svg {
@@ -208,6 +213,15 @@ p {
 }
 .skip-link:focus {
   transform: none;
+}
+
+/* ---------- lenis smooth scroll ---------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
 }
 
 /* ---------- reduced motion ---------- */

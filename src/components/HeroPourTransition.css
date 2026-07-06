@@ -1,0 +1,311 @@
+/* ============================================================
+   HeroPourTransition — pinned hero, coffee pour, liquid fill
+   that becomes the About section's espresso frame.
+
+   Scroll runway: .pour height − 100vh = pinned scrub distance.
+   Timing fractions live in HeroPourTransition.jsx (const T).
+   ============================================================ */
+
+/* chalky grain, shared by the animated fill and the static fallback */
+.pour,
+.pour-static {
+  --pour-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* ---------- scroll runway + pinned stage ---------- */
+
+/* TUNE: total scroll distance for the transition.
+   230vh = 100vh of hero + 130vh of pinned scrub. */
+.pour {
+  position: relative;
+  height: 230vh;
+}
+
+.pour-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh; /* avoids clipping the hero under mobile browser chrome */
+  overflow: hidden;
+}
+
+.pour-hero {
+  position: relative;
+  height: 100%;
+  z-index: 1;
+}
+
+/* cup tilt — driven by --cup-tilt / --cup-shift set on .pour-stage.
+   The small translate makes the cup lean toward the pour, not just spin. */
+.pour-stage .hero-doodle {
+  transform: translate(
+      calc(var(--cup-shift, 0) * -5px),
+      calc(var(--cup-shift, 0) * 8px)
+    )
+    rotate(var(--cup-tilt, 0deg));
+  transform-origin: 30% 74%;
+  will-change: transform;
+}
+
+/* ---------- liquid frame ----------
+   Inset rectangle the liquid fills. Not full-bleed: --frame-left /
+   --frame-right are measured in JS (HeroPourTransition.jsx) so the
+   frame runs from the tilted cup's pour point to a bit past the
+   portrait. The clamp() fallbacks give a full-width frame when JS
+   hasn't measured (small screens, missing doodle). */
+.pour-frame {
+  --stream-inset: 36px; /* stream's left edge inside the frame — keep in
+                           sync with STREAM_INSET in the JSX */
+  --wave-h: clamp(48px, 9vh, 96px);
+  position: absolute;
+  top: calc(var(--nav-h) + 10px);
+  bottom: clamp(10px, 1.8vh, 18px);
+  left: var(--frame-left, clamp(10px, 1.6vw, 22px));
+  right: var(--frame-right, clamp(10px, 1.6vw, 22px));
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* vertical stream falling from the tilted cup's lip — it sits just
+   inside the frame's left edge (spout height measured in JS, written
+   as --spout-y on .pour-stage). No bottom rounding: the stream runs
+   flush into the base run below, forming one corner. */
+.pour-stream {
+  position: absolute;
+  left: var(--stream-inset);
+  top: var(--spout-y, 46%);
+  bottom: 0;
+  width: 6px;
+  border-radius: 5px 5px 0 0;
+  background: var(--liquid);
+  transform: scaleY(0);
+  transform-origin: top center;
+  will-change: transform;
+}
+
+/* rising body: wave crest on top, solid fill below.
+   Height is 118% of the frame so the wave can clear the frame top at
+   the end of the rise, leaving a clean solid rectangle. */
+.pour-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 118%;
+  transform: translateY(100%);
+  will-change: transform;
+  z-index: 2;
+}
+/* chalky grain over the whole body — wave and fill together, so the
+   surface reads as one mass (screen-blend is invisible over the paper) */
+.pour-body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--pour-grain);
+  background-size: 140px 140px;
+  opacity: 0.08;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* liquid surface: two wave trains scrolling continuously in opposite
+   directions at different speeds (the classic pour-fill technique —
+   each svg is 200% wide holding two identical wave periods, so
+   translateX(-50%) loops seamlessly). Kept slow and linear so it reads
+   as calm liquid, not a marquee. */
+.pour-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--wave-h);
+}
+.pour-wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  max-width: none; /* escape the global `svg { max-width: 100% }` reset */
+  height: 100%;
+  will-change: transform;
+  animation: pour-wave-loop 9s linear infinite;
+}
+.pour-wave-f path {
+  fill: var(--liquid);
+}
+/* lighter crest drifting the other way, slower — reads as crema */
+.pour-wave-b {
+  animation-duration: 14s;
+  animation-direction: reverse;
+}
+.pour-wave-b path {
+  fill: var(--liquid-soft);
+}
+@keyframes pour-wave-loop {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.pour-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--wave-h) - 2px); /* 2px overlap hides the seam */
+  bottom: 0;
+  background: var(--liquid);
+}
+
+/* ---------- About content over the liquid ----------
+   Opacity/pointer-events arrive via CSS vars (--op / --pe) set by
+   Motion — plain style-value MotionValues don't re-render on scroll
+   in motion v12.42, but CSS variables and transforms do. Fallbacks
+   (1 / auto-none) keep the reduced-motion static markup visible. */
+.pour-about {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* track the measured frame so the text never hangs off the liquid */
+  left: var(--frame-left, 0px);
+  right: var(--frame-right, 0px);
+  z-index: 4;
+  display: grid;
+  align-content: center;
+  /* when content is taller than the frame (small screens), start from the
+     top instead of clipping the title above the scrollable area */
+  align-content: safe center;
+  overflow-y: auto;
+  padding-top: calc(var(--nav-h) + clamp(20px, 5vh, 56px));
+  padding-bottom: clamp(24px, 6vh, 64px);
+  color: var(--on-liquid);
+  pointer-events: var(--pe, none);
+}
+
+.pour-about-title {
+  font-size: var(--fs-h1);
+  color: var(--on-liquid);
+  margin-bottom: clamp(20px, 4.5vh, 48px);
+  opacity: var(--op, 1);
+}
+.pour-about-body,
+.pour-about-focus {
+  opacity: var(--op, 1);
+}
+
+.pour-about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.9fr);
+  gap: clamp(32px, 6vw, 88px);
+  align-items: start;
+}
+
+.pour-about-lead {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--on-liquid);
+  text-wrap: balance;
+  margin-bottom: var(--sp-4);
+}
+.pour-about-para {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--on-liquid-soft);
+  max-width: 56ch;
+}
+.pour-about-para + .pour-about-para {
+  margin-top: var(--sp-3);
+}
+
+.pour-about-focus {
+  border-top: 1px solid var(--on-liquid);
+  padding-top: var(--sp-3);
+}
+.pour-about-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3px;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--on-liquid-line);
+}
+.pour-about-row dt {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--on-liquid-faint);
+}
+.pour-about-row dd {
+  font-family: var(--serif);
+  font-size: 1.08rem;
+  line-height: 1.35;
+  color: var(--on-liquid);
+}
+
+/* ---------- anchor marker ----------
+   Sits over the last 100vh of the runway, so #about links land where
+   the fill is complete, and nav highlighting picks it up. */
+.pour-anchor {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 100vh;
+  pointer-events: none;
+}
+
+/* ---------- reduced-motion fallback ----------
+   No pin, no scrub: the hero flows normally into a static espresso
+   frame carrying the same About content. */
+.pour-static {
+  position: relative;
+  margin: clamp(10px, 1.6vw, 22px);
+  border-radius: var(--radius-lg);
+  background-color: var(--liquid);
+  color: var(--on-liquid);
+  padding-block: var(--section-y);
+  scroll-margin-top: var(--nav-h);
+  overflow: hidden;
+}
+/* same subtle grain as the animated fill */
+.pour-static::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--pour-grain);
+  background-size: 140px 140px;
+  opacity: 0.08;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 940px) {
+  .pour-about-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+  }
+}
+@media (max-width: 620px) {
+  /* TUNE: shorter runway on phones — flick-scrolling covers distance fast */
+  .pour {
+    height: 205vh;
+  }
+  .pour-about {
+    padding-top: calc(var(--nav-h) + 16px);
+  }
+  .pour-about-para {
+    font-size: 0.95rem;
+  }
+  .pour-about-row dd {
+    font-size: 1rem;
+  }
+}

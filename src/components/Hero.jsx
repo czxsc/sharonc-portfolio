@@ -5,8 +5,10 @@ import catAnim from '../assets/cat_animation.gif';
 import './Hero.css';
 
 export default function Hero() {
+  // #top lives on the pour wrapper (HeroPourTransition) so the nav logo
+  // returns to the real page top even while the hero is pinned
   return (
-    <section id="top" className="hero" aria-label="Introduction">
+    <section className="hero" aria-label="Introduction">
       <div className="container hero-grid">
         {/* margin column — folio + note */}
         <div className="hero-margin">

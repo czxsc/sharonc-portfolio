@@ -20,6 +20,14 @@
   --sage: #3f4a3e;
   --navy: #2c3a4a;
 
+  /* — Color: liquid fill (hero pour transition) — */
+  --liquid: #332c29;          /* espresso pool — the poured coffee */
+  --liquid-soft: #5a4b3e;     /* crema crest above the liquid surface */
+  --on-liquid: #f2ede7;       /* headings/emphasis on the liquid */
+  --on-liquid-soft: rgba(242, 237, 231, 0.78); /* body text on liquid */
+  --on-liquid-faint: rgba(242, 237, 231, 0.55); /* labels on liquid */
+  --on-liquid-line: rgba(242, 237, 231, 0.2);   /* hairlines on liquid */
+
   /* project cover tones (muted, brand-consistent) */
   --tone-a1: #3f4a3e; --tone-a2: #2c3a4a;
   --tone-b1: #5a4636; --tone-b2: #8a7159;
@@ -79,6 +87,9 @@
     --espresso-deep: #d9b89e;
     --sage: #a3b39a;
     --navy: #97b3c8;
+    /* liquid lifts a touch so the frame separates from the dark ground */
+    --liquid: #372f2a;
+    --liquid-soft: #574a3f;
     --tone-a1: #3f4a3e; --tone-a2: #24303d;
     --tone-b1: #5a4636; --tone-b2: #7c6650;
     --tone-c1: #2c3a4a; --tone-c2: #3d5364;
