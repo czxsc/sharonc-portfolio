@@ -2,6 +2,7 @@
    Site content. Drawn from Sharon's own reference mockups; treat as
    real and refine specifics later. Placeholder links marked TODO.
    ------------------------------------------------------------------ */
+import portfolioProjectImg from '../assets/portfolio_project_img.jpg';
 
 export const meta = {
   name: 'Sharon Chen',
@@ -83,14 +84,15 @@ export const experience = [
   },
 ];
 
-// Hover a project to preview it. Case-study subpages + real imagery TODO.
+// Hover a project to preview it. Same sample image everywhere for now —
+// swap in per-project shots; sample blurbs + tech lists are TODO.
 export const projects = [
-  { index: '01', name: 'Artificer', category: 'Design engineering', year: '2026', tone: ['var(--tone-b1)', 'var(--tone-b2)'], href: '#work' },
-  { index: '02', name: 'Portfolio', category: 'Web · this site', year: '2026', tone: ['var(--tone-a1)', 'var(--tone-a2)'], href: '#work' },
-  { index: '03', name: 'Project DPK', category: 'Software', year: '2025', tone: ['var(--tone-c1)', 'var(--tone-c2)'], href: '#work' },
-  { index: '04', name: 'Little Wonder', category: 'Product design', year: '2025', tone: ['var(--tone-e1)', 'var(--tone-e2)'], href: '#work' },
-  { index: '05', name: 'Dishcovery', category: 'Mobile app', year: '2025', tone: ['var(--tone-d1)', 'var(--tone-d2)'], href: '#work' },
-  { index: '06', name: 'Another', category: 'Experiment', year: '2024', tone: ['var(--tone-f1)', 'var(--tone-f2)'], href: '#work' },
+  { index: '01', name: 'Artificer', category: 'Design engineering', year: '2026', blurb: 'ML powered app to scan artworks and learn their history.', tech: ['React', 'TypeScript', 'Claude API'], image: portfolioProjectImg, tone: ['var(--tone-b1)', 'var(--tone-b2)'], href: '#work' },
+  { index: '02', name: 'Portfolio', category: 'Web · this site', year: '2026', blurb: 'Personal ortfolio website to learn more about me and my work.', tech: ['React', 'Vite', 'Motion', 'CSS'], image: portfolioProjectImg, tone: ['var(--tone-a1)', 'var(--tone-a2)'], href: '#work' },
+  { index: '03', name: 'Project DPK', category: 'Software', year: '2025', blurb: 'Sensor and motor calibration for our custom Ground Control Station', tech: ['Python', 'SQL', 'Node.js'], image: portfolioProjectImg, tone: ['var(--tone-c1)', 'var(--tone-c2)'], href: '#work' },
+  { index: '04', name: 'Little Wonder', category: 'Product design', year: '2025', blurb: 'Platformer action game set in a fantasy acorn world', tech: ['Figma'], image: portfolioProjectImg, tone: ['var(--tone-e1)', 'var(--tone-e2)'], href: '#work' },
+  { index: '05', name: 'Dishcovery', category: 'Mobile app', year: '2025', blurb: 'A mobile app for finding your next favorite dish.', tech: ['React Native', 'Figma'], image: portfolioProjectImg, tone: ['var(--tone-d1)', 'var(--tone-d2)'], href: '#work' },
+  { index: '06', name: 'Another', category: 'Experiment', year: '2024', blurb: 'A small experiment in interaction and motion.', tech: ['JavaScript', 'CSS'], image: portfolioProjectImg, tone: ['var(--tone-f1)', 'var(--tone-f2)'], href: '#work' },
 ];
 
 export const interests = [

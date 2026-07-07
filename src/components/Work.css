@@ -16,6 +16,10 @@
   overflow: hidden;
   border: 1px solid var(--line);
   box-shadow: 0 1px 0 var(--line-soft), 0 40px 70px -50px rgba(40, 30, 20, 0.55);
+  /* dark ground: aspect-ratio yields fractional heights, and subpixel
+     rounding can leave a hairline gap under the image — on the paper
+     background it read as a faint white line at the frame's bottom */
+  background: var(--liquid);
 }
 .preview-item {
   position: absolute;
@@ -43,7 +47,7 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.16);
+  background: rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .preview-dots {
@@ -71,43 +75,58 @@
   justify-content: flex-end;
   overflow: hidden;
 }
-.preview-ghost {
+/* project screenshot fills the window body; the bar above keeps the
+   per-project tone from the gradient behind */
+.preview-img {
   position: absolute;
-  top: -0.24em;
-  right: 0.04em;
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: clamp(7rem, 20vw, 15rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: rgba(255, 255, 255, 0.1);
-  transition: transform 0.9s var(--ease);
+  inset: 0;
+  width: 100%;
+  /* 1px overshoot (clipped by the frame) so subpixel rounding never
+     exposes a hairline of the ground beneath */
+  height: calc(100% + 1px);
+  object-fit: cover;
+  /* anchor the top of the screenshot so its nav bar survives the crop —
+     cover trims from the bottom instead */
+  object-position: top center;
 }
-.preview-item.is-active .preview-ghost {
-  transform: translateY(-6px);
+/* scrim so the label stays readable over any screenshot — fades to the
+   same color as the window bar above (project tone + the bar's 30%
+   black overlay), so the chrome bookends the shot in one hue */
+.preview-body::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, color-mix(in srgb, var(--t1) 70%, black) 90%, transparent)
+  );
+  pointer-events: none;
 }
-.preview-name {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: clamp(1.8rem, 3.6vw, 2.7rem);
-  letter-spacing: -0.02em;
-  color: #fff;
-  line-height: 1;
+.preview-label {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* no project name here — the active list row already carries it */
+.preview-blurb {
+  font-size: 0.98rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.94);
+  max-width: 44ch;
+  text-wrap: balance;
 }
 .preview-meta {
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 12px;
-}
-.preview-tag {
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.42);
-  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.66);
+  margin-top: 9px;
 }
 
 /* ---------- list ---------- */

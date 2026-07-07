@@ -50,10 +50,11 @@ export default function Work() {
                     <span className="preview-url">{p.name.toLowerCase().replace(/\s+/g, '')}.app</span>
                   </div>
                   <div className="preview-body">
-                    <span className="preview-ghost">{p.index}</span>
-                    <span className="preview-name">{p.name}</span>
-                    <span className="preview-meta">{p.category} · {p.year}</span>
-                    <span className="preview-tag">Placeholder — case study soon</span>
+                    <img className="preview-img" src={p.image} alt="" />
+                    <div className="preview-label">
+                      <span className="preview-blurb">{p.blurb}</span>
+                      <span className="preview-meta">{p.tech.join(' · ')}</span>
+                    </div>
                   </div>
                 </div>
               ))}
