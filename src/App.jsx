@@ -1,6 +1,5 @@
 import Nav from './components/Nav.jsx';
 import HeroPourTransition from './components/HeroPourTransition.jsx';
-import Craft from './components/Craft.jsx';
 import Work from './components/Work.jsx';
 import Play from './components/Play.jsx';
 import Contact from './components/Contact.jsx';
@@ -16,9 +15,8 @@ export default function App() {
       <a href="#about" className="skip-link">Skip to content</a>
       <Nav />
       <main>
-        {/* Hero + About, joined by the coffee-pour scroll transition */}
+        {/* Hero + About/Experience, joined by the coffee-pour scroll transition */}
         <HeroPourTransition />
-        <Craft />
         <Work />
         <Play />
         <Contact />

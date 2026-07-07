@@ -7,7 +7,7 @@ import {
   useReducedMotion,
 } from 'motion/react';
 import Hero from './Hero.jsx';
-import { about } from '../data/content.js';
+import { about, experience, stack } from '../data/content.js';
 import './HeroPourTransition.css';
 
 /* ==================================================================
@@ -23,12 +23,12 @@ import './HeroPourTransition.css';
    ================================================================== */
 const T = {
   cupTilt: [0.04, 0.18], // cup rotates into the pour
-  stream: [0.1, 0.2], // stream falls from the spout to the frame base
-  rise: [0.2, 0.84], // fill rises the moment the stream lands — no
-  //                    horizontal run, so nothing depends on frame width
+  stream: [0.18, 0.28], // stream falls only once the cup is fully tilted
+  rise: [0.28, 0.84], // fill rises the moment the stream lands — no
+  //                     horizontal run, so nothing depends on frame width
   heading: [0.58, 0.72], // "About" ghosts in as fill passes mid-viewport
   body: [0.66, 0.8], // lead + paragraphs, once the liquid is under them
-  list: [0.72, 0.86], // focus list arrives last
+  list: [0.72, 0.86], // experience + toolkit column arrives last
 };
 
 const CUP_MAX_TILT = -42; // deg — final pouring angle of the cup
@@ -44,15 +44,20 @@ const HERO_INERT_AT = 0.62; // hero unfocusable once mostly submerged
    noted on each constant.
    ------------------------------------------------------------------ */
 const STREAM_W = 6; // px — .pour-stream width
-const STREAM_INSET = 36; // px — --stream-inset on .pour-frame
+const STREAM_INSET = 36; // px — frame's left edge sits this far left of the stream
+const STREAM_GAP = 4; // px — stream centreline this far left of the tilted cup's
+//                       box: close enough to read as pouring from the lip
+const SPOUT_DROP = 8; // px — stream starts this far below the computed lip
+//                       height, tucking it under the tilted rim
 const FRAME_RIGHT_PAD = 56; // px — frame extends this far past the portrait
-const FRAME_MEASURE_MIN = 941; // px — below this the hero reflows; keep the
-//                                     full-width CSS fallback frame instead
+const HERO_STACK_MAX = 941; // px — below this the hero reflows (cup moves to the
+//                             top right); the frame stays full-width there
 
 /* Cup-lip geometry: the rim corner of the Coffee doodle (viewBox 24×24,
    rim at 4,9), rotated by the full pour tilt about the CSS
    transform-origin (30% 74%), plus the lean translate(-5px, 8px) —
-   i.e. where the tip of the cup lands once tilted. */
+   used for the spout HEIGHT only; the stream's x position is a fixed
+   gap left of the cup's box so the pour distance never varies. */
 const LIP_FX = 4 / 24;
 const LIP_FY = 9 / 24;
 const TILT_ORIGIN_FX = 0.3;
@@ -76,29 +81,47 @@ const WAVE_BACK =
 
 /* Shared About content — used over the liquid and in the
    reduced-motion static fallback. */
-function AboutInk({ bodyStyle, listStyle }) {
+function AboutInk({ headStyle, bodyStyle, listStyle }) {
   return (
     <div className="pour-about-grid">
       {/* NOTE: opacity is driven via --op (see CSS) — motion v12.42 has a
           bug where plain style-value MotionValues (opacity, pointerEvents)
           never re-render on scroll, while transforms and CSS vars do. */}
-      <motion.div className="pour-about-body" style={bodyStyle}>
-        <p className="pour-about-lead">{about.lead}</p>
-        {about.body.map((p, i) => (
-          <p key={i} className="pour-about-para">
-            {p}
-          </p>
-        ))}
-      </motion.div>
+      {/* title lives inside the left column so the Experience column
+          top-aligns with it instead of hanging below the heading */}
+      <div className="pour-about-main">
+        <motion.h2 className="pour-about-title" style={headStyle}>
+          About
+        </motion.h2>
+        <motion.div className="pour-about-body" style={bodyStyle}>
+          <p className="pour-about-lead">{about.lead}</p>
+          {about.body.map((p, i) => (
+            <p key={i} className="pour-about-para">
+              {p}
+            </p>
+          ))}
+        </motion.div>
+      </div>
 
-      <motion.dl className="pour-about-focus" style={listStyle}>
-        {about.focus.map((f) => (
-          <div key={f.k} className="pour-about-row">
-            <dt>{f.k}</dt>
-            <dd>{f.v}</dd>
-          </div>
-        ))}
-      </motion.dl>
+      <motion.div className="pour-about-side" style={listStyle}>
+        <p className="pour-side-label">Experience</p>
+        <ol className="pour-exp-list">
+          {experience.map((e) => (
+            <li key={e.org} className="pour-exp-item">
+              <span className="pour-exp-date">{e.date}</span>
+              <span className="pour-exp-org">{e.org}</span>
+              <span className="pour-exp-role">{e.role}</span>
+            </li>
+          ))}
+        </ol>
+
+        <p className="pour-side-label pour-toolkit-label">Toolkit</p>
+        <ul className="pour-chips">
+          {stack.map((it) => (
+            <li key={it}>{it}</li>
+          ))}
+        </ul>
+      </motion.div>
     </div>
   );
 }
@@ -149,9 +172,12 @@ export default function HeroPourTransition() {
     if (el.inert !== covered) el.inert = covered;
   });
 
-  /* Frame + spout geometry: the frame's left edge hugs the point where
-     the tilted cup's lip will land (so the stream never overlaps the
-     cup), and its right edge sits a bit past the portrait. Written as
+  /* Frame + spout geometry. The stream's centreline sits a fixed gap
+     left of the tilted cup at EVERY viewport, so the pour distance
+     never varies and never overlaps the mug. Above HERO_STACK_MAX the
+     frame's left edge follows the stream and its right edge sits a bit
+     past the portrait; below it (hero stacked, cup top-right) the frame
+     stays full-width but the stream still tracks the cup. Written as
      CSS vars on the stage; re-measured after the hero entrance
      animation settles and on resize. (All rects live inside the sticky
      stage, so pin offset cancels out.) */
@@ -164,41 +190,54 @@ export default function HeroPourTransition() {
     const measure = () => {
       const cup = stage.querySelector('.hero-doodle');
       const portrait = stage.querySelector('.hero-portrait');
-      if (!cup || window.innerWidth < FRAME_MEASURE_MIN) {
+      if (!cup) {
         // CSS fallbacks take over (full-width frame, default spout)
         stage.style.removeProperty('--frame-left');
         stage.style.removeProperty('--frame-right');
         stage.style.removeProperty('--spout-y');
+        stage.style.removeProperty('--stream-x');
         return;
       }
       const s = stage.getBoundingClientRect();
       const c = cup.getBoundingClientRect();
 
-      // where the cup's lip lands at full tilt — mirror the
-      // .pour-stage .hero-doodle transform (rotate about origin + lean)
+      // stream centreline: fixed gap left of the cup's leaned box
+      const streamX = c.left - s.left + TILT_SHIFT_X - STREAM_GAP;
+
+      // lip HEIGHT at full tilt — mirror the .pour-stage .hero-doodle
+      // transform (rotate about origin + lean) — sets where the stream
+      // starts falling from
       const rad = (CUP_MAX_TILT * Math.PI) / 180;
       const ox = c.width * TILT_ORIGIN_FX;
       const oy = c.height * TILT_ORIGIN_FY;
       const dx = c.width * LIP_FX - ox;
       const dy = c.height * LIP_FY - oy;
-      const lipX =
-        c.left - s.left + ox + dx * Math.cos(rad) - dy * Math.sin(rad) +
-        TILT_SHIFT_X;
       const lipY =
         c.top - s.top + oy + dx * Math.sin(rad) + dy * Math.cos(rad) +
         TILT_SHIFT_Y;
 
-      const frameLeft = Math.max(8, lipX - STREAM_W / 2 - STREAM_INSET);
-      stage.style.setProperty('--frame-left', `${frameLeft}px`);
-      if (portrait) {
-        const pRight = portrait.getBoundingClientRect().right - s.left;
-        stage.style.setProperty(
-          '--frame-right',
-          `${Math.max(8, s.width - pRight - FRAME_RIGHT_PAD)}px`
-        );
+      let frameLeft;
+      if (window.innerWidth < HERO_STACK_MAX) {
+        // stacked hero: full-width frame (mirror the CSS clamp fallback)
+        frameLeft = Math.min(22, Math.max(10, window.innerWidth * 0.016));
+        stage.style.setProperty('--frame-right', `${frameLeft}px`);
+      } else {
+        frameLeft = Math.max(8, streamX - STREAM_W / 2 - STREAM_INSET);
+        if (portrait) {
+          const pRight = portrait.getBoundingClientRect().right - s.left;
+          stage.style.setProperty(
+            '--frame-right',
+            `${Math.max(8, s.width - pRight - FRAME_RIGHT_PAD)}px`
+          );
+        }
       }
+      stage.style.setProperty('--frame-left', `${frameLeft}px`);
+      stage.style.setProperty(
+        '--stream-x',
+        `${streamX - STREAM_W / 2 - frameLeft}px`
+      );
       const frameTop = frame.getBoundingClientRect().top - s.top;
-      stage.style.setProperty('--spout-y', `${lipY - frameTop}px`);
+      stage.style.setProperty('--spout-y', `${lipY + SPOUT_DROP - frameTop}px`);
     };
 
     measure();
@@ -221,7 +260,6 @@ export default function HeroPourTransition() {
         <Hero />
         <section id="about" className="pour-static" aria-label="About">
           <div className="container">
-            <h2 className="pour-about-title">About</h2>
             <AboutInk />
           </div>
         </section>
@@ -242,7 +280,13 @@ export default function HeroPourTransition() {
 
         {/* liquid layer — decorative; above the hero, below the text */}
         <div className="pour-frame" ref={frameRef} aria-hidden="true">
-          <motion.div className="pour-stream" style={{ scaleY: streamScale }} />
+          {/* height (not scaleY) so the rounded caps aren't squashed
+              while the stream is short; routed through a CSS var per
+              the motion v12.42 scroll bug */}
+          <motion.div
+            className="pour-stream"
+            style={{ '--stream-scale': streamScale }}
+          />
           <motion.div className="pour-body" style={{ y: bodyY }}>
             {/* two wave trains scrolling in opposite directions at
                 different speeds — the surface reads as moving liquid,
@@ -278,13 +322,8 @@ export default function HeroPourTransition() {
           style={{ '--pe': aboutPointer }}
         >
           <div className="container">
-            <motion.h2
-              className="pour-about-title"
-              style={{ '--op': headOp, y: headY }}
-            >
-              About
-            </motion.h2>
             <AboutInk
+              headStyle={{ '--op': headOp, y: headY }}
               bodyStyle={{ '--op': bodyOp, y: bodyLift }}
               listStyle={{ '--op': listOp, y: listLift }}
             />

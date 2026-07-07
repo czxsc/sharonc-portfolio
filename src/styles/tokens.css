@@ -21,7 +21,7 @@
   --navy: #2c3a4a;
 
   /* — Color: liquid fill (hero pour transition) — */
-  --liquid: #332c29;          /* espresso pool — the poured coffee */
+  --liquid: #332c29;          /* espresso pool — dark so on-liquid text stands out */
   --liquid-soft: #5a4b3e;     /* crema crest above the liquid surface */
   --on-liquid: #f2ede7;       /* headings/emphasis on the liquid */
   --on-liquid-soft: rgba(242, 237, 231, 0.78); /* body text on liquid */

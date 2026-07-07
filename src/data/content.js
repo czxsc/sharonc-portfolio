@@ -13,7 +13,6 @@ export const meta = {
 
 export const nav = [
   { id: 'about', label: 'About' },
-  { id: 'craft', label: 'Craft' },
   { id: 'work', label: 'Work' },
   { id: 'play', label: 'Play' },
   { id: 'contact', label: 'Contact' },
@@ -43,11 +42,6 @@ export const about = {
     'I’m a computer science student at Cornell, working where engineering and design overlap. Most of what I make lives in that overlap: design systems, human-centered AI tools, and interfaces that feel considered rather than assembled.',
     'I care less about shipping everything and more about shipping the right thing, well — the same instinct whether I’m naming a component or setting a headline.',
   ],
-  focus: [
-    { k: 'Now', v: 'Design systems & human-centered AI tools' },
-    { k: 'Studying', v: 'B.S. Computer Science, Cornell University' },
-    { k: 'Believes', v: 'Restraint over decoration; the right thing, done well' },
-  ],
 };
 
 export const stack = [
@@ -63,11 +57,6 @@ export const stack = [
   'C',
   'GitHub',
   'Figma',
-];
-
-export const education = [
-  { school: 'Cornell University', detail: 'Class of 2028' },
-  { school: 'Lovejoy High School', detail: 'Class of 2024' },
 ];
 
 // Reverse-chronological by start date. Each: accent date range → organization → role.

@@ -68,21 +68,21 @@
   z-index: 3;
 }
 
-/* vertical stream falling from the tilted cup's lip — it sits just
-   inside the frame's left edge (spout height measured in JS, written
-   as --spout-y on .pour-stage). No bottom rounding: the stream runs
-   flush into the base run below, forming one corner. */
+/* vertical stream falling just left of the tilted cup — x position and
+   spout height are measured in JS (--stream-x / --spout-y on
+   .pour-stage) so the pour-to-mug distance is the same at every
+   viewport. Grows via height (not scaleY): a transform would squash
+   the rounded caps flat while the stream is short. Cheap despite the
+   layout hit — one 6px element inside an overflow-hidden frame. */
 .pour-stream {
   position: absolute;
-  left: var(--stream-inset);
+  left: var(--stream-x, var(--stream-inset));
   top: var(--spout-y, 46%);
-  bottom: 0;
+  height: calc((100% - var(--spout-y, 46%)) * var(--stream-scale, 0));
   width: 6px;
-  border-radius: 5px 5px 0 0;
+  border-radius: 999px;
   background: var(--liquid);
-  transform: scaleY(0);
-  transform-origin: top center;
-  will-change: transform;
+  will-change: height;
 }
 
 /* rising body: wave crest on top, solid fill below.
@@ -190,17 +190,17 @@
 .pour-about-title {
   font-size: var(--fs-h1);
   color: var(--on-liquid);
-  margin-bottom: clamp(20px, 4.5vh, 48px);
+  margin-bottom: clamp(18px, 3.5vh, 40px);
   opacity: var(--op, 1);
 }
 .pour-about-body,
-.pour-about-focus {
+.pour-about-side {
   opacity: var(--op, 1);
 }
 
 .pour-about-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.9fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: clamp(32px, 6vw, 88px);
   align-items: start;
 }
@@ -208,46 +208,91 @@
 .pour-about-lead {
   font-family: var(--serif);
   font-weight: 500;
-  font-size: clamp(1.35rem, 2.6vw, 2rem);
-  line-height: 1.3;
+  font-size: clamp(1.25rem, 2.2vw, 1.7rem);
+  line-height: 1.32;
   letter-spacing: -0.015em;
   color: var(--on-liquid);
   text-wrap: balance;
-  margin-bottom: var(--sp-4);
+  margin-bottom: var(--sp-3);
 }
 .pour-about-para {
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: 0.92rem;
+  line-height: 1.65;
   color: var(--on-liquid-soft);
   max-width: 56ch;
 }
 .pour-about-para + .pour-about-para {
-  margin-top: var(--sp-3);
+  margin-top: var(--sp-2);
 }
 
-.pour-about-focus {
-  border-top: 1px solid var(--on-liquid);
-  padding-top: var(--sp-3);
-}
-.pour-about-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 3px;
-  padding: var(--sp-3) 0;
-  border-bottom: 1px solid var(--on-liquid-line);
-}
-.pour-about-row dt {
+/* ---- right column: experience, then toolkit ---- */
+.pour-side-label {
   font-family: var(--mono);
   font-size: 0.66rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--on-liquid-faint);
+  padding-bottom: var(--sp-2);
+  margin-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--on-liquid);
 }
-.pour-about-row dd {
+.pour-toolkit-label {
+  margin-top: clamp(18px, 3vh, 32px);
+}
+
+.pour-exp-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 20px);
+}
+.pour-exp-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pour-exp-date {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--on-liquid-faint);
+  font-variant-numeric: tabular-nums;
+}
+.pour-exp-org {
   font-family: var(--serif);
-  font-size: 1.08rem;
-  line-height: 1.35;
+  font-weight: 600;
+  font-size: clamp(1.02rem, 1.4vw, 1.18rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--on-liquid);
+  text-wrap: balance;
+}
+.pour-exp-role {
+  font-size: 0.85rem;
+  color: var(--on-liquid-soft);
+}
+
+.pour-chips {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.pour-chips li {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  color: var(--on-liquid-soft);
+  border: 1px solid var(--on-liquid-line);
+  border-radius: 7px;
+  padding: 5px 10px;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.pour-chips li:hover {
+  color: var(--on-liquid);
+  border-color: var(--on-liquid);
 }
 
 /* ---------- anchor marker ----------
@@ -303,9 +348,6 @@
     padding-top: calc(var(--nav-h) + 16px);
   }
   .pour-about-para {
-    font-size: 0.95rem;
-  }
-  .pour-about-row dd {
-    font-size: 1rem;
+    font-size: 0.88rem;
   }
 }
