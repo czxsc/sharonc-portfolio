@@ -115,9 +115,47 @@
 }
 .hero-portrait-img {
   display: block;
+  position: relative; /* sits above the wheel (scrapbook layering) */
+  z-index: 1;
   width: 100%;
   height: auto;
   filter: drop-shadow(0 24px 34px rgba(40, 30, 20, 0.16));
+}
+
+/* ---------- role wheel (behind the portrait) ---------- */
+.hero-wheel {
+  position: absolute;
+  top: -3%;
+  left: -1%;
+  width: 40%;
+  height: auto;
+  z-index: 0; /* floats in the open top-left corner of the portrait box */
+  overflow: visible;
+}
+.hero-wheel-ring {
+  animation: wheel-spin 42s linear infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes wheel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.hero-wheel-text {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 3px;
+  fill: var(--ink-soft);
+}
+.hero-wheel-mark {
+  fill: var(--espresso);
+}
+.hero-wheel-bean {
+  fill: none;
+  stroke: var(--espresso);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* animated cat (GIF) overlaid exactly over the static cat — its transparent
@@ -130,15 +168,7 @@
   width: 55.8%;
   height: auto;
   pointer-events: none;
-}
-.hero-hand {
-  position: absolute;
-  top: 6%;
-  left: -8%;
-  font-family: var(--hand);
-  font-size: 1.5rem;
-  color: var(--espresso);
-  transform: rotate(-8deg);
+  z-index: 2; /* above the z-indexed portrait img */
 }
 
 /* scroll cue */
@@ -213,4 +243,5 @@
   .hero-anim { opacity: 1; transform: none; animation: none; }
   .hero-scroll svg { animation: none; }
   .hero-cat-anim { display: none; } /* fall back to the static cat beneath */
+  .hero-wheel-ring { animation: none; }
 }
