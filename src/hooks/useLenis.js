@@ -1,6 +1,14 @@
 import { useEffect } from 'react';
 import Lenis from 'lenis';
 
+// current instance, so overlays (HobbyPage) can stop/start page scroll;
+// null under prefers-reduced-motion, where Lenis never runs
+let instance = null;
+
+export function getLenis() {
+  return instance;
+}
+
 /**
  * Global smooth scrolling. Wheel input is interpolated, which is what
  * lets scroll-scrubbed animations (the hero pour) glide instead of
@@ -16,6 +24,10 @@ export function useLenis() {
       // from the page's scroll-padding-top, which Lenis respects
       anchors: true,
     });
-    return () => lenis.destroy();
+    instance = lenis;
+    return () => {
+      instance = null;
+      lenis.destroy();
+    };
   }, []);
 }

@@ -76,6 +76,65 @@ export function Pencil({ size = 24, ...p }) {
   );
 }
 
+export function Laptop({ size = 24, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>
+      <g {...base}>
+        <rect x="4.5" y="5" width="15" height="10" rx="1" />
+        <path d="M2.5 18.5h19M4.5 15l-1.6 3M19.5 15l1.6 3" />
+        <path d="M10.6 8.1v3.8l3.4-1.9z" />
+      </g>
+    </svg>
+  );
+}
+
+export function Book({ size = 24, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>
+      <g {...base}>
+        <path d="M12 6.5C10.2 4.9 7.3 4.6 4 5v13c3.3-.4 6.2-.1 8 1.5 1.8-1.6 4.7-1.9 8-1.5V5c-3.3-.4-6.2-.1-8 1.5z" />
+        <path d="M12 6.5v13" />
+      </g>
+    </svg>
+  );
+}
+
+export function Controller({ size = 24, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>
+      <g {...base}>
+        <path d="M7.2 7.5h9.6a4.6 4.6 0 0 1 4.6 5c-.2 2.4-1 4.9-2.7 4.9-1.5 0-2.2-1.7-3.6-1.7H8.9c-1.4 0-2.1 1.7-3.6 1.7-1.7 0-2.5-2.5-2.7-4.9a4.6 4.6 0 0 1 4.6-5z" />
+        <path d="M8.2 10.6v3.2M6.6 12.2h3.2" />
+        <path d="M15.6 10.8h.01M17.6 12.8h.01" />
+      </g>
+    </svg>
+  );
+}
+
+export function Headphones({ size = 24, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>
+      <g {...base}>
+        <path d="M4 15v-2a8 8 0 0 1 16 0v2" />
+        <rect x="3" y="13.5" width="3.8" height="6.5" rx="1.7" />
+        <rect x="17.2" y="13.5" width="3.8" height="6.5" rx="1.7" />
+      </g>
+    </svg>
+  );
+}
+
+export function Sketchbook({ size = 24, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>
+      <g {...base}>
+        <rect x="5" y="5" width="14" height="16" rx="1.5" />
+        <path d="M8 2.5V7M12 2.5V7M16 2.5V7" />
+        <path d="M8.5 14.5c1.4-2.6 2.6 1.8 4 0s2.4.9 3 .4" />
+      </g>
+    </svg>
+  );
+}
+
 export function Sparkle({ size = 24, ...p }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>

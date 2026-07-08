@@ -1,58 +1,168 @@
-.play-grid {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-.play-card {
-  background: var(--paper);
-  padding: clamp(24px, 3vw, 38px);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  min-height: 190px;
-  transition: background var(--dur) var(--ease);
-}
-.play-card:hover {
-  background: var(--card);
-}
-.play-icon {
-  color: var(--espresso);
-  margin-bottom: var(--sp-2);
-  transition: transform var(--dur) var(--ease);
-  transform-origin: left center;
-}
-.play-card:hover .play-icon {
-  transform: rotate(-6deg) scale(1.08);
-}
-.play-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.35rem;
-  letter-spacing: -0.01em;
-}
-.play-note {
-  font-size: 0.92rem;
-  line-height: 1.55;
-  color: var(--ink-soft);
-  max-width: 26ch;
+/* ============================================================
+   Play — "off the clock". The cat knocks over the tote (gif
+   plays once; Play.jsx swaps first-frame still → gif → last-
+   frame still) and the hobby icons spill out to the right in a
+   scrapbook flat-lay (references/whats_in_bag_ref.jpg).
+   ============================================================ */
+
+.bag-scene {
+  position: relative;
+  aspect-ratio: 2.15 / 1;
+  /* entry offsets (--fx/--fy) are tuned at desktop width; --k scales
+     them down with the layout */
+  --k: 1;
 }
 
-@media (max-width: 780px) {
-  .play-grid {
-    grid-template-columns: repeat(2, 1fr);
+.bag-gif {
+  position: absolute;
+  left: 0;
+  bottom: 16%;
+  width: 45%;
+  height: auto;
+}
+
+.bag-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* each item rests at its scatter spot; before the spill it waits at
+   the bag's mouth (translated back by --fx/--fy), tiny and invisible */
+.bag-item {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  opacity: 0;
+  pointer-events: none; /* not clickable until it has spilled out */
+  transform: translate(calc(var(--fx) * var(--k)), calc(var(--fy) * var(--k)))
+    scale(0.2) rotate(0deg);
+}
+.bag-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.is-spilled .bag-item {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(0, 0) scale(1) rotate(var(--r));
+  transition:
+    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.35s ease-out;
+  transition-delay: calc(var(--i) * 95ms);
+}
+
+/* ----- item as a button: hover picks it up off the table ----------
+   The li keeps the spill choreography (position + resting rotation);
+   the inner button layers the pickup on top — lift, mostly straighten
+   the resting tilt (counter-rotate), grow a touch, cast a shadow. */
+.bag-item-btn {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    transform 0.45s var(--ease),
+    opacity 0.35s var(--ease);
+}
+.bag-item-btn img {
+  position: relative;
+  z-index: 1;
+  transition: filter 0.4s var(--ease);
+}
+.bag-item-btn:hover,
+.bag-item-btn:focus-visible {
+  transform: translateY(-7px) rotate(calc(var(--r) * -0.72)) scale(1.06);
+}
+.bag-item-btn:hover img,
+.bag-item-btn:focus-visible img {
+  filter: drop-shadow(0 12px 14px rgb(0 0 0 / 0.16));
+}
+/* pressed: settle back toward the table (feedback before the iris) */
+.bag-item-btn:active {
+  transform: translateY(-3px) rotate(calc(var(--r) * -0.72)) scale(1.02);
+}
+
+/* while its mini-page is open the clicked item hands off to the iris:
+   it shrinks away as the circle grows over it, and grows back in when
+   the circle collapses (class removed as the overlay unmounts) */
+.bag-item.is-opened .bag-item-btn,
+.bag-item.is-opened .bag-item-btn:hover,
+.bag-item.is-opened .bag-item-btn:active {
+  transform: scale(0.1);
+  opacity: 0;
+}
+
+/* the hover dot — a muted wash of the hobby's tone; on click the
+   HobbyPage iris grows from this exact circle */
+.bag-dot {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 50%;
+  width: 128%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  scale: 0.55;
+  opacity: 0;
+  background: color-mix(in srgb, var(--tone) 24%, var(--paper));
+  transition:
+    opacity 0.3s var(--ease),
+    scale 0.45s var(--ease);
+}
+.bag-item-btn:hover .bag-dot,
+.bag-item-btn:focus-visible .bag-dot {
+  opacity: 1;
+  scale: 1;
+}
+
+/* handwritten name under the picked-up item */
+.bag-label {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: calc(100% + 4px);
+  translate: -50% 6px;
+  rotate: -2deg;
+  white-space: nowrap;
+  pointer-events: none;
+  font-family: var(--hand);
+  font-size: 1.2rem;
+  color: var(--ink-soft);
+  opacity: 0;
+  transition:
+    opacity 0.3s var(--ease),
+    translate 0.3s var(--ease);
+}
+.bag-item-btn:hover .bag-label,
+.bag-item-btn:focus-visible .bag-label {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+@media (max-width: 700px) {
+  .bag-scene {
+    aspect-ratio: 1.35 / 1;
+    --k: 0.42;
+  }
+  .bag-gif {
+    width: 55%;
+    bottom: 2%;
+  }
+  /* icons sized for desktop — rest a step smaller here */
+  .is-spilled .bag-item {
+    transform: translate(0, 0) scale(0.7) rotate(var(--r));
   }
 }
-@media (max-width: 460px) {
-  .play-grid {
-    grid-template-columns: 1fr;
-  }
-  .play-card {
-    min-height: 0;
+
+@media (prefers-reduced-motion: reduce) {
+  .is-spilled .bag-item {
+    transition: none;
   }
 }

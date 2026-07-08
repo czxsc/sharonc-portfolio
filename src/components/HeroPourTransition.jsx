@@ -91,7 +91,7 @@ function AboutInk({ headStyle, bodyStyle, listStyle }) {
           top-aligns with it instead of hanging below the heading */}
       <div className="pour-about-main">
         <motion.h2 className="pour-about-title" style={headStyle}>
-          About
+          Hello, I&rsquo;m Sharon!
         </motion.h2>
         <motion.div className="pour-about-body" style={bodyStyle}>
           <p className="pour-about-lead">{about.lead}</p>

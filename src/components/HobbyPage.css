@@ -1,0 +1,355 @@
+/* ============================================================
+   HobbyPage — full-screen mini-page behind an iris transition.
+   The iris is two circle elements scaling up from the clicked
+   item (transform-only, so the growth stays on the compositor
+   and never stutters — an animated clip-path repaints every
+   frame). Tone circle leads, page-ground circle follows, then
+   the content layer fades in above them.
+   ============================================================ */
+
+.hp {
+  position: fixed;
+  inset: 0;
+  z-index: 300; /* above nav (100) and skip-link (200) */
+}
+
+.hp-circle {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  will-change: transform;
+}
+.hp-circle-tone {
+  background: var(--tone);
+  transition: transform 0.95s cubic-bezier(0.32, 0.08, 0.24, 1);
+}
+.hp-circle-page {
+  background: color-mix(in srgb, var(--tone) 6%, var(--paper));
+  transition: transform 0.95s cubic-bezier(0.32, 0.08, 0.24, 1) 0.12s;
+}
+.hp.is-open .hp-circle {
+  transform: scale(1);
+}
+
+/* close is the same move reversed, a touch quicker (exit < enter):
+   the page circle shrinks first, the tone rim covers its retreat */
+.hp.is-closing .hp-circle {
+  transform: scale(0);
+}
+.hp.is-closing .hp-circle-page {
+  transition: transform 0.6s cubic-bezier(0.55, 0, 0.45, 1);
+}
+.hp.is-closing .hp-circle-tone {
+  transition: transform 0.6s cubic-bezier(0.55, 0, 0.45, 1) 0.09s;
+}
+
+/* the content layer sits above the circles (transparent ground —
+   the page circle provides the color) and fades in once they have
+   mostly covered the screen */
+.hp-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease);
+}
+.hp.is-open .hp-scroll {
+  opacity: 1;
+  transition-delay: 0.4s;
+}
+.hp.is-closing .hp-scroll {
+  opacity: 0;
+  transition: opacity 0.18s ease-out;
+}
+
+/* content rises gently as it fades */
+.hp-page {
+  min-height: 100%;
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--sp-6);
+  transform: translateY(16px);
+  transition: transform 0.55s var(--ease);
+}
+.hp.is-open .hp-page {
+  transform: none;
+  transition-delay: 0.4s;
+}
+.hp.is-closing .hp-page {
+  transform: none;
+}
+
+/* ---------- back button ---------- */
+.hp-back {
+  position: sticky;
+  top: 22px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 26px;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.hp-back-ring {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid color-mix(in srgb, var(--ink) 32%, transparent);
+  border-radius: 50%;
+  color: var(--ink);
+  /* opaque over content that scrolls beneath the sticky button */
+  background: color-mix(in srgb, var(--tone) 6%, var(--paper));
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.hp-back-ring svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  transition: transform var(--dur) var(--ease);
+}
+.hp-back:hover .hp-back-ring,
+.hp-back:focus-visible .hp-back-ring {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.hp-back:hover svg {
+  transform: translateX(-2px);
+}
+
+/* ---------- header ---------- */
+.hp-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-5);
+  align-items: end;
+  max-width: 1080px;
+  margin-top: clamp(36px, 8vh, 84px);
+}
+.hp-head h1 {
+  font-size: clamp(2.8rem, 6.5vw, 5rem);
+  margin-top: var(--sp-3);
+}
+.hp-tagline {
+  margin-top: var(--sp-4);
+  max-width: 46ch;
+  font-family: var(--serif);
+  font-size: var(--fs-lead);
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.hp-icon {
+  width: clamp(130px, 17vw, 210px);
+  justify-self: end;
+  margin-right: clamp(0px, 4vw, 56px);
+  rotate: -6deg;
+  filter: drop-shadow(0 14px 22px rgb(0 0 0 / 0.12));
+}
+
+/* ---------- content blocks (column offset right of the header —
+   the same asymmetry the rest of the site leans on) ---------- */
+.hp-blocks {
+  display: grid;
+  gap: var(--sp-6);
+  max-width: 820px;
+  margin-top: var(--sp-6);
+  margin-left: clamp(0px, 8vw, 120px);
+}
+
+/* mono label with a trailing hairline */
+.hpb-label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hpb-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.hpb-p {
+  max-width: 58ch;
+  color: var(--ink-soft);
+}
+.hpb-p + .hpb-p {
+  margin-top: var(--sp-3);
+}
+
+/* list — name / meta on one line, note beneath */
+.hpb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hpb-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--sp-4);
+  padding-block: 18px;
+  border-top: 1px solid var(--line);
+}
+.hpb-list li:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.hpb-name {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.hpb-meta {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+.hpb-note {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  font-size: var(--fs-small);
+  color: var(--ink-soft);
+}
+
+/* specs — label / value rows */
+.hpb-specs {
+  margin: 0;
+}
+.hpb-specs > div {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  gap: var(--sp-4);
+  padding-block: 12px;
+  border-top: 1px solid var(--line);
+}
+.hpb-specs > div:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.hpb-specs dt {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  align-self: baseline;
+  padding-top: 3px;
+}
+.hpb-specs dd {
+  margin: 0;
+}
+
+/* gallery — taped scrapbook frames, slightly off-square */
+.hpb-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: clamp(18px, 3vw, 34px);
+}
+.hp-frame {
+  position: relative;
+  margin: 0;
+  padding: 10px 10px 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  rotate: -1.1deg;
+}
+.hp-frame:nth-child(even) {
+  rotate: 1.2deg;
+}
+/* the tape */
+.hp-frame::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  translate: -50%;
+  width: 56px;
+  height: 17px;
+  rotate: -2deg;
+  background: color-mix(in srgb, var(--tone) 16%, var(--paper-2));
+  opacity: 0.85;
+}
+.hp-frame img,
+.hp-ph {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.hp-ph {
+  display: grid;
+  place-items: center;
+  background: var(--paper-2);
+  border: 1px dashed var(--line);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hp-frame figcaption {
+  margin-top: 10px;
+  text-align: center;
+  font-family: var(--hand);
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- footer ---------- */
+.hp-foot {
+  margin-top: var(--sp-6);
+  margin-left: clamp(0px, 8vw, 120px);
+}
+.hp-foot-back {
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 700px) {
+  .hp-head {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+  .hp-icon {
+    justify-self: start;
+    width: 120px;
+    margin: 0;
+  }
+  .hp-blocks,
+  .hp-foot {
+    margin-left: 0;
+  }
+  .hpb-list li {
+    grid-template-columns: 1fr;
+  }
+  .hpb-meta {
+    margin-top: 2px;
+  }
+  .hpb-specs > div {
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: var(--sp-3);
+  }
+}
+
+/* index.css zeroes all transition durations under reduced motion, so
+   the iris and content simply appear/disappear; nothing extra needed */
