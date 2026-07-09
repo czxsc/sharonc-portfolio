@@ -5,6 +5,9 @@
 import portfolioProjectImg from '../assets/portfolio_project_img.jpg';
 import dishcoveryImg from '../assets/dishcovery_demo.jpg';
 import artificerImg from '../assets/artificer_placeholder.jpg';
+import cuairRadioImg from '../assets/cuair_cropped.png';
+import littleWonderImg from '../assets/little_wonder.png';
+import pokeleetDashboardImg from '../assets/pokeleet_dashboard_static.png';
 
 export const meta = {
   name: 'Sharon Chen',
@@ -23,8 +26,8 @@ export const nav = [
 
 export const links = {
   email: 'mailto:sharonc4747@gmail.com',
-  github: '#', // TODO: real GitHub URL
-  linkedin: '#', // TODO: real LinkedIn URL
+  github: 'https://github.com/czxsc',
+  linkedin: 'https://www.linkedin.com/in/sharon-chen-692595211',
   resume: '#', // TODO: real résumé link
 };
 
@@ -297,7 +300,7 @@ export const projects = [
     year: '2025',
     blurb: 'Sensor calibration support for CUAIR\'s custom GCS',
     tech: ['Python', 'SQL', 'Node.js'],
-    image: portfolioProjectImg,
+    image: cuairRadioImg,
     tone: ['var(--tone-c1)', 'var(--tone-c2)'],
     href: '#work',
     page: {
@@ -343,7 +346,7 @@ export const projects = [
     year: '2025',
     blurb: 'Platformer action game set in a fantasy acorn world',
     tech: ['Java'],
-    image: portfolioProjectImg,
+    image: littleWonderImg,
     tone: ['var(--tone-e1)', 'var(--tone-e2)'],
     href: '#work',
     page: {
@@ -465,7 +468,7 @@ export const projects = [
     year: '2024',
     blurb: 'Gamified, pokemon-themed Leetcode tracker.',
     tech: ['JavaScript', 'CSS'],
-    image: portfolioProjectImg,
+    image: pokeleetDashboardImg,
     tone: ['var(--tone-f1)', 'var(--tone-f2)'],
     href: '#work',
     page: {
