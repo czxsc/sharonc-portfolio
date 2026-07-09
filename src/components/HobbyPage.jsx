@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { getLenis } from '../hooks/useLenis.js';
+import { useOverlayPage } from '../hooks/useOverlayPage.js';
 import './HobbyPage.css';
 
 /* ------------------------------------------------------------------
@@ -10,8 +10,8 @@ import './HobbyPage.css';
    where an animated clip-path would repaint every frame. The tone
    circle leads, the page-ground circle follows (a brief colored rim,
    as in motion.dev's "curtains" iris), then the content fades in
-   above them. Closing reverses the pair. Esc, the back buttons, and
-   the browser back button all funnel through the same reverse.
+   above them. Closing reverses the pair; overlay plumbing (scroll
+   lock, Esc, browser back, focus) lives in useOverlayPage.
    ------------------------------------------------------------------ */
 
 // must cover the CSS transition durations + stagger in HobbyPage.css
@@ -25,71 +25,14 @@ const coverRadius = ({ x, y }) =>
   ) + 24;
 
 export default function HobbyPage({ hobby, img, origin, onClose }) {
-  const [state, setState] = useState('enter'); // enter → open → closing
   const [radius, setRadius] = useState(() => coverRadius(origin));
   const backRef = useRef(null);
-  const closingRef = useRef(false); // reverse animation underway
-  const poppedRef = useRef(false); // our history entry already consumed
-  const rafRef = useRef(0);
-  const timerRef = useRef(0);
-
-  const beginClose = () => {
-    if (closingRef.current) return;
-    closingRef.current = true;
-    setState('closing');
-    timerRef.current = setTimeout(onClose, CLOSE_MS);
-  };
-
-  // canonical close: pop the history entry we pushed; popstate → beginClose
-  const requestClose = () => {
-    if (closingRef.current || poppedRef.current) return;
-    poppedRef.current = true;
-    history.back();
-  };
-
-  // expand on the frame after the closed clip-path has been committed
-  useEffect(() => {
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = requestAnimationFrame(() => setState('open'));
-    });
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      clearTimeout(timerRef.current);
-    };
-  }, []);
-
-  // while open: page behind is inert and its scroll is paused
-  useEffect(() => {
-    const root = document.getElementById('root');
-    getLenis()?.stop();
-    root?.setAttribute('inert', '');
-    document.documentElement.style.overflow = 'hidden';
-    backRef.current?.focus({ preventScroll: true });
-    return () => {
-      root?.removeAttribute('inert');
-      document.documentElement.style.overflow = '';
-      getLenis()?.start();
-    };
-  }, []);
-
-  // browser back closes the page instead of leaving the site
-  useEffect(() => {
-    if (!poppedRef.current && !closingRef.current) {
-      history.pushState({ hobby: hobby.slug }, '');
-    }
-    const onPop = () => {
-      poppedRef.current = true;
-      beginClose();
-    };
-    const onKey = (e) => e.key === 'Escape' && requestClose();
-    window.addEventListener('popstate', onPop);
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('popstate', onPop);
-      window.removeEventListener('keydown', onKey);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { state, requestClose } = useOverlayPage({
+    slug: hobby.slug,
+    closeMs: CLOSE_MS,
+    onClose,
+    focusRef: backRef,
+  });
 
   // keep the open iris covering the viewport if the window grows
   useEffect(() => {

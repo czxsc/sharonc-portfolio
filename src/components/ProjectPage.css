@@ -1,0 +1,349 @@
+/* ============================================================
+   ProjectPage — full-screen case study. Professional register:
+   calm fade/rise entrance, close top-right, prev/next arrows
+   bottom-right (layout modeled on dousanmiao.com case pages,
+   set in this site's paper/ink system).
+   ============================================================ */
+
+.pp {
+  position: fixed;
+  inset: 0;
+  z-index: 300; /* above nav (100) and skip-link (200) */
+  background: var(--paper);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+.pp.is-open {
+  opacity: 1;
+}
+.pp.is-closing {
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+
+.pp-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* article remounts per project; the rise replays when paging */
+.pp-page {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+  padding: 26px var(--gutter) var(--sp-7);
+  animation: pp-in 0.55s var(--ease) both;
+}
+@keyframes pp-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* ---------- back button (sticky while the case scrolls) ---------- */
+.pp-back {
+  position: sticky;
+  top: 22px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.pp-back-ring {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+  border-radius: 50%;
+  color: var(--ink);
+  background: var(--paper); /* opaque over content scrolling beneath */
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.pp-back-ring svg {
+  width: 15px;
+  height: 15px;
+  transition: transform var(--dur) var(--ease);
+}
+.pp-back:hover .pp-back-ring,
+.pp-back:focus-visible .pp-back-ring {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.pp-back:hover svg {
+  transform: translateX(-2px);
+}
+
+/* ---------- header ---------- */
+.pp-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  margin-top: clamp(32px, 6vh, 60px);
+}
+.pp-head-text {
+  min-width: 0;
+}
+.pp-head h1 {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+}
+.pp-subtitle {
+  margin-top: var(--sp-3);
+  font-family: var(--serif);
+  font-size: var(--fs-lead);
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+.pp-status {
+  flex: none;
+  margin-left: auto;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.pp-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--espresso);
+}
+
+/* ---------- media panels ---------- */
+.pp-media {
+  margin: 0;
+}
+/* wide and shallow, like the reference's hero band — the pages
+   shouldn't spend most of their height on media */
+.pp-media img,
+.pp-media-ph {
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line-soft);
+  background: var(--paper-2);
+}
+.pp-media-ph {
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  border-color: var(--line);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.pp-media figcaption {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+.pp-hero {
+  margin-top: var(--sp-5);
+}
+
+/* ---------- intro + link chips ---------- */
+.pp-intro {
+  margin-top: var(--sp-5);
+}
+.pp-intro p {
+  font-size: clamp(1rem, 1.2vw, 1.1rem);
+  line-height: 1.7;
+}
+.pp-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+.pp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.02em;
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+.pp-chip svg {
+  width: 11px;
+  height: 11px;
+}
+.pp-chip:hover,
+.pp-chip:focus-visible {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+/* ---------- meta ----------
+   four columns abreast under one hairline (see
+   references/project_ref.jpg); extra rows (Team) span the width */
+.pp-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin: var(--sp-5) 0 0;
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+}
+.pp-meta > div {
+  min-width: 0;
+}
+.pp-meta > div:nth-child(n + 5) {
+  grid-column: 1 / -1;
+}
+.pp-meta dt {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+.pp-meta dd {
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ---------- case sections ---------- */
+.pp-section {
+  margin-top: var(--sp-6);
+}
+.pp-section h2 {
+  font-size: var(--fs-h3);
+  margin-bottom: var(--sp-3);
+}
+.pp-section > p {
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+.pp-section > p + p {
+  margin-top: var(--sp-3);
+}
+.pp-section .pp-media {
+  margin-top: var(--sp-4);
+}
+
+/* three findings, ruled like the meta rows */
+.pp-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+.pp-fact {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.pp-fact h3 {
+  font-size: 1.12rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.pp-fact p {
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+/* ---------- close + project nav (fixed chrome) ---------- */
+.pp-close,
+.pp-nav-btn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.pp-close svg,
+.pp-nav-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.pp-close:hover,
+.pp-close:focus-visible,
+.pp-nav-btn:hover,
+.pp-nav-btn:focus-visible {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.pp-close {
+  position: fixed;
+  top: 22px;
+  right: max(var(--gutter), 22px);
+}
+.pp-nav {
+  position: fixed;
+  bottom: 26px;
+  right: max(var(--gutter), 22px);
+  display: flex;
+  gap: 10px;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 700px) {
+  .pp-head {
+    flex-direction: column-reverse;
+    gap: var(--sp-3);
+  }
+  .pp-status {
+    margin-left: 0;
+    margin-top: 0;
+  }
+  .pp-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pp-meta > div:nth-child(n + 5) {
+    grid-column: 1 / -1;
+  }
+  .pp-facts {
+    grid-template-columns: 1fr;
+  }
+  /* keep the fixed chrome clear of content on small screens */
+  .pp-page {
+    padding-bottom: 140px;
+  }
+}

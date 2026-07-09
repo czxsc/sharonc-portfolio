@@ -205,24 +205,21 @@
   align-items: start;
 }
 
-.pour-about-lead {
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: clamp(1.25rem, 2.2vw, 1.7rem);
-  line-height: 1.32;
-  letter-spacing: -0.015em;
-  color: var(--on-liquid);
-  text-wrap: balance;
-  margin-bottom: var(--sp-3);
-}
+/* body carries the column alone under the headline, so it sits a
+   step larger than default body text */
 .pour-about-para {
-  font-size: 0.92rem;
-  line-height: 1.65;
+  font-size: clamp(1rem, 1.2vw, 1.1rem);
+  line-height: 1.7;
   color: var(--on-liquid-soft);
   max-width: 56ch;
 }
 .pour-about-para + .pour-about-para {
-  margin-top: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+/* the first line after the heading reads brighter, easing the jump
+   from display serif to body text */
+.pour-about-para:first-child {
+  color: var(--on-liquid);
 }
 
 /* ---- right column: experience, then toolkit ---- */

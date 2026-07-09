@@ -15,6 +15,12 @@ How to observe changes running in this repo (Vite + React SPA, no tests).
   plain `sleep()`s — page.screenshot does not freeze CSS transitions.
 
 ## Flows worth driving
+- **Project case studies**: `.work-item` click → `.pp` overlay; check meta
+  rows (Team only on Little Wonder/Dishcovery), `.pp-nav-btn` / arrow keys
+  page between projects with scroll reset, single browser-back closes even
+  after paging. Both overlays share `useOverlayPage` — history/Esc/inert
+  probes apply to each. Focus-return uses rAF (focus into an inert subtree
+  is silently ignored — never focus synchronously with the unmount).
 - **Play section spill**: scroll `.bag-scene` to viewport center (trigger is
   the middle 20% band), wait for `.bag-scene.is-spilled`, then ~1.8s for the
   scatter transition. The knock gif takes ~2.5s before items spill.

@@ -4,6 +4,7 @@
    ------------------------------------------------------------------ */
 import portfolioProjectImg from '../assets/portfolio_project_img.jpg';
 import dishcoveryImg from '../assets/dishcovery_demo.jpg';
+import artificerImg from '../assets/artificer_placeholder.jpg';
 
 export const meta = {
   name: 'Sharon Chen',
@@ -38,8 +39,6 @@ export const hero = {
 };
 
 export const about = {
-  lead:
-    'Some starting header',
   body: [
     'I\'m a Computer Science student at Cornell who enjoys building at the intersection of software engineering, AI, design, and autonomous systems. I\'m most drawn to spaces where different disciplines overlap, because that\'s often where the most interesting problems emerge from.',
     'Whatever I\'m building, I strive to understand how each piece of a system influences the next, from the underlying algorithms and infrastructure to the interface people actually interact with. Whether I\'m building an AI application, developing autonomous plane software for my team, or designing user interfaces, I enjoy balancing complex systems with experiences that feel intuitive and approachable.',
@@ -85,15 +84,425 @@ export const experience = [
   },
 ];
 
-// Hover a project to preview it. Same sample image everywhere for now —
-// swap in per-project shots; sample blurbs + tech lists are TODO.
+/* Hover a project to preview it; click to open its case study.
+   Same sample image everywhere for now — swap in per-project shots.
+
+   Each `page` renders in ProjectPage.jsx (layout modeled on
+   dousanmiao.com case pages):
+   - status:   pill next to the title ('Completed' / 'Developing' / 'Live')
+   - subtitle: one line under the title
+   - intro:    short paragraph under the hero media
+   - links:    external chips, e.g. [{ label: 'GitHub', href }]
+   - meta:     labeled rows — Product / My role / Timeline / Skills
+               (+ Team only where it was a team project)
+   - sections: [{ heading, body: [paragraphs], facts?: [{title, text}],
+                  media?: { src?, caption } }] — media without src
+               renders a placeholder panel
+
+   TODO(sharon): all case copy below is placeholder — replace with the
+   real story per project, plus real links and media. */
 export const projects = [
-  { index: '01', name: 'Artificer', category: 'Design engineering', year: '2026', blurb: 'ML powered app to scan artworks and learn their history.', tech: ['React', 'TypeScript', 'Claude API'], image: portfolioProjectImg, tone: ['var(--tone-b1)', 'var(--tone-b2)'], href: '#work' },
-  { index: '02', name: 'Portfolio', category: 'Web · this site', year: '2026', blurb: 'Personal portfolio site to learn about me and my work.', tech: ['React', 'Vite', 'Motion', 'CSS'], image: portfolioProjectImg, tone: ['var(--tone-a1)', 'var(--tone-a2)'], href: '#work' },
-  { index: '03', name: 'Project DPK', category: 'Software', year: '2025', blurb: 'Sensor calibration support for CUAIR\'s custom GCS', tech: ['Python', 'SQL', 'Node.js'], image: portfolioProjectImg, tone: ['var(--tone-c1)', 'var(--tone-c2)'], href: '#work' },
-  { index: '04', name: 'Little Wonder', category: 'Product design', year: '2025', blurb: 'Platformer action game set in a fantasy acorn world', tech: ['Java'], image: portfolioProjectImg, tone: ['var(--tone-e1)', 'var(--tone-e2)'], href: '#work' },
-  { index: '05', name: 'Dishcovery', category: 'Web app', year: '2025', blurb: 'Restaurant recommendations from food, ambiance, and price queries.', tech: ['React', 'Python', 'SVD', 'LLM'], image: dishcoveryImg, tone: ['var(--tone-d1)', 'var(--tone-d2)'], href: '#work' },
-  { index: '06', name: 'PokeLeet', category: 'Experiment', year: '2024', blurb: 'Gamified, pokemon-themed Leetcode tracker.', tech: ['JavaScript', 'CSS'], image: portfolioProjectImg, tone: ['var(--tone-f1)', 'var(--tone-f2)'], href: '#work' },
+  {
+    index: '01',
+    name: 'Artificer',
+    slug: 'artificer',
+    category: 'Design engineering',
+    year: '2026',
+    blurb: 'ML powered app to scan artworks and learn their history.',
+    tech: ['React', 'TypeScript', 'Claude API'],
+    image: artificerImg,
+    tone: ['var(--tone-b1)', 'var(--tone-b2)'],
+    href: '#work',
+    page: {
+      status: 'Developing',
+      subtitle: 'Point your camera at a painting; get its story.',
+      intro:
+        'Artificer is an ML-powered app that identifies artworks from a photo and unpacks their history, technique, and context. I’m building it end to end — from the recognition pipeline to an interface that reads like a well-set gallery label.',
+      links: [{ label: 'GitHub', href: '#' }],
+      meta: [
+        { label: 'Category', value: 'Machine Learning, RAG, Full-Stack' },
+        { label: 'My role', value: 'Design & engineering' },
+        { label: 'Timeline', value: '2026 — in progress' },
+        { label: 'Skills', value: 'Evaluating ML Models, RAG, LLM, React, Javascript' },
+      ],
+      sections: [
+        {
+          heading: 'Problem: Art context is locked in wall text',
+          body: [
+            'Standing in front of a painting, most of what makes it interesting — who made it, why, what to look at — lives in a paragraph you have to find, or a tour you didn’t book. Outside a museum there’s even less: reverse image search returns listings, not stories.',
+            'Artificer starts from the moment of curiosity: you’re looking at the thing, and you want to know more right now.',
+          ],
+        },
+        {
+          heading: 'Approach',
+          body: [
+            'The build is organized around three decisions, each still being tested against real gallery visits.',
+          ],
+          facts: [
+            {
+              title: 'Recognition first',
+              text: 'Identification has to work on imperfect photos — glare, angles, crops — before anything else matters.',
+            },
+            {
+              title: 'Context, not captions',
+              text: 'The model’s output is edited into a structured story: era, technique, and one thing to look closer at.',
+            },
+            {
+              title: 'Gallery-label tone',
+              text: 'The interface borrows from wall text: quiet type, short measures, no feed mechanics.',
+            },
+          ],
+        },
+        {
+          heading: 'Architecture: From photograph to provenance',
+          body: [
+            'A single CLIP encoder feeds two parallel heads — exact-match retrieval and label classification. A confidence gate decides which signal to trust before handing a rewritten query to the RAG layer. Hover a layer to expand its stack.',
+          ],
+          // renders the interactive isometric pile (StackDiagram.jsx);
+          // one plate per tool, grouped top → bottom
+          stack: {
+            title: 'Four layers, one request',
+            hint: 'Hover a layer to expand its stack.',
+            flow: [
+              { title: 'Photograph in', note: 'museum capture, upload, or crop' },
+              { title: 'Embed → route → retrieve', note: 'CLIP encoder + confidence gate' },
+              { title: 'Context out', note: 'top match + synthesized history' },
+            ],
+            // diagram-specific hues (not site tokens): the translucent
+            // plates blend when stacked, so the bands need genuinely
+            // different hue families — rust / blue / amber / green
+            groups: [
+              {
+                name: 'Frontend',
+                tone: '#b05438',
+                tools: [
+                  { name: 'React + TypeScript', note: 'capture, scan, and reading views' },
+                  { name: 'Vite', note: 'build and dev tooling' },
+                  { name: 'Design tokens', note: 'the gallery-label reading experience' },
+                ],
+              },
+              {
+                name: 'Backend & data',
+                tone: '#3e6b9e',
+                tools: [
+                  { name: 'Node.js API', note: 'scan orchestration and session state' },
+                  { name: 'Job queue', note: 'rate-limited model calls' },
+                  { name: 'Vector index', note: 'artwork embeddings' },
+                  { name: 'Metadata store', note: 'artists, eras, provenance' },
+                  { name: 'Ingest pipeline', note: 'museum open-data sets' },
+                ],
+              },
+              {
+                name: 'Vision model',
+                tone: '#c99a3d',
+                tools: [
+                  { name: 'CLIP encoder', note: 'shared image embeddings' },
+                  { name: 'Retrieval head', note: 'exact match against the index' },
+                  { name: 'Classifier + confidence gate', note: 'decides which signal to trust' },
+                ],
+              },
+              {
+                name: 'RAG & context',
+                tone: '#55855a',
+                tools: [
+                  { name: 'Claude API', note: 'history and technique, synthesized' },
+                  { name: 'Corpus retrieval', note: 'curated art-history passages' },
+                  { name: 'Prompt templates', note: 'wall-label tone control' },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          heading: 'Solution: A pocket docent',
+          body: [
+            'Scan a work and Artificer returns a label-sized summary with the option to go deeper — related works, the artist’s arc, and how this piece fits it. Depth is opt-in; the default reading takes under a minute.',
+          ],
+          media: { caption: 'Scan-to-story flow — screens coming as the build stabilizes.' },
+        },
+        {
+          heading: 'Status',
+          body: [
+            'The recognition pipeline and core reading experience are working; current focus is offline handling in low-signal galleries and the related-works graph.',
+          ],
+        },
+      ],
+    },
+  },
+  {
+    index: '02',
+    name: 'Portfolio',
+    slug: 'portfolio',
+    category: 'Web · this site',
+    year: '2026',
+    blurb: 'Personal portfolio site to learn about me and my work.',
+    tech: ['React', 'Vite', 'Motion', 'CSS'],
+    image: portfolioProjectImg,
+    tone: ['var(--tone-a1)', 'var(--tone-a2)'],
+    href: '#work',
+    page: {
+      status: 'Live',
+      subtitle: 'The site you’re reading, designed like a printed journal.',
+      intro:
+        'This portfolio began as a Framer prototype and was rebuilt from scratch in code — partly to own every detail, mostly because the details are the point. It’s a React + Vite site with a paper-and-ink design system and hand-tuned motion throughout.',
+      links: [{ label: 'GitHub', href: '#' }],
+      meta: [
+        { label: 'Product', value: 'Personal website' },
+        { label: 'My role', value: 'Design & engineering' },
+        { label: 'Timeline', value: '2026' },
+        { label: 'Skills', value: 'React, Vite, Motion, CSS, editorial design' },
+      ],
+      sections: [
+        {
+          heading: 'Goal: Feel set, not assembled',
+          body: [
+            'Most developer portfolios read as templates with content poured in. The goal here was the opposite: an editorial object with strong typography, asymmetric composition, and personality kept to about ten percent — coffee, one cat, and a tote bag.',
+          ],
+        },
+        {
+          heading: 'Details: The interactions carry it',
+          body: [
+            'Every section got one considered moment instead of scattered effects.',
+          ],
+          facts: [
+            {
+              title: 'Coffee-pour transition',
+              text: 'The hero pours into the About section on scroll, scrubbed through a liquid fill.',
+            },
+            {
+              title: 'The tote-bag spill',
+              text: 'A drawn cat knocks over a bag and the hobbies scatter out as a flat-lay.',
+            },
+            {
+              title: 'Iris mini-pages',
+              text: 'Hobby items open full-screen pages through a compositor-friendly circle transition.',
+            },
+          ],
+        },
+        {
+          heading: 'Build notes',
+          body: [
+            'Animations are CSS-first and kept on transform/opacity for smoothness; Lenis handles scroll feel; reduced-motion collapses everything to instant states. The design system lives in tokens — components never touch raw hex.',
+          ],
+          media: { caption: 'Selected details — recorded walkthrough coming soon.' },
+        },
+      ],
+    },
+  },
+  {
+    index: '03',
+    name: 'Project DPK',
+    slug: 'project-dpk',
+    category: 'Software',
+    year: '2025',
+    blurb: 'Sensor calibration support for CUAIR\'s custom GCS',
+    tech: ['Python', 'SQL', 'Node.js'],
+    image: portfolioProjectImg,
+    tone: ['var(--tone-c1)', 'var(--tone-c2)'],
+    href: '#work',
+    page: {
+      status: 'Completed',
+      subtitle: 'Sensor calibration support for CUAIR’s custom ground control station.',
+      intro:
+        'On Cornell’s Unmanned Aerial Systems team, I built calibration tooling for the autopilot’s sensor stack inside our custom ground control station — turning a manual, error-prone pre-flight ritual into a guided, logged workflow.',
+      links: [{ label: 'CUAIR', href: '#' }],
+      meta: [
+        { label: 'Product', value: 'Ground control station tooling' },
+        { label: 'My role', value: 'Autopilot software engineer' },
+        { label: 'Timeline', value: '2025' },
+        { label: 'Skills', value: 'Python, SQL, Node.js, data pipelines' },
+      ],
+      sections: [
+        {
+          heading: 'Problem: Drifting sensors, manual fixes',
+          body: [
+            'Autopilot accuracy depends on well-calibrated sensors, and calibration state drifted between flight days. The existing process was manual, undocumented, and easy to get subtly wrong — the kind of wrong you only discover in the air.',
+          ],
+        },
+        {
+          heading: 'Solution: Calibration in the loop',
+          body: [
+            'The tooling walks operators through each sensor’s calibration, validates readings against expected ranges as they come in, and records every run to the flight database — so a bad calibration is caught on the ground and every flight has a traceable baseline.',
+          ],
+          media: { caption: 'Calibration workflow in the GCS — screenshots pending team approval.' },
+        },
+        {
+          heading: 'Impact: Flight-day confidence',
+          body: [
+            'Pre-flight sensor checks went from tribal knowledge to a repeatable procedure any team member can run, and logged calibration history made post-flight debugging meaningfully faster.',
+          ],
+        },
+      ],
+    },
+  },
+  {
+    index: '04',
+    name: 'Little Wonder',
+    slug: 'little-wonder',
+    category: 'Product design',
+    year: '2025',
+    blurb: 'Platformer action game set in a fantasy acorn world',
+    tech: ['Java'],
+    image: portfolioProjectImg,
+    tone: ['var(--tone-e1)', 'var(--tone-e2)'],
+    href: '#work',
+    page: {
+      status: 'Completed',
+      subtitle: 'A platformer set in a fantasy acorn world.',
+      intro:
+        'Little Wonder is a 2D platformer built in Java with a small team — a forest adventure where you play an acorn sprite finding its way home. I owned character movement and level design, the two systems that decide whether a platformer feels good.',
+      links: [{ label: 'Play', href: '#' }],
+      meta: [
+        { label: 'Product', value: 'Desktop game' },
+        { label: 'My role', value: 'Design Lead & Game Programmer' },
+        { label: 'Timeline', value: 'Spring 2026' },
+        { label: 'Skills', value: 'Java, game feel, level design' },
+        { label: 'Team', value: 'Christian Amadeo, Caden Lau, Afram Ahmed, Paul Lukewesa, David Colle, Samantha Ahn, Thomas Myers' },
+      ],
+      sections: [
+        {
+          heading: 'Concept: Small hero, big forest',
+          body: [
+            'The world is scaled to an acorn: blades of grass are platforms, puddles are lakes, and a garden fence is the final ascent. That one framing decision drove the art direction, the level metaphors, and the movement tuning.',
+          ],
+        },
+        {
+          heading: 'Design: Movement before everything',
+          body: [
+            'We prototyped jump arcs for two weeks before building a single level — if carrying momentum around the world isn’t fun, nothing layered on top will fix it.',
+          ],
+          facts: [
+            {
+              title: 'Coyote time & buffers',
+              text: 'Forgiving input windows make the controls feel fair without making them easy.',
+            },
+            {
+              title: 'Readable danger',
+              text: 'Every hazard telegraphs one screen early; deaths should feel earned, not cheap.',
+            },
+            {
+              title: 'One new idea per level',
+              text: 'Each level introduces a single mechanic, then remixes the ones you already know.',
+            },
+          ],
+        },
+        {
+          heading: 'Outcome',
+          body: [
+            'The finished build shipped with a full level arc and boss encounter. Playtesters’ first words were about how the jump felt — which was the point.',
+          ],
+          media: { caption: 'Gameplay capture — recording coming soon.' },
+        },
+      ],
+    },
+  },
+  {
+    index: '05',
+    name: 'Dishcovery',
+    slug: 'dishcovery',
+    category: 'Web app',
+    year: '2025',
+    blurb: 'Restaurant recommendations from food, ambiance, and price queries.',
+    tech: ['React', 'Python', 'SVD', 'LLM'],
+    image: dishcoveryImg,
+    tone: ['var(--tone-d1)', 'var(--tone-d2)'],
+    href: '#work',
+    page: {
+      status: 'Completed',
+      subtitle: 'Restaurant recommendations from plain-language cravings.',
+      intro:
+        'Dishcovery answers the question review sites can’t: “somewhere quiet with great hand-pulled noodles, under $20.” It parses free-form queries about food, ambiance, and price, and ranks restaurants against thousands of reviews.',
+      links: [{ label: 'Demo', href: '#' }, { label: 'GitHub', href: '#' }],
+      meta: [
+        { label: 'Product', value: 'Web app' },
+        { label: 'My role', value: 'ML & frontend' },
+        { label: 'Timeline', value: '2025' },
+        { label: 'Skills', value: 'React, Python, SVD, LLM integration' },
+        { label: 'Team', value: 'Team of 5 — TODO: teammate names' },
+      ],
+      sections: [
+        {
+          heading: 'Problem: Reviews answer questions nobody asked',
+          body: [
+            'Star ratings average away exactly what you care about. A four-star restaurant might be perfect for a date and wrong for a work lunch — the signal is in the review text, and nobody reads three hundred reviews.',
+          ],
+        },
+        {
+          heading: 'How it works',
+          body: [
+            'The pipeline turns a sentence of preferences into a ranked shortlist with receipts.',
+          ],
+          facts: [
+            {
+              title: 'SVD retrieval',
+              text: 'Latent-semantic search over review text finds candidates that match the vibe, not just the keywords.',
+            },
+            {
+              title: 'LLM reranking',
+              text: 'A second pass scores candidates against the specific query — food, ambiance, and price separately.',
+            },
+            {
+              title: 'Evidence surfaced',
+              text: 'Each recommendation quotes the review lines that earned it, so you can trust the match.',
+            },
+          ],
+        },
+        {
+          heading: 'Impact',
+          body: [
+            'The demo consistently beat keyword search on ambiance-heavy queries in our evaluation set, and the evidence-quoting pattern became the feature testers mentioned first.',
+          ],
+          media: { src: dishcoveryImg, caption: 'Dishcovery results view — query to ranked shortlist.' },
+        },
+      ],
+    },
+  },
+  {
+    index: '06',
+    name: 'PokeLeet',
+    slug: 'pokeleet',
+    category: 'Experiment',
+    year: '2024',
+    blurb: 'Gamified, pokemon-themed Leetcode tracker.',
+    tech: ['JavaScript', 'CSS'],
+    image: portfolioProjectImg,
+    tone: ['var(--tone-f1)', 'var(--tone-f2)'],
+    href: '#work',
+    page: {
+      status: 'Completed',
+      subtitle: 'A Pokémon-themed tracker that turns Leetcode into a collect-a-thon.',
+      intro:
+        'PokeLeet is a small experiment in motivation design: every solved Leetcode problem earns progress toward catching a Pokémon, with harder problems yielding rarer catches. Built to make a grind feel like a game — mostly for me, then for friends.',
+      links: [{ label: 'GitHub', href: '#' }],
+      meta: [
+        { label: 'Product', value: 'Browser app' },
+        { label: 'My role', value: 'Design & engineering' },
+        { label: 'Timeline', value: '2024' },
+        { label: 'Skills', value: 'JavaScript, CSS, gamification' },
+      ],
+      sections: [
+        {
+          heading: 'Idea: Borrow a better reward loop',
+          body: [
+            'Interview prep has a brutal feedback curve — effort now, payoff months away. Collection games solved that problem decades ago: visible progress, variable rewards, and a shelf to fill.',
+          ],
+        },
+        {
+          heading: 'How it works',
+          body: [
+            'Problems map to encounter tiers by difficulty and topic; streaks improve catch rates. The collection screen is the real interface — the todo list is just how you hunt.',
+          ],
+          media: { caption: 'Collection screen — capture coming soon.' },
+        },
+        {
+          heading: 'What I learned',
+          body: [
+            'Gamification works when the game is honest: as soon as rewards felt arbitrary, motivation dropped. Tying rarity to genuine difficulty kept the loop meaningful — a lesson that generalizes well beyond side projects.',
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 /* What spills out of the tote in the Play section. Each item opens a
@@ -275,7 +684,7 @@ export const hobbies = [
 ];
 
 export const contact = {
-  title: 'Let’s make something considered.',
+  title: 'Let’s make something!',
   body:
-    'I’m open to 2026 internships and collaborations at the intersection of software and design. The fastest way to reach me is email.',
+    'I’m open to 2027 internships and collaborations. The fastest way to reach me is email.',
 };

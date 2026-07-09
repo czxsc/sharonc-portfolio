@@ -73,7 +73,11 @@ export default function Play() {
   const closeHobby = () => {
     const { index } = active;
     setActive(null);
-    btnRefs.current[index]?.focus({ preventScroll: true });
+    // after the overlay unmounts and #root sheds `inert` — a focus()
+    // into an inert subtree is silently ignored
+    requestAnimationFrame(() =>
+      btnRefs.current[index]?.focus({ preventScroll: true })
+    );
   };
 
   const clearTimers = () => {

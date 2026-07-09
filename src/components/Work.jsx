@@ -1,17 +1,36 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { projects } from '../data/content.js';
 import { ArrowRight } from './Doodles.jsx';
+import ProjectPage from './ProjectPage.jsx';
 import './Work.css';
 
 export default function Work() {
   const [active, setActive] = useState(0);
+  const [openIndex, setOpenIndex] = useState(null); // case study overlay
+  const btnRefs = useRef([]);
+
+  const openProject = (i) => {
+    setActive(i);
+    setOpenIndex(i);
+  };
+
+  const closeProject = () => {
+    const i = openIndex;
+    setOpenIndex(null);
+    setActive(i);
+    // after the overlay unmounts and #root sheds `inert` — a focus()
+    // into an inert subtree is silently ignored
+    requestAnimationFrame(() =>
+      btnRefs.current[i]?.focus({ preventScroll: true })
+    );
+  };
 
   return (
     <section id="work" className="section work">
       <div className="container">
         <div className="section-head reveal">
           <h2>Selected Work</h2>
-          <p className="head-note">Hover a project to preview it — full case studies coming soon.</p>
+          <p className="head-note">Hover to preview — click a project for the case study.</p>
         </div>
 
         <div className="work-gallery reveal">
@@ -21,12 +40,12 @@ export default function Work() {
               <li key={p.name} className="work-row">
                 <button
                   type="button"
+                  ref={(el) => (btnRefs.current[i] = el)}
                   className={`work-item ${i === active ? 'is-active' : ''}`}
                   onMouseEnter={() => setActive(i)}
                   onFocus={() => setActive(i)}
-                  onClick={() => setActive(i)}
-                  aria-label={`Preview ${p.name}`}
-                  aria-pressed={i === active}
+                  onClick={() => openProject(i)}
+                  aria-label={`Open ${p.name} case study`}
                 >
                   <span className="work-index">{p.index}</span>
                   <span className="work-name">{p.name}</span>
@@ -62,6 +81,14 @@ export default function Work() {
           </div>
         </div>
       </div>
+
+      {openIndex !== null && (
+        <ProjectPage
+          index={openIndex}
+          onNavigate={setOpenIndex}
+          onClose={closeProject}
+        />
+      )}
     </section>
   );
 }

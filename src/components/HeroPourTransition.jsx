@@ -94,7 +94,6 @@ function AboutInk({ headStyle, bodyStyle, listStyle }) {
           Hello, I&rsquo;m Sharon!
         </motion.h2>
         <motion.div className="pour-about-body" style={bodyStyle}>
-          <p className="pour-about-lead">{about.lead}</p>
           {about.body.map((p, i) => (
             <p key={i} className="pour-about-para">
               {p}
