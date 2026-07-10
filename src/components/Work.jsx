@@ -49,6 +49,7 @@ export default function Work() {
                 >
                   <span className="work-index">{p.index}</span>
                   <span className="work-name">{p.name}</span>
+                  <span className="work-cat">{p.category}</span>
                   <ArrowRight size={15} className="work-arrow" />
                 </button>
               </li>

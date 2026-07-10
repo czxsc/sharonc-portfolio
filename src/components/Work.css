@@ -11,7 +11,10 @@
 }
 .work-frame {
   position: relative;
-  aspect-ratio: 16 / 10;
+  /* sized so the body below the ~34px chrome bar lands at ≈1.86 —
+     little_wonder's native ratio, the one shot that can't crop;
+     the other screenshots tolerate the slight cover trim */
+  aspect-ratio: 16 / 9.5;
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--line);
@@ -165,7 +168,27 @@
   letter-spacing: -0.015em;
   line-height: 1.1;
   margin-right: auto;
+  /* stay on one line; the category label ellipsizes instead */
+  white-space: nowrap;
   transition: color var(--dur) var(--ease);
+}
+/* discipline label — always visible so the list scans without
+   hovering or opening anything */
+.work-cat {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color var(--dur) var(--ease);
+}
+.work-item.is-active .work-cat {
+  color: var(--ink-soft);
 }
 .work-arrow {
   align-self: center;

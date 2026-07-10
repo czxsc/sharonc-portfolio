@@ -20,6 +20,10 @@
   --sage: #3f4a3e;
   --navy: #2c3a4a;
 
+  /* — Color: status dots (project pills) — */
+  --ok: #4e8a57;   /* completed / live */
+  --wip: #c9973b;  /* in development */
+
   /* — Color: liquid fill (hero pour transition) — */
   --liquid: #332c29;          /* espresso pool — dark so on-liquid text stands out */
   --liquid-soft: #5a4b3e;     /* crema crest above the liquid surface */
@@ -87,6 +91,8 @@
     --espresso-deep: #d9b89e;
     --sage: #a3b39a;
     --navy: #97b3c8;
+    --ok: #82b98b;
+    --wip: #d9b06a;
     /* liquid lifts a touch so the frame separates from the dark ground */
     --liquid: #372f2a;
     --liquid-soft: #574a3f;

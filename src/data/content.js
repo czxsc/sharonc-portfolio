@@ -5,7 +5,13 @@
 import portfolioProjectImg from '../assets/portfolio_project_img.jpg';
 import dishcoveryImg from '../assets/dishcovery_demo.jpg';
 import artificerImg from '../assets/artificer_placeholder.jpg';
-import cuairRadioImg from '../assets/cuair_cropped.png';
+import cuairGcsImg from '../assets/cuair.png';
+import dpkMissionPlannerImg from '../assets/dpk_mission_planner.png';
+import dpkAccelImg from '../assets/dpk_accel_cropped.png';
+import dpkGuideImg from '../assets/dpk_guide.png';
+import dpkRadioImg from '../assets/dpk_radio.png';
+import dpkServosImg from '../assets/dpk_servos.png';
+import dpkFlightModesImg from '../assets/dpk_flightmodes.png';
 import littleWonderImg from '../assets/little_wonder.png';
 import pokeleetDashboardImg from '../assets/pokeleet_dashboard_static.png';
 
@@ -96,11 +102,17 @@ export const experience = [
    - subtitle: one line under the title
    - intro:    short paragraph under the hero media
    - links:    external chips, e.g. [{ label: 'GitHub', href }]
-   - meta:     labeled rows — Product / My role / Timeline / Skills
+   - meta:     labeled rows — Category / My role / Timeline / Skills
                (+ Team only where it was a team project)
    - sections: [{ heading, body: [paragraphs], facts?: [{title, text}],
-                  media?: { src?, caption } }] — media without src
-               renders a placeholder panel
+                  points?: [{icon, text}], stack?, flow?,
+                  compare?: { before, after: {src, label}, caption },
+                  media?: { src?, fit?, caption },
+                  gallery?: [{src, caption}] }] — media without src
+               renders a placeholder panel; fit shows the whole image
+               instead of the 21:9 crop; points renders icon tiles;
+               compare renders a labeled before/after pair;
+               stack renders StackDiagram.jsx, flow FlowDiagram.jsx
 
    TODO(sharon): all case copy below is placeholder — replace with the
    real story per project, plus real links and media. */
@@ -109,7 +121,7 @@ export const projects = [
     index: '01',
     name: 'Artificer',
     slug: 'artificer',
-    category: 'Design engineering',
+    category: 'ML · Full-Stack',
     year: '2026',
     blurb: 'ML powered app to scan artworks and learn their history.',
     tech: ['React', 'TypeScript', 'Claude API'],
@@ -236,7 +248,7 @@ export const projects = [
     index: '02',
     name: 'Portfolio',
     slug: 'portfolio',
-    category: 'Web · this site',
+    category: 'Frontend · Design',
     year: '2026',
     blurb: 'Personal portfolio site to learn about me and my work.',
     tech: ['React', 'Vite', 'Motion', 'CSS'],
@@ -250,7 +262,7 @@ export const projects = [
         'This portfolio began as a Framer prototype and was rebuilt from scratch in code — partly to own every detail, mostly because the details are the point. It’s a React + Vite site with a paper-and-ink design system and hand-tuned motion throughout.',
       links: [{ label: 'GitHub', href: '#' }],
       meta: [
-        { label: 'Product', value: 'Personal website' },
+        { label: 'Category', value: 'Frontend, Design' },
         { label: 'My role', value: 'Design & engineering' },
         { label: 'Timeline', value: '2026' },
         { label: 'Skills', value: 'React, Vite, Motion, CSS, editorial design' },
@@ -294,45 +306,504 @@ export const projects = [
   },
   {
     index: '03',
-    name: 'Project DPK',
-    slug: 'project-dpk',
-    category: 'Software',
+    name: 'Preflight',
+    slug: 'preflight',
+    category: 'Full-Stack · Autonomous Systems',
     year: '2025',
-    blurb: 'Sensor calibration support for CUAIR\'s custom GCS',
-    tech: ['Python', 'SQL', 'Node.js'],
-    image: cuairRadioImg,
+    blurb: 'Hardware setup & calibration suite for CUAIR\'s custom GCS',
+    tech: ['Svelte', 'Flask', 'MAVLink'],
+    image: cuairGcsImg,
     tone: ['var(--tone-c1)', 'var(--tone-c2)'],
     href: '#work',
     page: {
       status: 'Completed',
-      subtitle: 'Sensor calibration support for CUAIR’s custom ground control station.',
+      // show the whole GCS screenshot instead of the 21:9 hero crop
+      hero: { fit: true },
+      subtitle: 'Bringing pre-flight hardware setup into CUAIR’s custom ground control station.',
       intro:
-        'On Cornell’s Unmanned Aerial Systems team, I built calibration tooling for the autopilot’s sensor stack inside our custom ground control station — turning a manual, error-prone pre-flight ritual into a guided, logged workflow.',
-      links: [{ label: 'CUAIR', href: '#' }],
+        'Every CUAIR test flight used to be divided between two different software platforms. Our team flies a custom ground control station, but hardware setup features, such as sensor calibration, radio checks, servo and flight-mode configuration, still lived in Mission Planner. Preflight — internally nicknamed DPK, a name that survives in the code — moved that entire setup layer into our own GCS, where I built the main five workflows end to end, from the Svelte interface down to the MAVLink commands on the wire.',
+      links: [{ label: 'CUAIR', href: 'https://cuair.org' }],
       meta: [
-        { label: 'Product', value: 'Ground control station tooling' },
+        { label: 'Category', value: 'Full-Stack, Autonomous Systems' },
         { label: 'My role', value: 'Autopilot software engineer' },
         { label: 'Timeline', value: '2025' },
-        { label: 'Skills', value: 'Python, SQL, Node.js, data pipelines' },
+        { label: 'Skills', value: 'Svelte, Python, Flask, MAVProxy, MAVLink' },
       ],
       sections: [
         {
-          heading: 'Problem: Drifting sensors, manual fixes',
+          heading: 'Problem: Two ground stations, one 45-minute clock',
           body: [
-            'Autopilot accuracy depends on well-calibrated sensors, and calibration state drifted between flight days. The existing process was manual, undocumented, and easy to get subtly wrong — the kind of wrong you only discover in the air.',
+            'Mission Planner is the de facto ground station for ArduPilot teams, and it does everything. So even with our team\'s custom GCS flying the plane autonomously, hardware setup kept us still tethered to Mission Planner. Every test flight required setup in one tool then migrating to the other, and when this year’s competition rules changed to include setup into the 45-minute mission window, that workflow became a significant problem.',
+            'Setting up in Mission Planner posed four large problems to our team: ',
+          ],
+          points: [
+            { icon: 'freeze', text: 'Older, clunkier software that often crashes and freezes' },
+            { icon: 'platform', text: 'Only Windows compatible software on a largely-Mac team' },
+            { icon: 'guide', text: 'Guidance lived in forum threads and docs, not the tool itself' },
+            { icon: 'clock', text: 'Switching between platforms is timely, with setup now in the window' },
+          ],
+          compare: {
+            // the MP asset is pre-trimmed to content (no title bar or
+            // dead space), so a center crop only shaves a few px
+            before: { src: dpkMissionPlannerImg, label: 'Before · Mission Planner', position: 'center' },
+            // fit: the wider GCS shot letterboxes a hair instead of
+            // losing its modal edge to the crop
+            after: { src: dpkAccelImg, label: 'After · Preflight', fit: true },
+            caption:
+              'The same pre-flight calibration — Mission Planner’s configuration tree vs. Preflight’s guided window inside our GCS.',
+          },
+        },
+        {
+          heading: 'Research: Scope by pain, not by feature list',
+          body: [
+            'Rather than porting Mission Planner screen by screen, I let those survey answers set the scope — the goal was to fix the pain, not replicate the menu tree.',
+          ],
+          facts: [
+            {
+              title: 'Five workflows, deliberately',
+              text: 'Accelerometer calibration, large-vehicle compass calibration, radio calibration, servo outputs, and flight modes — the setup steps every flight needs, and nothing else.',
+            },
+            {
+              title: 'A window, not a sidebar',
+              text: 'Hardware setup happens before flight, so it lives in its own draggable modal instead of permanently crowding flight-critical telemetry on the main display.',
+            },
+            {
+              title: 'Guidance built in',
+              text: 'A dedicated Guide tab and per-step prompts replace the documentation shuffle — the tool teaches the process it automates.',
+            },
           ],
         },
         {
-          heading: 'Solution: Calibration in the loop',
+          heading: 'Implementation: One command’s round trip',
           body: [
-            'The tooling walks operators through each sensor’s calibration, validates readings against expected ranges as they come in, and records every run to the flight database — so a bad calibration is caught on the ground and every flight has a traceable baseline.',
+            'The GCS frontend is a Svelte single-page app; the backend is a Flask REST API that MAVProxy hosts on a background thread. Preflight adds a layer to each: a five-tab setup window in the UI, five Flask blueprints behind it, and a new MAVProxy module — dpk.py — that owns every MAVLink conversation. The boundaries are strict: nothing above dpk.py knows MAVLink exists, and nothing below the Flask views knows there’s a UI.',
+            'Live feedback rides a single polling loop: every 500 ms the app asks each status endpoint, writes the answers into Svelte stores, and the tabs re-render reactively — so step prompts and progress update in real time while a calibration runs on the plane. Explore the architecture below.',
           ],
-          media: { caption: 'Calibration workflow in the GCS — screenshots pending team approval.' },
+          // renders the interactive layered flow (FlowDiagram.jsx)
+          flow: {
+            title: 'One command’s round trip',
+            hint: 'Hover or tap any file to see what it sends — and what it listens for.',
+            journey: [
+              {
+                title: 'The tab asks',
+                note: 'A click in the modal → DpkActions → SendAPI fires a fetch() POST.',
+              },
+              {
+                title: 'Flask validates',
+                note: 'The blueprint checks and shapes the JSON, then calls the dpk singleton.',
+              },
+              {
+                title: 'dpk.py transmits',
+                note: 'The module turns it into COMMAND_LONG / PARAM_SET on the MAVLink radio.',
+              },
+              {
+                title: 'Status climbs back',
+                note: 'Inbound packets update module state; the 500 ms poll lifts it into the stores and the UI re-renders.',
+              },
+            ],
+            // diagram-specific hues (not site tokens): each layer needs
+            // its own hue family — blue / green / rust / amber
+            layers: [
+              {
+                id: 'ui',
+                name: 'Svelte UI',
+                file: 'modalWindow.svelte',
+                note: 'a draggable five-tab setup window, opened from the flight display',
+                tone: '#3e6b9e',
+                rows: [
+                  {
+                    label: 'Tabs',
+                    nodes: [
+                      {
+                        id: 'guide',
+                        label: 'GuideTab.svelte',
+                        feature: ['all'],
+                        detail: {
+                          summary: 'Plain-language setup instructions, written into the tool itself.',
+                          points: [
+                            { tag: 'role', text: 'The onboarding fix: what each workflow does, when to run it, and what “good” looks like — no forum tabs required.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'cal-tab',
+                        label: 'Calibration.svelte',
+                        feature: ['accel', 'mag'],
+                        detail: {
+                          summary: 'The guided calibration tab: six-position accelerometer flow plus large-vehicle compass cal.',
+                          points: [
+                            { tag: 'sends', text: 'startAccel() · confirmAccelPosition() — begin the flow, then confirm each vehicle position.' },
+                            { tag: 'sends', text: 'sendLargeMagCalib(yaw) — submit the vehicle’s measured heading for fixed-yaw compass cal.' },
+                            { tag: 'listens', text: '$accelStatusStore · $accelStepStore — the live step prompt (“Place vehicle LEVEL”) and progress.' },
+                            { tag: 'listens', text: '$magStatusStore — IN_PROGRESS → SUCCESS / FAILED, straight from the autopilot’s reports.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'radio-tab',
+                        label: 'RadioCalibration.svelte',
+                        feature: ['radio'],
+                        detail: {
+                          summary: 'A live stick monitor — channel bars move as the pilot sweeps the transmitter.',
+                          points: [
+                            { tag: 'sends', text: 'startRadioCalibration() · finishRadioCalibration(snapshot) — open and close the capture window.' },
+                            { tag: 'listens', text: '$rollCurrent … $throttleMax — current, min, and max for roll / pitch / throttle / yaw.' },
+                            { tag: 'listens', text: '$radio5 – $radio14 — the auxiliary channels, live.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'modes-tab',
+                        label: 'FlightModes.svelte',
+                        feature: ['modes'],
+                        detail: {
+                          summary: 'Six FLTMODE slots, edited locally and written to the plane on an explicit Save.',
+                          points: [
+                            { tag: 'sends', text: 'saveFlightModes(list) — POSTs exactly six { slot, mode } entries.' },
+                            { tag: 'role', text: 'A one-shot parameter write — no live polling needed, unlike the calibration tabs.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'servo-tab',
+                        label: 'ServoOutput.svelte',
+                        feature: ['servo'],
+                        detail: {
+                          summary: 'A per-channel servo table: function, min / trim / max PWM, and reverse.',
+                          points: [
+                            { tag: 'sends', text: 'saveServoOutputs(channels) — one { channel, function, reversed, min, trim, max } row per servo.' },
+                            { tag: 'role', text: 'Explicit Save keeps half-finished edits off the aircraft.' },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    label: 'Wiring',
+                    nodes: [
+                      {
+                        id: 'store',
+                        label: 'DpkStore.js',
+                        feature: ['all'],
+                        detail: {
+                          summary: 'Svelte writables — the single source of truth every tab subscribes to.',
+                          points: [
+                            { tag: 'state', text: 'Accel: step · status · in-progress.' },
+                            { tag: 'state', text: 'Compass: calibration status · vehicle yaw.' },
+                            { tag: 'state', text: 'Radio: current / min / max / reverse for the four primaries, plus aux channels 5–14.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'actions',
+                        label: 'DpkActions.js',
+                        feature: ['all'],
+                        detail: {
+                          summary: 'A thin action layer between components and the network.',
+                          points: [
+                            { tag: 'role', text: 'startAccel, saveFlightModes, finishRadioCalibration… — components trigger intents; they never call fetch directly.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'send',
+                        label: 'SendAPI.js',
+                        feature: ['all'],
+                        detail: {
+                          summary: 'The write path: fetch() POSTs to the five Flask routes.',
+                          points: [
+                            { tag: 'sends', text: 'POST /accelcal_start · /magcal_large · /radiocal_start · /flight_modes · /servo_output, JSON bodies shaped per feature.' },
+                            { tag: 'role', text: 'Raises a success or failure toast on every call — the operator always gets an answer.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'receive',
+                        label: 'ReceiveAPI.js',
+                        feature: ['all'],
+                        detail: {
+                          summary: 'The read path: three status pollers keep the stores fresh.',
+                          points: [
+                            { tag: 'listens', text: 'GET /accelcal_status · /magcal_status · /radiocal_status — then .set()s the matching stores.' },
+                            { tag: 'role', text: 'startReceive(500) — one interval drives Preflight status alongside telemetry, heartbeat, and mode polling.' },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                id: 'flask',
+                name: 'Flask REST API',
+                file: 'mavproxy_cuairapi/views',
+                note: 'one blueprint per feature on localhost:8001 — validate, delegate, JSON out',
+                tone: '#55855a',
+                rows: [
+                  {
+                    label: 'Views',
+                    nodes: [
+                      {
+                        id: 'accel-view',
+                        label: 'accelerometer.py',
+                        feature: ['accel'],
+                        detail: {
+                          summary: 'The guided accelerometer flow, as three routes.',
+                          points: [
+                            { tag: 'routes', text: 'POST /accelcal_start · POST /accelcal_next · GET /accelcal_status.' },
+                            { tag: 'role', text: 'Delegates to start_accel_calibration() and send_accel_next(); status returns { status, step, in_progress }.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'mag-view',
+                        label: 'magcal.py',
+                        feature: ['mag'],
+                        detail: {
+                          summary: 'Large-vehicle compass calibration from a known heading.',
+                          points: [
+                            { tag: 'routes', text: 'POST /magcal_large · GET /magcal_status → { status, detail }.' },
+                            { tag: 'guards', text: 'Rejects requests with no yaw value before anything reaches the plane.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'radio-view',
+                        label: 'radio.py',
+                        feature: ['radio'],
+                        detail: {
+                          summary: 'Start, finish, and observe radio calibration.',
+                          points: [
+                            { tag: 'routes', text: 'POST /radiocal_start · POST /radiocal_finish · GET /radiocal_status.' },
+                            { tag: 'role', text: 'Finish accepts the UI’s snapshot and returns the saved channel ranges.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'modes-view',
+                        label: 'flightmodes.py',
+                        feature: ['modes'],
+                        detail: {
+                          summary: 'Flight-mode assignment as a single validated write.',
+                          points: [
+                            { tag: 'routes', text: 'POST /flight_modes.' },
+                            { tag: 'guards', text: 'Exactly six entries, each with a mode name — anything else is a 400, not a radio packet.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'servo-view',
+                        label: 'servooutputs.py',
+                        feature: ['servo'],
+                        detail: {
+                          summary: 'Servo configuration, checked against ArduPilot’s own vocabulary.',
+                          points: [
+                            { tag: 'routes', text: 'POST /servo_output.' },
+                            { tag: 'guards', text: 'Owns SERVO_FUNCTION_MAP (name → ArduPilot int) and enforces 500 ≤ min ≤ trim ≤ max ≤ 2200 per channel.' },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                id: 'dpk',
+                name: 'MAVProxy module',
+                file: 'dpk.py',
+                note: 'a singleton state machine — the only layer that speaks MAVLink',
+                tone: '#b05438',
+                rows: [
+                  {
+                    label: 'Sends',
+                    nodes: [
+                      {
+                        id: 'accel-fn',
+                        label: 'start_accel_calibration()',
+                        feature: ['accel'],
+                        detail: {
+                          summary: 'Drives the six-position accelerometer sequence.',
+                          points: [
+                            { tag: 'sends', text: 'MAV_CMD_PREFLIGHT_CALIBRATION — kicks off the calibration onboard.' },
+                            { tag: 'sends', text: 'MAV_CMD_ACCELCAL_VEHICLE_POS — send_accel_next() confirms each position as the operator places the plane.' },
+                            { tag: 'state', text: 'Advances the step optimistically; the autopilot’s STATUSTEXT corrects it if they ever disagree.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'mag-fn',
+                        label: 'largeVehicleMagCal(yaw)',
+                        feature: ['mag'],
+                        detail: {
+                          summary: 'Compass calibration for a plane too large to spin in your hands.',
+                          points: [
+                            { tag: 'sends', text: 'MAV_CMD_FIXED_MAG_CAL_YAW — calibrates from the measured heading instead of rotations.' },
+                            { tag: 'sends', text: 'MAV_CMD_DO_ACCEPT_MAG_CAL — auto-accepts a successful result the autopilot didn’t autosave.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'radio-fn',
+                        label: 'start_radio_calibration()',
+                        feature: ['radio'],
+                        detail: {
+                          summary: 'Opens the capture window and tracks stick extremes.',
+                          points: [
+                            { tag: 'sends', text: 'MAV_CMD_PREFLIGHT_CALIBRATION (param4 = 1) — puts the autopilot in radio-cal mode.' },
+                            { tag: 'state', text: 'Tracks running min / max per channel from live RC_CHANNELS while the pilot sweeps; finish snapshots the ranges.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'modes-fn',
+                        label: 'set_flight_modes()',
+                        feature: ['modes'],
+                        detail: {
+                          summary: 'Writes the six mode slots as autopilot parameters.',
+                          points: [
+                            { tag: 'sends', text: 'PARAM_SET FLTMODE1–6 — one parameter write per slot.' },
+                            { tag: 'guards', text: 'Resolves names against the autopilot’s own mode mapping — unknown modes never leave the ground.' },
+                          ],
+                        },
+                      },
+                      {
+                        id: 'servo-fn',
+                        label: 'set_servo_outputs()',
+                        feature: ['servo'],
+                        detail: {
+                          summary: 'Writes each channel’s full servo configuration.',
+                          points: [
+                            { tag: 'sends', text: 'PARAM_SET SERVOn_FUNCTION · _MIN · _TRIM · _MAX · _REVERSED — five parameters per channel.' },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    label: 'Listens',
+                    nodes: [
+                      {
+                        id: 'packet-fn',
+                        label: 'mavlink_packet(m)',
+                        feature: ['all'],
+                        detail: {
+                          summary: 'Called for every inbound MAVLink message — the ear of the whole system.',
+                          points: [
+                            { tag: 'listens', text: 'MAG_CAL_PROGRESS / MAG_CAL_REPORT — compass percent-complete, fitness, pass / fail.' },
+                            { tag: 'listens', text: 'COMMAND_ACK — accepted / denied verdicts for the mag and radio commands.' },
+                            { tag: 'listens', text: 'RC_CHANNELS — live stick positions; min / max tracking while radio cal runs.' },
+                            { tag: 'listens', text: 'STATUSTEXT — “Place vehicle LEVEL”… step prompts and calibration success / failure text.' },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                id: 'plane',
+                name: 'Autopilot',
+                file: 'ArduPilot',
+                note: 'runs the calibration onboard and streams progress back over the radio',
+                tone: '#c99a3d',
+                terminal: true,
+              },
+            ],
+            channels: [
+              {
+                via: 'fetch() over HTTP · localhost:8001',
+                down: 'POST — start · next · save',
+                up: 'GET *_status — every 500 ms',
+              },
+              {
+                via: 'get_dpk_mod() · in-process singleton',
+                down: 'direct method calls',
+                up: 'status dicts, read on demand',
+              },
+              {
+                via: 'pymavlink · MAVLink over the radio link',
+                down: 'COMMAND_LONG · PARAM_SET',
+                up: 'ACKs · progress · RC_CHANNELS · STATUSTEXT',
+              },
+            ],
+          },
         },
         {
-          heading: 'Impact: Flight-day confidence',
+          heading: 'Engineering decisions',
           body: [
-            'Pre-flight sensor checks went from tribal knowledge to a repeatable procedure any team member can run, and logged calibration history made post-flight debugging meaningfully faster.',
+            'Three choices shaped the build more than any feature.',
+          ],
+          facts: [
+            {
+              title: 'A state machine, not a wrapper',
+              text: 'dpk.py doesn’t fire commands and hope. It holds each calibration as explicit state, updated only by what the autopilot reports back — so the UI reflects what the plane said, never what we assumed.',
+            },
+            {
+              title: 'Polling over push',
+              text: 'One 500 ms GET loop rides the existing telemetry poller instead of introducing websockets. It’s trivially debuggable at a windy flight line, and a dropped response just means the next tick catches up.',
+            },
+            {
+              title: 'Validate on the ground',
+              text: 'The Flask layer rejects bad input before it becomes a radio packet: exactly six flight modes, servo functions checked against a canonical map, PWM ranges pinned with min ≤ trim ≤ max.',
+            },
+          ],
+        },
+        {
+          heading: 'Challenges: Three learning curves',
+          body: [
+            'Preflight was my first feature inside a team-scale codebase, and nearly every layer of it was new to me. The architecture diagram above is, in a real sense, the artifact of working through that — the map I wish I’d been handed on day one.',
+          ],
+          subs: [
+            {
+              title: 'A codebase with history',
+              text: 'The GCS is the accumulated work of many generations of CUAIR members. I spent the first weeks reading and diagramming before writing a line — how MAVProxy autoloads its modules, how the Flask server threads inside it, how the frontend layers stay separated.',
+            },
+            {
+              title: 'Two unfamiliar tools',
+              text: 'I hadn’t touched Svelte or MAVLink before. I picked up Svelte’s reactive stores by tracing the GCS’s existing tabs, and MAVLink by reading ArduPilot docs against live packet logs.',
+            },
+            {
+              title: 'Making async feel live',
+              text: 'Calibration is a conversation — commands out, STATUSTEXT and ACKs back, on the autopilot’s schedule. Understanding that packet flow well enough to design the polling loop and state machine took the longest.',
+            },
+          ],
+        },
+        {
+          heading: 'Impact: Minutes, not sessions',
+          body: [
+            'Preflight shipped for the 2025 season and changed who can run a flight line, not just how fast. Setup used to require a Windows-equipped autopilot member with Mission Planner at every test flight; now any team member — autopilot or not — can lead it from their own laptop.',
+          ],
+          facts: [
+            {
+              title: '10–15 minutes → under 3',
+              text: 'Full pre-flight hardware setup now happens inside our GCS — comfortably inside the competition’s 45-minute mission window, with no tool-switching.',
+            },
+            {
+              title: 'Two semesters → three months',
+              text: 'New members used to shadow for most of a year before running setup alone. With the guided flows, they now lead ground tests solo within a semester.',
+            },
+            {
+              title: 'One ground station, any laptop',
+              text: 'Our GCS runs on macOS and Windows alike, with nothing extra to install — Mission Planner is no longer required equipment, and comes out only for rare edge cases.',
+            },
+          ],
+          gallery: [
+            {
+              src: dpkGuideImg,
+              caption: 'Guide tab — plain-language instructions for every workflow, built into the window.',
+            },
+            {
+              src: dpkRadioImg,
+              caption: 'Radio tab — live stick positions, with min / max captured as the pilot sweeps.',
+            },
+            {
+              src: dpkServosImg,
+              caption: 'Servos tab — per-channel function, PWM range, and reverse.',
+            },
+            {
+              src: dpkFlightModesImg,
+              caption: 'Flight Modes tab — six FLTMODE slots, written to the autopilot on Save.',
+            },
           ],
         },
       ],
@@ -342,7 +813,7 @@ export const projects = [
     index: '04',
     name: 'Little Wonder',
     slug: 'little-wonder',
-    category: 'Product design',
+    category: 'Game Design',
     year: '2025',
     blurb: 'Platformer action game set in a fantasy acorn world',
     tech: ['Java'],
@@ -356,7 +827,7 @@ export const projects = [
         'Little Wonder is a 2D platformer built in Java with a small team — a forest adventure where you play an acorn sprite finding its way home. I owned character movement and level design, the two systems that decide whether a platformer feels good.',
       links: [{ label: 'Play', href: '#' }],
       meta: [
-        { label: 'Product', value: 'Desktop game' },
+        { label: 'Category', value: 'Game Design & Development' },
         { label: 'My role', value: 'Design Lead & Game Programmer' },
         { label: 'Timeline', value: 'Spring 2026' },
         { label: 'Skills', value: 'Java, game feel, level design' },
@@ -403,7 +874,7 @@ export const projects = [
     index: '05',
     name: 'Dishcovery',
     slug: 'dishcovery',
-    category: 'Web app',
+    category: 'ML · Full-Stack',
     year: '2025',
     blurb: 'Restaurant recommendations from food, ambiance, and price queries.',
     tech: ['React', 'Python', 'SVD', 'LLM'],
@@ -417,7 +888,7 @@ export const projects = [
         'Dishcovery answers the question review sites can’t: “somewhere quiet with great hand-pulled noodles, under $20.” It parses free-form queries about food, ambiance, and price, and ranks restaurants against thousands of reviews.',
       links: [{ label: 'Demo', href: '#' }, { label: 'GitHub', href: '#' }],
       meta: [
-        { label: 'Product', value: 'Web app' },
+        { label: 'Category', value: 'Machine Learning, Full-Stack' },
         { label: 'My role', value: 'ML & frontend' },
         { label: 'Timeline', value: '2025' },
         { label: 'Skills', value: 'React, Python, SVD, LLM integration' },
@@ -464,7 +935,7 @@ export const projects = [
     index: '06',
     name: 'PokeLeet',
     slug: 'pokeleet',
-    category: 'Experiment',
+    category: 'Frontend · Game Design',
     year: '2024',
     blurb: 'Gamified, pokemon-themed Leetcode tracker.',
     tech: ['JavaScript', 'CSS'],
@@ -478,7 +949,7 @@ export const projects = [
         'PokeLeet is a small experiment in motivation design: every solved Leetcode problem earns progress toward catching a Pokémon, with harder problems yielding rarer catches. Built to make a grind feel like a game — mostly for me, then for friends.',
       links: [{ label: 'GitHub', href: '#' }],
       meta: [
-        { label: 'Product', value: 'Browser app' },
+        { label: 'Category', value: 'Frontend, Game Design' },
         { label: 'My role', value: 'Design & engineering' },
         { label: 'Timeline', value: '2024' },
         { label: 'Skills', value: 'JavaScript, CSS, gamification' },

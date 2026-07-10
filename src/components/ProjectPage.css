@@ -51,7 +51,12 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 0;
+  /* paper pill so the label doesn't blend into content scrolling
+     beneath; negative margin keeps the ring on the content edge */
+  padding: 5px 20px 5px 5px;
+  margin-left: -5px;
+  border-radius: 999px;
+  background: var(--paper);
   font-family: var(--mono);
   font-size: var(--fs-label);
   letter-spacing: 0.18em;
@@ -132,6 +137,14 @@
   border-radius: 50%;
   background: var(--espresso);
 }
+/* dot color tracks the status: green = out the door, yellow = in progress */
+.pp-status[data-status='Completed']::before,
+.pp-status[data-status='Live']::before {
+  background: var(--ok);
+}
+.pp-status[data-status='Developing']::before {
+  background: var(--wip);
+}
 
 /* ---------- media panels ---------- */
 .pp-media {
@@ -158,6 +171,16 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-faint);
+}
+/* fit: whole screenshot at its own ratio, centered on the page */
+.pp-media.is-fit img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 540px;
+  aspect-ratio: auto;
+  display: block;
+  margin-inline: auto;
 }
 .pp-media figcaption {
   margin-top: 10px;
@@ -259,6 +282,111 @@
   margin-top: var(--sp-4);
 }
 
+/* pain-point summary tiles (references/dpk/solution_ref.jpg):
+   quiet icon + one line each, two abreast */
+.pp-points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: var(--sp-4);
+}
+.pp-point {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  background: var(--paper-2);
+  border-radius: var(--radius);
+}
+.pp-point svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--espresso);
+}
+.pp-point p {
+  font-size: var(--fs-small);
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+/* two-up screenshot showcase at the end of a section */
+.pp-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+.pp-gallery .pp-media {
+  margin-top: 0;
+}
+/* the tab screenshots run ~1.9–2.1, so a 2:1 crop stays near-lossless
+   while keeping the grid rows even */
+.pp-gallery .pp-media img {
+  aspect-ratio: 2 / 1;
+}
+
+/* labeled before/after pair */
+.pp-compare {
+  margin: var(--sp-4) 0 0;
+}
+.pp-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+.pp-compare-label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.pp-compare-item:last-child .pp-compare-label {
+  color: var(--espresso);
+}
+.pp-compare-item img {
+  width: 100%;
+  /* 8:5 splits the difference between the two screenshots' ratios:
+     Mission Planner (1.57, pre-trimmed to content) center-crops by
+     only a few px; the DPK shot (1.67) uses `fit` to letterbox a
+     hair instead of losing its modal edge */
+  aspect-ratio: 8 / 5;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line-soft);
+  background: var(--paper-2);
+}
+.pp-compare figcaption {
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+/* stacked subsections (references/dpk/solution_ref.jpg's research
+   block): bold lead-in + paragraph, full width — a quieter rhythm
+   than the three-column facts grid */
+.pp-subs {
+  display: grid;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+  max-width: 72ch;
+}
+.pp-sub h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.pp-sub p {
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+
 /* three findings, ruled like the meta rows */
 .pp-facts {
   display: grid;
@@ -340,6 +468,11 @@
     grid-column: 1 / -1;
   }
   .pp-facts {
+    grid-template-columns: 1fr;
+  }
+  .pp-points,
+  .pp-gallery,
+  .pp-compare-grid {
     grid-template-columns: 1fr;
   }
   /* keep the fixed chrome clear of content on small screens */

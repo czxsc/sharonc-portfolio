@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { projects } from '../data/content.js';
 import { useOverlayPage } from '../hooks/useOverlayPage.js';
 import StackDiagram from './StackDiagram.jsx';
+import FlowDiagram from './FlowDiagram.jsx';
 import './ProjectPage.css';
 
 /* ------------------------------------------------------------------
@@ -17,6 +18,36 @@ import './ProjectPage.css';
    ------------------------------------------------------------------ */
 
 const CLOSE_MS = 300; // covers the .25s closing fade in ProjectPage.css
+
+/* small stroke icons for section.points tiles (pain-point summaries) */
+const POINT_ICONS = {
+  freeze: (
+    <>
+      <path d="M12 3.5 2.5 20h19L12 3.5z" />
+      <path d="M12 10v4.5" />
+      <circle cx="12" cy="17.4" r="0.4" fill="currentColor" />
+    </>
+  ),
+  platform: (
+    <>
+      <path d="M4.5 6h15v9.5h-15z" />
+      <path d="M2.5 18.5h19" />
+    </>
+  ),
+  guide: (
+    <>
+      <path d="M12 6.5C10 5 7.5 4.5 5 4.5v13c2.5 0 5 .5 7 2 2-1.5 4.5-2 7-2v-13c-2.5 0-5 .5-7 2z" />
+      <path d="M12 6.5v13" />
+    </>
+  ),
+  clock: (
+    <>
+      <circle cx="12" cy="13.5" r="7" />
+      <path d="M12 13.5v-4" />
+      <path d="M9.5 3h5" />
+    </>
+  ),
+};
 
 export default function ProjectPage({ index, onNavigate, onClose }) {
   const project = projects[index];
@@ -80,11 +111,15 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
               <h1>{project.name}</h1>
               <p className="pp-subtitle">{page.subtitle}</p>
             </div>
-            <span className="pp-status">{page.status}</span>
+            <span className="pp-status" data-status={page.status}>
+              {page.status}
+            </span>
           </header>
 
+          {/* page.hero can override the crop: { fit: true } shows the
+              whole image, { position: 'top' } keeps the top edge */}
           <Media
-            media={{ src: project.image }}
+            media={{ src: project.image, ...page.hero }}
             className="pp-hero"
             alt={`${project.name} preview`}
           />
@@ -126,6 +161,36 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
               {s.body.map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
+              {s.points && (
+                <div className="pp-points">
+                  {s.points.map((pt) => (
+                    <div className="pp-point" key={pt.text}>
+                      <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        {POINT_ICONS[pt.icon]}
+                      </svg>
+                      <p>{pt.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {s.subs && (
+                <div className="pp-subs">
+                  {s.subs.map((sub) => (
+                    <div className="pp-sub" key={sub.title}>
+                      <h3>{sub.title}</h3>
+                      <p>{sub.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
               {s.facts && (
                 <div className="pp-facts">
                   {s.facts.map((f) => (
@@ -137,7 +202,38 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
                 </div>
               )}
               {s.stack && <StackDiagram stack={s.stack} />}
+              {s.flow && <FlowDiagram flow={s.flow} />}
+              {s.compare && (
+                <figure className="pp-compare">
+                  <div className="pp-compare-grid">
+                    {[s.compare.before, s.compare.after].map((c) => (
+                      <div className="pp-compare-item" key={c.label}>
+                        <span className="pp-compare-label">{c.label}</span>
+                        <img
+                          src={c.src}
+                          alt=""
+                          loading="lazy"
+                          style={{
+                            objectPosition: c.position,
+                            objectFit: c.fit ? 'contain' : undefined,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {s.compare.caption && (
+                    <figcaption>{s.compare.caption}</figcaption>
+                  )}
+                </figure>
+              )}
               {s.media && <Media media={s.media} className="pp-panel" alt="" />}
+              {s.gallery && (
+                <div className="pp-gallery">
+                  {s.gallery.map((g) => (
+                    <Media key={g.caption} media={g} className="pp-panel" alt="" />
+                  ))}
+                </div>
+              )}
             </section>
           ))}
         </article>
@@ -170,12 +266,19 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
   );
 }
 
-/* media panel: real image when given, labeled placeholder otherwise */
+/* media panel: real image when given, labeled placeholder otherwise;
+   media.fit shows the whole image at its own ratio instead of the
+   21:9 crop (for screenshots that crop badly) */
 function Media({ media, className, alt }) {
   return (
-    <figure className={`pp-media ${className}`}>
+    <figure className={`pp-media ${className} ${media.fit ? 'is-fit' : ''}`}>
       {media.src ? (
-        <img src={media.src} alt={alt} loading="lazy" />
+        <img
+          src={media.src}
+          alt={alt}
+          loading="lazy"
+          style={media.position ? { objectPosition: media.position } : undefined}
+        />
       ) : (
         <div className="pp-media-ph">media — coming soon</div>
       )}
