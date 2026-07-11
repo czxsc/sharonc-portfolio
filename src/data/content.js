@@ -331,7 +331,7 @@ export const projects = [
       ],
       sections: [
         {
-          heading: 'Problem: Two ground stations, one 45-minute clock',
+          heading: 'Problem: Two ground stations',
           body: [
             'Mission Planner is the de facto ground station for ArduPilot teams, and it covers everything. So even with our team\'s custom Ground Control Station flying the plane autonomously, hardware setup kept us still tethered to Mission Planner. Every test flight required pre-flight configuration in one tool then migrating to the other. However, when this year’s competition rules changed to include setup into the 45-minute mission window, this workflow became a significant problem that has to change.',
             'Through surveying the team, I identified four key limitations of depending on Mission Planner for hardware setup:',
@@ -354,7 +354,7 @@ export const projects = [
           },
         },
         {
-          heading: 'Research: Scope by pain, not by feature list',
+          heading: 'Research: Redesigning for the team',
           body: [
             'Rather than directly moving Mission Planner\'s interface over, I redesigned the setup experience to best fit our team\'s needs. Integrating hardware setup into our GCS solved the platform-switching and Mac compatibility problems, while the interface itself was simplified to focus on the five setup tasks we actually perform, replacing cluttered menus and external documentation with a guided, intuitive experience.',
           ],
@@ -729,6 +729,30 @@ export const projects = [
           },
         },
         {
+          heading: 'Results: The finished window',
+          body: [
+            'The shipped setup window, tab by tab — guidance, radio, servos, and flight modes, all inside our GCS.',
+          ],
+          gallery: [
+            {
+              src: dpkGuideImg,
+              caption: 'Guide tab — plain-language instructions for every workflow, built into the window.',
+            },
+            {
+              src: dpkRadioImg,
+              caption: 'Radio tab — live stick positions, with min / max captured as the pilot sweeps.',
+            },
+            {
+              src: dpkServosImg,
+              caption: 'Servos tab — per-channel function, PWM range, and reverse.',
+            },
+            {
+              src: dpkFlightModesImg,
+              caption: 'Flight Modes tab — six FLTMODE slots, written to the autopilot on Save.',
+            },
+          ],
+        },
+        {
           heading: 'Engineering decisions',
           body: [
             'Three choices shaped the build more than any feature.',
@@ -785,24 +809,6 @@ export const projects = [
             {
               title: 'One ground station, any laptop',
               text: 'Our GCS runs on macOS and Windows alike, so Mission Planner is no longer required equipment, coming out only for rare edge cases.',
-            },
-          ],
-          gallery: [
-            {
-              src: dpkGuideImg,
-              caption: 'Guide tab — plain-language instructions for every workflow, built into the window.',
-            },
-            {
-              src: dpkRadioImg,
-              caption: 'Radio tab — live stick positions, with min / max captured as the pilot sweeps.',
-            },
-            {
-              src: dpkServosImg,
-              caption: 'Servos tab — per-channel function, PWM range, and reverse.',
-            },
-            {
-              src: dpkFlightModesImg,
-              caption: 'Flight Modes tab — six FLTMODE slots, written to the autopilot on Save.',
             },
           ],
         },

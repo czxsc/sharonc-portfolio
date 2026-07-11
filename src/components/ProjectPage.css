@@ -283,7 +283,7 @@
   margin-top: var(--sp-4);
 }
 
-/* pain-point summary tiles (references/dpk/solution_ref.jpg):
+/* pain-point summary tiles (src/assets/dpk/solution_ref.jpg):
    quiet icon + one line each, two abreast */
 .pp-points {
   display: grid;
@@ -369,7 +369,7 @@
   color: var(--ink-faint);
 }
 
-/* stacked subsections (references/dpk/solution_ref.jpg's research
+/* stacked subsections (src/assets/dpk/solution_ref.jpg's research
    block): bold lead-in + paragraph, full width — a quieter rhythm
    than the three-column facts grid */
 .pp-subs {
