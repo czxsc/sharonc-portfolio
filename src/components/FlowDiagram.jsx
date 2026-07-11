@@ -44,8 +44,11 @@ export default function FlowDiagram({ flow }) {
         if (e.pointerType !== 'touch') setActive(null);
       }}
       onClick={(e) => {
-        // tapping the background (not a chip) returns the default card
-        if (!e.target.closest('.fd-chip')) setActive(null);
+        // tapping the background returns the default card. Match the
+        // whole chip row, not just .fd-chip: on touch the click after a
+        // tap can retarget to the row container, and clearing on it
+        // would undo the selection the focus handler just made
+        if (!e.target.closest('.fd-chips')) setActive(null);
       }}
     >
       <div className="fd-scene">

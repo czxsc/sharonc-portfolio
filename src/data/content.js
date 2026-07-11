@@ -310,8 +310,8 @@ export const projects = [
     slug: 'preflight',
     category: 'Full-Stack · Autonomous Systems',
     year: '2025',
-    blurb: 'Hardware setup & calibration suite for CUAIR\'s custom GCS',
-    tech: ['Svelte', 'Flask', 'MAVLink'],
+    blurb: 'Hardware pre-flight setup for Cuair\'s custom GCS',
+    tech: ['Svelte', 'Python', 'Flask', 'MAVLink'],
     image: cuairGcsImg,
     tone: ['var(--tone-c1)', 'var(--tone-c2)'],
     href: '#work',
@@ -321,26 +321,26 @@ export const projects = [
       hero: { fit: true },
       subtitle: 'Bringing pre-flight hardware setup into CUAIR’s custom ground control station.',
       intro:
-        'Every CUAIR test flight used to be divided between two different software platforms. Our team flies a custom ground control station, but hardware setup features, such as sensor calibration, radio checks, servo and flight-mode configuration, still lived in Mission Planner. Preflight — internally nicknamed DPK, a name that survives in the code — moved that entire setup layer into our own GCS, where I built the main five workflows end to end, from the Svelte interface down to the MAVLink commands on the wire.',
+        'Every CUAIR test flight used to be divided between two different software platforms. Our team flies a custom ground control station, but hardware setup features, such as sensor calibration, radio checks, servo and flight-mode configuration, still lived in Mission Planner. Preflight moved that entire setup layer into our own GCS, where I built the main five workflows end to end, from the Svelte interface down to the MAVLink commands on the wire.',
       links: [{ label: 'CUAIR', href: 'https://cuair.org' }],
       meta: [
         { label: 'Category', value: 'Full-Stack, Autonomous Systems' },
-        { label: 'My role', value: 'Autopilot software engineer' },
-        { label: 'Timeline', value: '2025' },
+        { label: 'My role', value: 'Autopilot Team\nSoftware engineer' },
+        { label: 'Timeline', value: '2025-2026' },
         { label: 'Skills', value: 'Svelte, Python, Flask, MAVProxy, MAVLink' },
       ],
       sections: [
         {
           heading: 'Problem: Two ground stations, one 45-minute clock',
           body: [
-            'Mission Planner is the de facto ground station for ArduPilot teams, and it does everything. So even with our team\'s custom GCS flying the plane autonomously, hardware setup kept us still tethered to Mission Planner. Every test flight required setup in one tool then migrating to the other, and when this year’s competition rules changed to include setup into the 45-minute mission window, that workflow became a significant problem.',
-            'Setting up in Mission Planner posed four large problems to our team: ',
+            'Mission Planner is the de facto ground station for ArduPilot teams, and it covers everything. So even with our team\'s custom Ground Control Station flying the plane autonomously, hardware setup kept us still tethered to Mission Planner. Every test flight required pre-flight configuration in one tool then migrating to the other. However, when this year’s competition rules changed to include setup into the 45-minute mission window, this workflow became a significant problem that has to change.',
+            'Through surveying the team, I identified four key limitations of depending on Mission Planner for hardware setup:',
           ],
           points: [
             { icon: 'freeze', text: 'Older, clunkier software that often crashes and freezes' },
-            { icon: 'platform', text: 'Only Windows compatible software on a largely-Mac team' },
-            { icon: 'guide', text: 'Guidance lived in forum threads and docs, not the tool itself' },
-            { icon: 'clock', text: 'Switching between platforms is timely, with setup now in the window' },
+            { icon: 'platform', text: 'Windows-only compatibility on a largely-Mac team' },
+            { icon: 'guide', text: 'Guidance lived in forum threads and online docs, not the tool itself' },
+            { icon: 'clock', text: 'Switching between platforms is timely, with setup now on the clock' },
           ],
           compare: {
             // the MP asset is pre-trimmed to content (no title bar or
@@ -350,39 +350,39 @@ export const projects = [
             // losing its modal edge to the crop
             after: { src: dpkAccelImg, label: 'After · Preflight', fit: true },
             caption:
-              'The same pre-flight calibration — Mission Planner’s configuration tree vs. Preflight’s guided window inside our GCS.',
+              'Mission Planner’s hardware setup page vs. Preflight’s guided setup window inside our GCS.',
           },
         },
         {
           heading: 'Research: Scope by pain, not by feature list',
           body: [
-            'Rather than porting Mission Planner screen by screen, I let those survey answers set the scope — the goal was to fix the pain, not replicate the menu tree.',
+            'Rather than directly moving Mission Planner\'s interface over, I redesigned the setup experience to best fit our team\'s needs. Integrating hardware setup into our GCS solved the platform-switching and Mac compatibility problems, while the interface itself was simplified to focus on the five setup tasks we actually perform, replacing cluttered menus and external documentation with a guided, intuitive experience.',
           ],
           facts: [
             {
-              title: 'Five workflows, deliberately',
+              title: 'Simplified to the essential workflows',
               text: 'Accelerometer calibration, large-vehicle compass calibration, radio calibration, servo outputs, and flight modes — the setup steps every flight needs, and nothing else.',
             },
             {
               title: 'A window, not a sidebar',
-              text: 'Hardware setup happens before flight, so it lives in its own draggable modal instead of permanently crowding flight-critical telemetry on the main display.',
+              text: 'Hardware setup happens before flight, so it lives in its own separate draggable modal instead of permanently crowding flight-critical telemetry on the main display.',
             },
             {
               title: 'Guidance built in',
-              text: 'A dedicated Guide tab and per-step prompts replace the documentation shuffle — the tool teaches the process it automates.',
+              text: 'A dedicated Guide tab and per-step prompts replace the need to switch between online documentation and the GCS. ',
             },
           ],
         },
         {
           heading: 'Implementation: One command’s round trip',
           body: [
-            'The GCS frontend is a Svelte single-page app; the backend is a Flask REST API that MAVProxy hosts on a background thread. Preflight adds a layer to each: a five-tab setup window in the UI, five Flask blueprints behind it, and a new MAVProxy module — dpk.py — that owns every MAVLink conversation. The boundaries are strict: nothing above dpk.py knows MAVLink exists, and nothing below the Flask views knows there’s a UI.',
-            'Live feedback rides a single polling loop: every 500 ms the app asks each status endpoint, writes the answers into Svelte stores, and the tabs re-render reactively — so step prompts and progress update in real time while a calibration runs on the plane. Explore the architecture below.',
+            'The GCS frontend is a Svelte single-page app, and the backend is a Flask REST API that MAVProxy hosts on a background thread. Preflight adds a layer to each: a five-tab setup window in the UI, five Flask blueprints behind it, and a new MAVProxy module that owns the MAVLink communication. The boundaries are strict: nothing above dpk.py knows MAVLink exists, and nothing below the Flask views knows there’s a UI.',
+            'Live feedback rides a single polling loop. Every 500 ms the app asks each status endpoint, writes the answers into Svelte stores, and the tabs re-render reactively. This way, step prompts and progress update in real time while a calibration runs on the plane. The full architecture is shows below.',
           ],
           // renders the interactive layered flow (FlowDiagram.jsx)
           flow: {
             title: 'One command’s round trip',
-            hint: 'Hover or tap any file to see what it sends — and what it listens for.',
+            hint: 'Hover or tap any file to see what it sends and what it listens for.',
             journey: [
               {
                 title: 'The tab asks',
@@ -398,7 +398,7 @@ export const projects = [
               },
               {
                 title: 'Status climbs back',
-                note: 'Inbound packets update module state; the 500 ms poll lifts it into the stores and the UI re-renders.',
+                note: 'Inbound packets update module state; the poll lifts it into the stores and the UI re-renders.',
               },
             ],
             // diagram-specific hues (not site tokens): each layer needs
@@ -419,9 +419,9 @@ export const projects = [
                         label: 'GuideTab.svelte',
                         feature: ['all'],
                         detail: {
-                          summary: 'Plain-language setup instructions, written into the tool itself.',
+                          summary: 'Pre-flight setup instructions with the documentation directly written into the tool itself.',
                           points: [
-                            { tag: 'role', text: 'The onboarding fix: what each workflow does, when to run it, and what “good” looks like — no forum tabs required.' },
+                            { tag: 'role', text: 'The onboarding fix: this tab explains what each workflow does, when to run it, and detailed instructions for every step.' },
                           ],
                         },
                       },
@@ -430,7 +430,7 @@ export const projects = [
                         label: 'Calibration.svelte',
                         feature: ['accel', 'mag'],
                         detail: {
-                          summary: 'The guided calibration tab: six-position accelerometer flow plus large-vehicle compass cal.',
+                          summary: 'The accelerometer and compass calibration tab: includes the six-position accelerometer flow plus large-vehicle compass calibration.',
                           points: [
                             { tag: 'sends', text: 'startAccel() · confirmAccelPosition() — begin the flow, then confirm each vehicle position.' },
                             { tag: 'sends', text: 'sendLargeMagCalib(yaw) — submit the vehicle’s measured heading for fixed-yaw compass cal.' },
@@ -444,7 +444,7 @@ export const projects = [
                         label: 'RadioCalibration.svelte',
                         feature: ['radio'],
                         detail: {
-                          summary: 'A live stick monitor — channel bars move as the pilot sweeps the transmitter.',
+                          summary: 'Channel bars move as the pilot sweeps the transmitter, monitors the sticks and configures the min/max values.',
                           points: [
                             { tag: 'sends', text: 'startRadioCalibration() · finishRadioCalibration(snapshot) — open and close the capture window.' },
                             { tag: 'listens', text: '$rollCurrent … $throttleMax — current, min, and max for roll / pitch / throttle / yaw.' },
@@ -457,7 +457,7 @@ export const projects = [
                         label: 'FlightModes.svelte',
                         feature: ['modes'],
                         detail: {
-                          summary: 'Six FLTMODE slots, edited locally and written to the plane on an explicit Save.',
+                          summary: 'Sets up the six switches on the transmitter to custom set flight modes.',
                           points: [
                             { tag: 'sends', text: 'saveFlightModes(list) — POSTs exactly six { slot, mode } entries.' },
                             { tag: 'role', text: 'A one-shot parameter write — no live polling needed, unlike the calibration tabs.' },
@@ -469,7 +469,7 @@ export const projects = [
                         label: 'ServoOutput.svelte',
                         feature: ['servo'],
                         detail: {
-                          summary: 'A per-channel servo table: function, min / trim / max PWM, and reverse.',
+                          summary: 'A per-channel servo table to set up the function, min / trim / max PWM, and reverse state of each output.',
                           points: [
                             { tag: 'sends', text: 'saveServoOutputs(channels) — one { channel, function, reversed, min, trim, max } row per servo.' },
                             { tag: 'role', text: 'Explicit Save keeps half-finished edits off the aircraft.' },
@@ -486,7 +486,7 @@ export const projects = [
                         label: 'DpkStore.js',
                         feature: ['all'],
                         detail: {
-                          summary: 'Svelte writables — the single source of truth every tab subscribes to.',
+                          summary: 'Svelte writables are the single source of truth every tab subscribes to.',
                           points: [
                             { tag: 'state', text: 'Accel: step · status · in-progress.' },
                             { tag: 'state', text: 'Compass: calibration status · vehicle yaw.' },
@@ -537,7 +537,7 @@ export const projects = [
                 id: 'flask',
                 name: 'Flask REST API',
                 file: 'mavproxy_cuairapi/views',
-                note: 'one blueprint per feature on localhost:8001 — validate, delegate, JSON out',
+                note: 'one blueprint per feature to validate requests, delegate business logic, and return JSON responses',
                 tone: '#55855a',
                 rows: [
                   {
@@ -611,7 +611,7 @@ export const projects = [
                 id: 'dpk',
                 name: 'MAVProxy module',
                 file: 'dpk.py',
-                note: 'a singleton state machine — the only layer that speaks MAVLink',
+                note: 'a singleton state machine acts as the only layer that speaks MAVLink',
                 tone: '#b05438',
                 rows: [
                   {
@@ -736,7 +736,7 @@ export const projects = [
           facts: [
             {
               title: 'A state machine, not a wrapper',
-              text: 'dpk.py doesn’t fire commands and hope. It holds each calibration as explicit state, updated only by what the autopilot reports back — so the UI reflects what the plane said, never what we assumed.',
+              text: 'dpk.py doesn’t fire commands and hope. It holds each calibration as explicit state, updated only by what the autopilot reports back so the UI only reflects what the plane said.',
             },
             {
               title: 'Polling over push',
@@ -751,27 +751,27 @@ export const projects = [
         {
           heading: 'Challenges: Three learning curves',
           body: [
-            'Preflight was my first feature inside a team-scale codebase, and nearly every layer of it was new to me. The architecture diagram above is, in a real sense, the artifact of working through that — the map I wish I’d been handed on day one.',
+            'Preflight was my first full project inside such a large team-scale codebase, and nearly every layer of it was new to me. There was plenty of new skills I learned along the way, both new technical tools and strong engineering practices.',
           ],
           subs: [
             {
               title: 'A codebase with history',
-              text: 'The GCS is the accumulated work of many generations of CUAIR members. I spent the first weeks reading and diagramming before writing a line — how MAVProxy autoloads its modules, how the Flask server threads inside it, how the frontend layers stay separated.',
+              text: 'The GCS is the accumulated work of many generations of CUAIR members. I spent the first month just reading and trying to understand the project structure before writing a line.',
             },
             {
-              title: 'Two unfamiliar tools',
-              text: 'I hadn’t touched Svelte or MAVLink before. I picked up Svelte’s reactive stores by tracing the GCS’s existing tabs, and MAVLink by reading ArduPilot docs against live packet logs.',
+              title: 'Learning unfamiliar tools',
+              text: 'I hadn’t touched Svelte or MAVLink before so the beginning was definitely a steep learning curve. I picked up Svelte’s reactive stores by tracing the GCS’s existing tabs, and MAVLink by extensively reading MAVLink and ArduPilot docs.',
             },
             {
-              title: 'Making async feel live',
-              text: 'Calibration is a conversation — commands out, STATUSTEXT and ACKs back, on the autopilot’s schedule. Understanding that packet flow well enough to design the polling loop and state machine took the longest.',
+              title: 'Figuring out the polling loop',
+              text: 'Calibration is a conversation, you send commands out but also need to listen for status updates and flight controller values too. Understanding that packet flow well enough to design the polling loop and state machine took the longest.',
             },
           ],
         },
         {
-          heading: 'Impact: Minutes, not sessions',
+          heading: 'Impact: Time and Accessibility',
           body: [
-            'Preflight shipped for the 2025 season and changed who can run a flight line, not just how fast. Setup used to require a Windows-equipped autopilot member with Mission Planner at every test flight; now any team member — autopilot or not — can lead it from their own laptop.',
+            'Preflight shipped for the 2025 - 2026 season and changed who can run a flight line, not just how fast. Setup used to require a autopilot member and windows laptop with Mission Planner at every test flight. Now, any team member, even newer and non-autopilot members, can lead it from their own laptop.',
           ],
           facts: [
             {
@@ -784,7 +784,7 @@ export const projects = [
             },
             {
               title: 'One ground station, any laptop',
-              text: 'Our GCS runs on macOS and Windows alike, with nothing extra to install — Mission Planner is no longer required equipment, and comes out only for rare edge cases.',
+              text: 'Our GCS runs on macOS and Windows alike, so Mission Planner is no longer required equipment, coming out only for rare edge cases.',
             },
           ],
           gallery: [
