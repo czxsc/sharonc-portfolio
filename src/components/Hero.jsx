@@ -85,7 +85,7 @@ export default function Hero() {
           </p>
           <div className="hero-cta hero-anim" style={{ '--i': 4 }}>
             <a href="#work" className="btn btn-primary">
-              View selected work
+              View my work!
             </a>
             <a href={`mailto:${meta.email}`} className="ulink hero-email">
               {meta.email}

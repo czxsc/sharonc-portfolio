@@ -1,11 +1,11 @@
 import { contact, meta, links } from '../data/content.js';
-import { Sparkle } from './Doodles.jsx';
+import { Sparkle, Coffee, Heart } from './Doodles.jsx';
 import './Contact.css';
 
 const social = [
   { label: 'Email', href: links.email, note: meta.email },
-  { label: 'GitHub', href: links.github, note: 'github.com/…', todo: true },
-  { label: 'LinkedIn', href: links.linkedin, note: 'in/…', todo: true },
+  { label: 'GitHub', href: links.github, note: 'github.com/czxsc' },
+  { label: 'LinkedIn', href: links.linkedin, note: 'in/sharon-chen-692595211' },
   { label: 'Résumé', href: links.resume, note: 'PDF', todo: true },
 ];
 
@@ -54,7 +54,8 @@ export default function Contact() {
         <div className="container footer-inner">
           <span className="footer-mark">Sharon Chen</span>
           <span className="footer-meta">
-            Designed &amp; built by Sharon Chen · {new Date().getFullYear()}
+            Designed with <Coffee size={13} className="footer-icon" /> &amp;{' '}
+            <Heart size={13} className="footer-icon" /> by Sharon Chen · {new Date().getFullYear()}
           </span>
           <a href="#top" className="footer-top ulink">
             Back to top ↑

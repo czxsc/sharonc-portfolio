@@ -135,6 +135,16 @@ export function Sketchbook({ size = 24, ...p }) {
   );
 }
 
+export function Heart({ size = 24, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>
+      <g {...base}>
+        <path d="M12 20s-7-4.4-9.3-9A5 5 0 0 1 12 6a5 5 0 0 1 9.3 5c-2.3 4.6-9.3 9-9.3 9z" />
+      </g>
+    </svg>
+  );
+}
+
 export function Sparkle({ size = 24, ...p }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>

@@ -105,6 +105,15 @@
   letter-spacing: 0.08em;
   color: var(--ink-faint);
 }
+.footer-meta {
+  /* flex items shrink to min-content by default, which — without this —
+     wraps the sentence word-by-word instead of moving as one block */
+  white-space: nowrap;
+}
+.footer-icon {
+  vertical-align: -2px;
+  color: var(--espresso);
+}
 
 @media (max-width: 720px) {
   .contact-links {

@@ -48,6 +48,33 @@ const POINT_ICONS = {
       <path d="M9.5 3h5" />
     </>
   ),
+  scope: (
+    <>
+      <path d="M4 9V5h4" />
+      <path d="M20 9V5h-4" />
+      <path d="M4 15v4h4" />
+      <path d="M20 15v4h-4" />
+    </>
+  ),
+  performance: (
+    <>
+      <path d="M13 3 5 14h5l-1 7 8-11h-5l1-7z" />
+    </>
+  ),
+  identity: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M15 9l-2 6-6 2 2-6z" />
+    </>
+  ),
+  team: (
+    <>
+      <circle cx="9" cy="10" r="3.2" />
+      <circle cx="15" cy="10" r="3.2" />
+      <path d="M4.5 19c.6-3 2.6-4.7 4.9-4.7" />
+      <path d="M19.5 19c-.6-3-2.6-4.7-4.9-4.7" />
+    </>
+  ),
 };
 
 export default function ProjectPage({ index, onNavigate, onClose }) {

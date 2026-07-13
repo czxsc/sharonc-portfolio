@@ -105,7 +105,7 @@ export default function Work() {
     <section id="work" className="section work">
       <div className="container">
         <div className="section-head reveal">
-          <h2>Selected Work</h2>
+          <h2>Projects</h2>
           <div
             className="work-filters"
             role="group"

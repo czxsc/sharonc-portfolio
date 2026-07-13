@@ -1279,22 +1279,22 @@ export const projects = [
           body: [
             'This was the largest project any of us had built from scratch — 87 files and 35,000 lines across a single semester — and the biggest lessons were about scope and process as much as any one line of code.',
           ],
-          subs: [
+          points: [
             {
-              title: 'Scope, scope, scope',
-              text: 'We built the most ambitious game in the course, which was also the problem — a one-semester timeline isn’t built for a project this size, and we should have cut or refactored the pieces that didn’t earn their scope earlier than we did.',
+              icon: 'scope',
+              text: 'Scope, scope, scope — we built the most ambitious game in the course, and a one-semester timeline isn’t built for a project this size.',
             },
             {
-              title: 'Performance has to be a first-class concern',
-              text: 'A big map with dozens of enemies each firing volleys of projectiles isn’t something you can bolt performance onto afterward — keeping the game playable on lower-end hardware meant designing for it from early on.',
+              icon: 'performance',
+              text: 'A big map with dozens of enemies each firing volleys of projectiles meant performance had to be a first-class concern, not something bolted on afterward.',
             },
             {
-              title: 'Find the identity before the levels',
-              text: 'We designed and scrapped entire systems — passive abilities, several attack iterations, whole levels — because we hadn’t locked down what the game actually was before building around it. Traversal sometimes ate more of the pacing than combat did, and playtesting was the only way we caught it.',
+              icon: 'identity',
+              text: 'We designed and scrapped entire systems — passive abilities, attack iterations, whole levels — because we hadn’t locked down the game’s identity before building around it.',
             },
             {
-              title: 'Alignment across the team',
-              text: 'Everyone came in with a different art style, and reconciling that after the fact cost more time than agreeing on one direction up front would have. With several people on parallel feature branches, the biggest unlock was never a code pattern — it was documentation and planning that kept everyone’s work compatible.',
+              icon: 'team',
+              text: 'Everyone came in with a different art style, and with several people on parallel feature branches, documentation and planning mattered more than any code pattern.',
             },
           ],
         },
