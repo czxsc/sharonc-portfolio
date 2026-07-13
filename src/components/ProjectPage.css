@@ -43,11 +43,19 @@
   }
 }
 
-/* ---------- back button (sticky while the case scrolls) ---------- */
-.pp-back {
+/* ---------- topbar: back button + code/design toggle (sticky while
+   the case scrolls, so the toggle — and the swapped content just
+   below it — stays reachable without scrolling back up) ---------- */
+.pp-topbar {
   position: sticky;
   top: 22px;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.pp-back {
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -281,6 +289,50 @@
 }
 .pp-section .pp-media {
   margin-top: var(--sp-4);
+}
+
+/* ---------- code / design toggle ----------
+   segmented control, sitting in the sticky .pp-topbar beside Back so
+   it (and the swapped content just below it) stays in view while
+   scrolling (used by Little Wonder, and any future project split
+   across two angles); switches which run of sections renders between
+   the shared intro and the shared closing sections. */
+.pp-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-2);
+}
+.pp-toggle-btn {
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.pp-toggle-btn:hover:not(.is-active) {
+  color: var(--ink);
+}
+.pp-toggle-btn.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+/* replays a calm fade/rise whenever the toggle above switches branches */
+.pp-toggle-body {
+  animation: pp-toggle-in 0.4s var(--ease) both;
+}
+@keyframes pp-toggle-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 /* pain-point summary tiles (src/assets/dpk/solution_ref.jpg):

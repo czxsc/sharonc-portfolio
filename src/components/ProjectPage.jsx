@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { projects } from '../data/content.js';
 import { useOverlayPage } from '../hooks/useOverlayPage.js';
 import StackDiagram from './StackDiagram.jsx';
 import FlowDiagram from './FlowDiagram.jsx';
+import ArchMap from './ArchMap.jsx';
 import './ProjectPage.css';
 
 /* ------------------------------------------------------------------
@@ -61,12 +62,20 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
     focusRef: backRef,
   });
 
+  // which toggle.sections branch is showing (page.toggle.options[0] by
+  // default); only meaningful for projects that define page.toggle
+  const [view, setView] = useState(page.toggle?.options[0]?.id);
+
   const go = (dir) =>
     onNavigate((index + dir + projects.length) % projects.length);
 
-  // fresh case study starts from the top
+  // fresh case study starts from the top, and the toggle resets to its
+  // default branch — the article itself doesn't remount, so this state
+  // wouldn't otherwise reset when paging between projects
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    setView(page.toggle?.options[0]?.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
 
   // arrow keys page between projects
@@ -97,14 +106,40 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
         {/* key remounts the article per project so the entrance rise
             replays when paging with the arrows */}
         <article className="pp-page" key={project.slug}>
-          <button ref={backRef} className="pp-back" onClick={requestClose}>
-            <span className="pp-back-ring" aria-hidden="true">
-              <svg viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M10.5 3 5.5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-            Back
-          </button>
+          <div className="pp-topbar">
+            <button ref={backRef} className="pp-back" onClick={requestClose}>
+              <span className="pp-back-ring" aria-hidden="true">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M10.5 3 5.5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              Back
+            </button>
+
+            {/* projects split between two angles (e.g. code / design)
+                define page.toggle; the sections above and
+                page.sectionsAfter below stay fixed while the run of
+                sections in between swaps with this control. Sitting in
+                the sticky topbar keeps it (and the swapped content
+                just below it) in view while scrolled through the case
+                study, instead of requiring a scroll back up. */}
+            {page.toggle && (
+              <div className="pp-toggle" role="tablist" aria-label="Breakdown">
+                {page.toggle.options.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={view === opt.id}
+                    className={`pp-toggle-btn ${view === opt.id ? 'is-active' : ''}`}
+                    onClick={() => setView(opt.id)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <header className="pp-head">
             <div className="pp-head-text">
@@ -156,85 +191,21 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
           </dl>
 
           {page.sections.map((s) => (
-            <section className="pp-section" key={s.heading}>
-              <h2>{s.heading}</h2>
-              {s.body.map((p, i) => (
-                <p key={i}>{p}</p>
+            <Section s={s} key={s.heading} />
+          ))}
+
+          {/* key={view} replays the fade/rise whenever the toggle above
+              switches branches */}
+          {page.toggle && (
+            <div className="pp-toggle-body" key={view}>
+              {page.toggle.sections[view]?.map((s) => (
+                <Section s={s} key={s.heading} />
               ))}
-              {s.points && (
-                <div className="pp-points">
-                  {s.points.map((pt) => (
-                    <div className="pp-point" key={pt.text}>
-                      <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        {POINT_ICONS[pt.icon]}
-                      </svg>
-                      <p>{pt.text}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {s.subs && (
-                <div className="pp-subs">
-                  {s.subs.map((sub) => (
-                    <div className="pp-sub" key={sub.title}>
-                      <h3>{sub.title}</h3>
-                      <p>{sub.text}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {s.facts && (
-                <div className="pp-facts">
-                  {s.facts.map((f) => (
-                    <div className="pp-fact" key={f.title}>
-                      <h3>{f.title}</h3>
-                      <p>{f.text}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {s.stack && <StackDiagram stack={s.stack} />}
-              {s.flow && <FlowDiagram flow={s.flow} />}
-              {s.compare && (
-                <figure className="pp-compare">
-                  <div className="pp-compare-grid">
-                    {[s.compare.before, s.compare.after].map((c) => (
-                      <div className="pp-compare-item" key={c.label}>
-                        <span className="pp-compare-label">{c.label}</span>
-                        <img
-                          src={c.src}
-                          alt=""
-                          loading="lazy"
-                          style={{
-                            objectPosition: c.position,
-                            objectFit: c.fit ? 'contain' : undefined,
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  {s.compare.caption && (
-                    <figcaption>{s.compare.caption}</figcaption>
-                  )}
-                </figure>
-              )}
-              {s.media && <Media media={s.media} className="pp-panel" alt="" />}
-              {s.gallery && (
-                <div className="pp-gallery">
-                  {s.gallery.map((g) => (
-                    <Media key={g.caption} media={g} className="pp-panel" alt="" />
-                  ))}
-                </div>
-              )}
-            </section>
+            </div>
+          )}
+
+          {page.sectionsAfter?.map((s) => (
+            <Section s={s} key={s.heading} />
           ))}
         </article>
       </div>
@@ -263,6 +234,92 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
       </nav>
     </div>,
     document.body
+  );
+}
+
+/* one case-study section: heading, body copy, then whichever optional
+   blocks the data provides (points / subs / facts / stack / flow /
+   compare / media / gallery) */
+function Section({ s }) {
+  return (
+    <section className="pp-section">
+      <h2>{s.heading}</h2>
+      {s.body.map((p, i) => (
+        <p key={i}>{p}</p>
+      ))}
+      {s.points && (
+        <div className="pp-points">
+          {s.points.map((pt) => (
+            <div className="pp-point" key={pt.text}>
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {POINT_ICONS[pt.icon]}
+              </svg>
+              <p>{pt.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      {s.subs && (
+        <div className="pp-subs">
+          {s.subs.map((sub) => (
+            <div className="pp-sub" key={sub.title}>
+              <h3>{sub.title}</h3>
+              <p>{sub.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      {s.facts && (
+        <div className="pp-facts">
+          {s.facts.map((f) => (
+            <div className="pp-fact" key={f.title}>
+              <h3>{f.title}</h3>
+              <p>{f.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      {s.stack && <StackDiagram stack={s.stack} />}
+      {s.flow && <FlowDiagram flow={s.flow} />}
+      {s.archMap && <ArchMap map={s.archMap} />}
+      {s.compare && (
+        <figure className="pp-compare">
+          <div className="pp-compare-grid">
+            {[s.compare.before, s.compare.after].map((c) => (
+              <div className="pp-compare-item" key={c.label}>
+                <span className="pp-compare-label">{c.label}</span>
+                <img
+                  src={c.src}
+                  alt=""
+                  loading="lazy"
+                  style={{
+                    objectPosition: c.position,
+                    objectFit: c.fit ? 'contain' : undefined,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+          {s.compare.caption && <figcaption>{s.compare.caption}</figcaption>}
+        </figure>
+      )}
+      {s.media && <Media media={s.media} className="pp-panel" alt="" />}
+      {s.gallery && (
+        <div className="pp-gallery">
+          {s.gallery.map((g) => (
+            <Media key={g.caption} media={g} className="pp-panel" alt="" />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 

@@ -831,14 +831,15 @@ export const projects = [
       subtitle: 'A platformer set in a fantasy acorn world.',
       intro:
         'Little Wonder is a 2D platformer built in Java with a small team — a forest adventure where you play an acorn sprite finding its way home. I owned character movement and level design, the two systems that decide whether a platformer feels good.',
-      links: [{ label: 'Play', href: '#' }],
+      links: [{ label: 'Play', href: 'https://gdiac.cs.cornell.edu/gdiac/showcase/games/little_wonder/' }],
       meta: [
         { label: 'Category', value: 'Game Design & Development' },
         { label: 'My role', value: 'Design Lead & Game Programmer' },
         { label: 'Timeline', value: 'Spring 2026' },
-        { label: 'Skills', value: 'Java, game feel, level design' },
+        { label: 'Skills', value: 'Java, libGDX, Box2D, game feel, level design' },
         { label: 'Team', value: 'Christian Amadeo, Caden Lau, Afram Ahmed, Paul Lukewesa, David Colle, Samantha Ahn, Thomas Myers' },
       ],
+      // shared top section — same for both toggle views
       sections: [
         {
           heading: 'Concept: Small hero, big forest',
@@ -846,30 +847,461 @@ export const projects = [
             'The world is scaled to an acorn: blades of grass are platforms, puddles are lakes, and a garden fence is the final ascent. That one framing decision drove the art direction, the level metaphors, and the movement tuning.',
           ],
         },
-        {
-          heading: 'Design: Movement before everything',
-          body: [
-            'We prototyped jump arcs for two weeks before building a single level — if carrying momentum around the world isn’t fun, nothing layered on top will fix it.',
+      ],
+      // I split my time between the programming and the art/design side
+      // of this project, so the case study lets a reader toggle between
+      // the two breakdowns. Everything above and below this stays fixed.
+      toggle: {
+        options: [
+          { id: 'code', label: 'Code' },
+          { id: 'design', label: 'Design' },
+        ],
+        sections: {
+          code: [
+            {
+              heading: 'Prototyping: Movement first, then one enemy',
+              body: [
+                'Little Wonder runs on Java and libGDX with Box2D physics, built on top of a Cornell teaching framework that supplied a physics-obstacle wrapper and a JSON-driven asset pipeline — the team\'s job was everything above that: 87 files and roughly 35,000 lines built out over three months and 1,269 commits across parallel feature branches.',
+                'Before any levels existed, we proved out the core loop on one test map: basic movement against one basic enemy. I owned the player\'s dash and attack systems and its ammo/health state from that first prototype through to ship, plus enemy AI and getting our art assets working in-engine.',
+              ],
+              facts: [
+                {
+                  title: 'Dash vs. attack',
+                  text: 'Dash was straightforward. Attack design took far longer — we were still choosing between melee, charged, and tracking styles before settling on three to prototype: a direct projectile, a charged beam, and an area-of-effect burst.',
+                },
+                {
+                  title: 'Enemy AI v0',
+                  text: '"Move toward the player whenever they\'re in range" — the whole behavior, for exactly as long as it took to start playtesting.',
+                },
+              ],
+            },
+            {
+              heading: 'Playtesting rewrote the attack kit',
+              body: [
+                'Almost every attack changed shape between prototype and ship — the direct projectile was the only one that survived untouched. Getting combat to feel right meant treating it as a platforming-balance problem as much as a combat one.',
+                'Enemies needed rework too: because the game is built around downward traversal, a plain "follow the player" behavior sent whole packs of enemies falling off platforms and piling up below. I rooted enemies to their spawn platforms and added the AI rules to keep formations intact, and gave the dash invincibility frames so it read as a real evasive tool instead of just a repositioning one.',
+              ],
+              facts: [
+                {
+                  title: 'Aim, three times over',
+                  text: 'Autoaim → facing-direction (Hollow Knight–style) → full mouse aim, each pass trading platforming complexity against combat complexity until it balanced.',
+                },
+                {
+                  title: 'Charged beam → shotgun',
+                  text: 'The beam was too punishing in fast, platforming-heavy sections, so it became a shotgun-style spread instead.',
+                },
+                {
+                  title: 'AoE → bouncing burst',
+                  text: 'A damage-over-time pulse felt unsatisfying and slowed pacing; an instantaneous burst that bounces off walls made aiming it a skill instead of a wait.',
+                },
+              ],
+            },
+            {
+              heading: 'Architecture: How the game fits together',
+              body: [
+                'Above the Cornell teaching framework that supplies the physics wrapper and asset pipeline, the game itself is a web of controllers, entities, and plain JSON data. My own work lived mainly in the AI and Combat corners of this, but the diagram below is the full picture — click a box for what it does and what it depends on.',
+              ],
+              // renders the interactive dependency map (ArchMap.jsx): boxes
+              // grouped into zones, arrows for who-calls-who, "depends on /
+              // used by" in the side card derived straight from edges
+              archMap: {
+                title: 'Class & data dependency map',
+                hint: 'Click a box to see what it does and what it connects to.',
+                zones: [
+                  {
+                    id: 'model',
+                    name: 'Model',
+                    tone: '#55855a',
+                    note: 'Every physical object in the game — all sharing the same ObstacleSprite pattern.',
+                    colStart: 1,
+                    colEnd: 2,
+                    rowStart: 1,
+                    rowEnd: 3,
+                  },
+                  {
+                    id: 'controller',
+                    name: 'Controller',
+                    tone: '#3e6b9e',
+                    note: 'Screens, orchestration, physics, and the AI/combat controllers that drive the model each frame.',
+                    colStart: 3,
+                    colEnd: 7,
+                    rowStart: 1,
+                    rowEnd: 4,
+                  },
+                  {
+                    id: 'content',
+                    name: 'Content',
+                    tone: '#3e9e8f',
+                    note: 'Levels and assets as plain JSON — no code, no knowledge of game objects.',
+                    colStart: 1,
+                    colEnd: 3,
+                    rowStart: 5,
+                    rowEnd: 6,
+                  },
+                  {
+                    id: 'presentation',
+                    name: 'Presentation',
+                    tone: '#6b4fa0',
+                    note: 'What the player sees and hears — HUD and audio.',
+                    colStart: 5,
+                    colEnd: 7,
+                    rowStart: 5,
+                    rowEnd: 6,
+                  },
+                ],
+                nodes: [
+                  // ---- Model ----
+                  {
+                    id: 'player',
+                    zone: 'model',
+                    label: 'Player',
+                    col: 1,
+                    row: 1,
+                    detail: {
+                      summary: 'The largest entity (~2,900 lines): a full animation-state machine, movement physics, dual invincibility timers, and a pluggable loadout.',
+                    },
+                  },
+                  {
+                    id: 'enemy',
+                    zone: 'model',
+                    label: 'Enemy',
+                    col: 1,
+                    row: 2,
+                    detail: {
+                      summary: 'One class for every archetype — Patrol, Hopper, Flying, Armored — since its behavior comes entirely from the strategies its EnemyController is built with.',
+                    },
+                  },
+                  {
+                    id: 'worldObjects',
+                    zone: 'model',
+                    label: 'World objects',
+                    col: 1,
+                    row: 3,
+                    count: 5,
+                    detail: {
+                      summary: 'Every other physical object in a level, sharing the same ObstacleSprite pattern as Player and Enemy.',
+                      points: [
+                        { text: 'Surface' },
+                        { text: 'Door' },
+                        { text: 'Boat' },
+                        { text: 'Pickups' },
+                        { text: 'Hazards (stalactites, thermals)' },
+                      ],
+                    },
+                  },
+                  {
+                    id: 'attackEntities',
+                    zone: 'model',
+                    label: 'Attack entities',
+                    col: 2,
+                    row: 2,
+                    count: 4,
+                    detail: {
+                      summary: 'The projectiles and effects themselves — spawned, ticked, and culled by their owning controller, not by Player or Enemy directly.',
+                      points: [
+                        { text: 'Bullet' },
+                        { text: 'Pellet' },
+                        { text: 'Beam' },
+                        { text: 'AoE' },
+                      ],
+                    },
+                  },
+                  // ---- Controller ----
+                  {
+                    id: 'gameScene',
+                    zone: 'controller',
+                    label: 'GameScene',
+                    col: 5,
+                    row: 1,
+                    detail: {
+                      summary: 'Runs a fixed 1/60s timestep accumulator so physics stays consistent regardless of render rate — the loop that calls everything else below it, once per tick.',
+                    },
+                  },
+                  {
+                    id: 'inputController',
+                    zone: 'controller',
+                    label: 'InputController',
+                    col: 7,
+                    row: 1,
+                    detail: {
+                      summary: 'Polling-based, not event-driven: latches edge-triggered presses once per render frame, then resolves final movement/aim once per fixed physics tick.',
+                    },
+                  },
+                  {
+                    id: 'gameplayController',
+                    zone: 'controller',
+                    label: 'GameplayController',
+                    col: 5,
+                    row: 2,
+                    detail: {
+                      summary: 'The composition root — owns every entity list, turns JSON level data into live objects, and orchestrates the whole per-frame update in order.',
+                    },
+                  },
+                  {
+                    id: 'collisionController',
+                    zone: 'controller',
+                    label: 'CollisionController',
+                    col: 3,
+                    row: 2,
+                    detail: {
+                      summary: 'Owns the Box2D World and the only contact listener in the game; resolves a raw physics fixture back into a typed entity, so gameplay code never touches Box2D directly.',
+                    },
+                  },
+                  {
+                    id: 'playerController',
+                    zone: 'controller',
+                    label: 'PlayerController',
+                    col: 4,
+                    row: 3,
+                    detail: {
+                      summary: 'A thin translation layer: reads InputController state and calls setters on Player. It never applies a force itself.',
+                    },
+                  },
+                  {
+                    id: 'enemyController',
+                    zone: 'controller',
+                    label: 'EnemyController',
+                    col: 5,
+                    row: 3,
+                    detail: {
+                      summary: 'Composes three swappable strategies per enemy — movement, targeting, attack — read straight from level JSON, and drives its finite-state machine.',
+                    },
+                  },
+                  {
+                    id: 'attackControllers',
+                    zone: 'controller',
+                    label: 'Attack controllers',
+                    col: 6,
+                    row: 3,
+                    count: 4,
+                    detail: {
+                      summary: 'One controller per attack type, each spawning, ticking, and culling its own list of active instances.',
+                      points: [
+                        { text: 'ProjectileController' },
+                        { text: 'ShotgunController' },
+                        { text: 'BeamController' },
+                        { text: 'AoEController' },
+                      ],
+                    },
+                  },
+                  {
+                    id: 'aiStrategies',
+                    zone: 'controller',
+                    label: 'ai/* strategies',
+                    col: 5,
+                    row: 4,
+                    count: 4,
+                    detail: {
+                      summary: 'The actual behaviors an EnemyController can be built from — a new enemy archetype is a new combination of these, not a new class.',
+                      points: [
+                        { text: 'Patrol' },
+                        { text: 'Hopper' },
+                        { text: 'Flying' },
+                        { text: 'Armored' },
+                      ],
+                    },
+                  },
+                  // ---- Content ----
+                  {
+                    id: 'levelDataIO',
+                    zone: 'content',
+                    label: 'LevelDataIO',
+                    col: 1,
+                    row: 5,
+                    detail: {
+                      summary: 'Loads, saves, and lists levels purely as JSON trees — it has no idea what a Player or Enemy even is.',
+                    },
+                  },
+                  {
+                    id: 'levelJSON',
+                    zone: 'content',
+                    label: 'Level JSON',
+                    col: 1,
+                    row: 6,
+                    detail: {
+                      summary: 'Flat, per-category arrays — surfaces, enemies, charges, doors, and more — each entry pure data with no code behind it.',
+                    },
+                  },
+                  {
+                    id: 'assetLookup',
+                    zone: 'content',
+                    label: 'AssetLookup',
+                    col: 3,
+                    row: 5,
+                    detail: {
+                      summary: 'A three-tier manifest lookup: per-level asset overlays fall back to the shared core set by key.',
+                    },
+                  },
+                  {
+                    id: 'assetManifests',
+                    zone: 'content',
+                    label: 'Asset manifest JSON',
+                    col: 3,
+                    row: 6,
+                    detail: {
+                      summary: 'The manifest files themselves — a master texture list, plus per-level overlay bundles.',
+                    },
+                  },
+                  // ---- Presentation ----
+                  {
+                    id: 'hud',
+                    zone: 'presentation',
+                    label: 'HUD',
+                    col: 6,
+                    row: 5,
+                    detail: {
+                      summary: 'Four parallel scene2d Stages — main HUD, partial-fade, pause, full fade — laid out almost entirely from one shared JSON block instead of hardcoded values.',
+                    },
+                  },
+                  {
+                    id: 'audioManager',
+                    zone: 'presentation',
+                    label: 'AudioManager',
+                    col: 6,
+                    row: 6,
+                    detail: {
+                      summary: 'A small SFX dictionary with a single-slot interrupt, so overlapping sounds get replaced instead of stacking.',
+                    },
+                  },
+                ],
+                edges: [
+                  { from: 'gameScene', to: 'gameplayController' },
+                  { from: 'gameScene', to: 'collisionController' },
+                  { from: 'gameScene', to: 'inputController' },
+                  { from: 'gameScene', to: 'hud' },
+                  { from: 'gameplayController', to: 'playerController' },
+                  { from: 'gameplayController', to: 'enemyController' },
+                  { from: 'gameplayController', to: 'attackControllers' },
+                  { from: 'gameplayController', to: 'worldObjects' },
+                  { from: 'gameplayController', to: 'levelDataIO' },
+                  { from: 'gameplayController', to: 'assetLookup' },
+                  { from: 'gameplayController', to: 'audioManager' },
+                  { from: 'inputController', to: 'playerController' },
+                  { from: 'playerController', to: 'player' },
+                  { from: 'enemyController', to: 'enemy' },
+                  { from: 'enemyController', to: 'aiStrategies' },
+                  { from: 'aiStrategies', to: 'collisionController' },
+                  { from: 'attackControllers', to: 'attackEntities' },
+                  { from: 'collisionController', to: 'enemy' },
+                  { from: 'collisionController', to: 'attackEntities' },
+                  { from: 'levelDataIO', to: 'levelJSON' },
+                  { from: 'assetLookup', to: 'assetManifests' },
+                ],
+              },
+            },
+            {
+              heading: 'What I built: attacks & enemy AI',
+              body: [
+                'Two systems in the shipped game were entirely mine, and both had to hold up under maps far larger and busier than a typical class project.',
+              ],
+              facts: [
+                {
+                  title: 'Data-driven enemy archetypes',
+                  text: 'Each enemy is an EnemyController composed from three swappable strategies — movement, targeting, attack — read from level JSON. A new archetype is a new combination of existing strategies, not a new class.',
+                },
+                {
+                  title: 'AoE with real occlusion',
+                  text: 'The area attack casts 48 rays outward at the moment it explodes, builds a boundary polygon that respects walls, and only damages enemies whose position tests inside it — an actual geometry problem, not a flat-radius hitbox.',
+                },
+                {
+                  title: 'Designer-tunable damage',
+                  text: 'Every hit resolves through one takeDamage(type, amount) contract, with each enemy\'s resistances and weaknesses stored as a JSON-loaded map — balance changes without touching code.',
+                },
+              ],
+            },
+            {
+              heading: 'Solving the scale problem',
+              body: [
+                'The single biggest technical challenge was scale: a large map with dozens of enemies, each capable of firing volleys of projectiles, was enough to push us into stack overflows during heavy fights. Fixing it meant treating performance as part of the AI and attack systems, not a separate pass at the end.',
+              ],
+              facts: [
+                {
+                  title: 'Distance-gated AI',
+                  text: 'Enemies only run their AI at all within an activation radius of the player, with a hysteresis band between the on/off thresholds so ones near the boundary don\'t flicker in and out.',
+                },
+                {
+                  title: 'Cheaper cleanup',
+                  text: 'Dead projectiles and enemies are cleared with a stop-and-copy pass — copying survivors into a fresh array — instead of deleting in place, trading O(n) for what would have been O(n²) under heavy fire.',
+                },
+              ],
+            },
           ],
-          facts: [
+          // TODO(sharon): placeholder art-direction copy — replace with
+          // the real early concept art and implementation process.
+          design: [
             {
-              title: 'Coyote time & buffers',
-              text: 'Forgiving input windows make the controls feel fair without making them easy.',
+              heading: 'Concept art: An acorn’s-eye view',
+              body: [
+                'Before any code, I sketched what “big” and “small” would feel like from an acorn’s height — blades of grass as trees, dew drops as ponds. Early boards were about establishing scale and a warm, storybook palette rather than mechanics.',
+              ],
+              facts: [
+                {
+                  title: 'Palette first',
+                  text: 'A narrow, warm palette — moss, bark, amber — kept every biome feeling like the same forest, just a different corner of it.',
+                },
+                {
+                  title: 'Scale studies',
+                  text: 'Thumbnail sketches compared the acorn sprite against grass blades, puddles, and the fence to calibrate exactly how “small” should read.',
+                },
+                {
+                  title: 'Mood before mechanics',
+                  text: 'The earliest passes were about tone — cozy, storybook, a little melancholy — before any level layout existed.',
+                },
+              ],
             },
             {
-              title: 'Readable danger',
-              text: 'Every hazard telegraphs one screen early; deaths should feel earned, not cheap.',
+              heading: 'Implementation: From sketch to sprite',
+              body: [
+                'Concept art became a working spritesheet and tileset library, built to be remixed across levels rather than redrawn for each one.',
+              ],
+              facts: [
+                {
+                  title: 'Modular tileset',
+                  text: 'Environment pieces — grass, bark, stone — were built as a modular kit so new levels could be dressed without new art.',
+                },
+                {
+                  title: 'Readable silhouettes',
+                  text: 'The acorn sprite and hazards were designed to read clearly at a distance, so danger telegraphs visually as well as through level design.',
+                },
+                {
+                  title: 'Lightweight animation',
+                  text: 'A small frame count per animation kept the game feeling snappy and kept production scoped for a small team.',
+                },
+              ],
+            },
+          ],
+        },
+      },
+      // shared bottom sections — same for both toggle views
+      sectionsAfter: [
+        {
+          heading: 'Challenges & Takeaways',
+          body: [
+            'This was the largest project any of us had built from scratch — 87 files and 35,000 lines across a single semester — and the biggest lessons were about scope and process as much as any one line of code.',
+          ],
+          subs: [
+            {
+              title: 'Scope, scope, scope',
+              text: 'We built the most ambitious game in the course, which was also the problem — a one-semester timeline isn’t built for a project this size, and we should have cut or refactored the pieces that didn’t earn their scope earlier than we did.',
             },
             {
-              title: 'One new idea per level',
-              text: 'Each level introduces a single mechanic, then remixes the ones you already know.',
+              title: 'Performance has to be a first-class concern',
+              text: 'A big map with dozens of enemies each firing volleys of projectiles isn’t something you can bolt performance onto afterward — keeping the game playable on lower-end hardware meant designing for it from early on.',
+            },
+            {
+              title: 'Find the identity before the levels',
+              text: 'We designed and scrapped entire systems — passive abilities, several attack iterations, whole levels — because we hadn’t locked down what the game actually was before building around it. Traversal sometimes ate more of the pacing than combat did, and playtesting was the only way we caught it.',
+            },
+            {
+              title: 'Alignment across the team',
+              text: 'Everyone came in with a different art style, and reconciling that after the fact cost more time than agreeing on one direction up front would have. With several people on parallel feature branches, the biggest unlock was never a code pattern — it was documentation and planning that kept everyone’s work compatible.',
             },
           ],
         },
         {
           heading: 'Outcome',
           body: [
-            'The finished build shipped with a full level arc and boss encounter. Playtesters’ first words were about how the jump felt — which was the point.',
+            'Little Wonder shipped as the largest-scope game in the course and was recognized as the most polished game at the Game Design Showcase. The most repeated piece of playtester feedback was about how good movement felt — dash, jump, and the rest read as tight and responsive, which was exactly the bar we set in that first prototype.',
           ],
           media: { caption: 'Gameplay capture — recording coming soon.' },
         },
