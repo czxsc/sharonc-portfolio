@@ -1,6 +1,6 @@
 import { hero, meta } from '../data/content.js';
 import { Coffee, ArrowDown } from './Doodles.jsx';
-import portrait from '../assets/portrait_tailless.png';
+import portrait from '../assets/portrait_tailless.webp';
 import catAnim from '../assets/cat_animation.gif';
 import './Hero.css';
 

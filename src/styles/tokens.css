@@ -61,7 +61,7 @@
   --sp-5: 48px; --sp-6: 96px; --sp-7: 128px;
 
   /* — Layout — */
-  --maxw: 1280px;
+  --maxw: 1440px;
   --gutter: clamp(18px, 3.5vw, 40px);
   --section-y: clamp(72px, 12vh, 148px);
 

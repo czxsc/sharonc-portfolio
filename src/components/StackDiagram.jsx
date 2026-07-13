@@ -41,7 +41,13 @@ export default function StackDiagram({ stack }) {
   const group = hot != null ? stack.groups[hot] : null;
 
   return (
-    <div className="sd" onPointerLeave={() => setHot(null)}>
+    <div
+      className="sd"
+      onPointerLeave={(e) => {
+        // a touch pointer "leaves" right after tapping — keep the pick
+        if (e.pointerType !== 'touch') setHot(null);
+      }}
+    >
       {/* legend */}
       <div className="sd-legend">
         <p className="sd-label">The stack · top → bottom</p>

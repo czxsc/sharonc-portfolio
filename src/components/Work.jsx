@@ -78,6 +78,18 @@ export default function Work() {
     setOpenIndex(i);
   };
 
+  // desktop hover already previews a row before it's clicked, so a mouse
+  // click always lands on an already-active row and opens straight away.
+  // Touch has no hover: a tap here is the first the row's heard from the
+  // user, so let that tap preview it (crossfade the image up top) and
+  // require a second tap — now on an already-active row — to commit.
+  // Keyboard focus sets `active` the same way hover does, so Enter on a
+  // tabbed-to row still opens on the first press.
+  const pressRow = (i) => {
+    if (active === i) openProject(i);
+    else setActive(i);
+  };
+
   const closeProject = () => {
     const i = openIndex;
     setOpenIndex(null);
@@ -136,8 +148,12 @@ export default function Work() {
                     className={`work-item ${i === active ? 'is-active' : ''} ${rowState(i)}`}
                     onMouseEnter={() => setActive(i)}
                     onFocus={() => setActive(i)}
-                    onClick={() => openProject(i)}
-                    aria-label={`Open ${p.name} case study`}
+                    onClick={() => pressRow(i)}
+                    aria-label={
+                      i === active
+                        ? `Open ${p.name} case study`
+                        : `Preview ${p.name}`
+                    }
                   >
                     <span className="work-index">{p.index}</span>
                     <span className="work-name">{p.name}</span>

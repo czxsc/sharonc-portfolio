@@ -19,6 +19,10 @@
   bottom: 16%;
   width: 45%;
   height: auto;
+  /* own compositing layer: on lower-power hardware, the burst of item
+     transitions kicking off at the spill moment can otherwise share a
+     paint pass with the actively-decoding gif and visibly stutter it */
+  will-change: transform;
 }
 
 .bag-items {

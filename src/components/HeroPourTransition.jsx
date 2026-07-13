@@ -244,10 +244,23 @@ export default function HeroPourTransition() {
     const t1 = setTimeout(measure, 800);
     const t2 = setTimeout(measure, 1800);
     window.addEventListener('resize', measure);
+
+    // window 'resize' only fires for viewport changes — it misses the
+    // portrait reflowing for any other reason (a layout token change,
+    // a slow web font swapping in late, CSS hot-reloading in dev). The
+    // portrait's own box is what --frame-right is measured from, so
+    // watching it directly re-measures whenever it actually moves.
+    const portraitEl = stage.querySelector('.hero-portrait');
+    const ro = portraitEl && 'ResizeObserver' in window
+      ? new ResizeObserver(measure)
+      : null;
+    ro?.observe(portraitEl);
+
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       window.removeEventListener('resize', measure);
+      ro?.disconnect();
     };
   }, [reduce]);
 

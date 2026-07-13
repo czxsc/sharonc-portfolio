@@ -5,15 +5,15 @@
 import portfolioProjectImg from '../assets/portfolio_project_img.jpg';
 import dishcoveryImg from '../assets/dishcovery_demo.jpg';
 import artificerImg from '../assets/artificer_placeholder.jpg';
-import cuairGcsImg from '../assets/cuair.png';
+import cuairGcsImg from '../assets/cuair.webp';
 import dpkMissionPlannerImg from '../assets/dpk_mission_planner.png';
-import dpkAccelImg from '../assets/dpk_accel_cropped.png';
-import dpkGuideImg from '../assets/dpk_guide.png';
-import dpkRadioImg from '../assets/dpk_radio.png';
-import dpkServosImg from '../assets/dpk_servos.png';
-import dpkFlightModesImg from '../assets/dpk_flightmodes.png';
-import littleWonderImg from '../assets/little_wonder.png';
-import pokeleetDashboardImg from '../assets/pokeleet_dashboard_static.png';
+import dpkAccelImg from '../assets/dpk_accel_cropped.webp';
+import dpkGuideImg from '../assets/dpk_guide.webp';
+import dpkRadioImg from '../assets/dpk_radio.webp';
+import dpkServosImg from '../assets/dpk_servos.webp';
+import dpkFlightModesImg from '../assets/dpk_flightmodes.webp';
+import littleWonderImg from '../assets/little_wonder.webp';
+import pokeleetDashboardImg from '../assets/pokeleet_dashboard_static.webp';
 
 export const meta = {
   name: 'Sharon Chen',

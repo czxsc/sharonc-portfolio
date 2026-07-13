@@ -232,7 +232,16 @@
 @media (max-width: 620px) {
   .hero-grid {
     grid-template-columns: 1fr;
-    grid-template-areas: 'margin' 'main' 'side';
+    /* margin (eyebrow + coffee note) moves last — at this width the
+       row layout it inherits from the 940px tier has no room to
+       breathe, so it's stacked back to a column below the fold too */
+    grid-template-areas: 'main' 'side' 'margin';
+  }
+  .hero-margin {
+    flex-direction: column;
+    border-bottom: 0;
+    border-top: 1px solid var(--line);
+    padding: var(--sp-4) 0 0;
   }
   .hero-side { justify-content: flex-start; }
   .hero-portrait { max-width: 260px; }

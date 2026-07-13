@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { hobbies } from '../data/content.js';
 import HobbyPage from './HobbyPage.jsx';
-import laptopImg from '../assets/laptop.png';
-import bookImg from '../assets/book.png';
-import coffeeImg from '../assets/coffee.png';
-import controllerImg from '../assets/controller.png';
-import headphonesImg from '../assets/headphones.png';
-import sketchbookImg from '../assets/sketchbook.png';
+import laptopImg from '../assets/laptop.webp';
+import bookImg from '../assets/book.webp';
+import coffeeImg from '../assets/coffee.webp';
+import controllerImg from '../assets/controller.webp';
+import headphonesImg from '../assets/headphones.webp';
+import sketchbookImg from '../assets/sketchbook.webp';
 import bagGif from '../assets/cat_push_bag.gif';
 import bagStart from '../assets/cat_push_bag_start.png';
 import bagEnd from '../assets/cat_push_bag_end.png';
@@ -53,7 +53,7 @@ export default function Play() {
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
-  const timersRef = useRef([]);
+  const resetTimerRef = useRef(null);
   const btnRefs = useRef([]); // to return focus after a mini-page closes
   const [active, setActive] = useState(null); // { hobby, index, origin }
 
@@ -80,10 +80,23 @@ export default function Play() {
     );
   };
 
-  const clearTimers = () => {
-    timersRef.current.forEach(clearTimeout);
-    timersRef.current = [];
-  };
+  /* Drives the knock off `phase` itself rather than the gif's onLoad —
+     an <img>'s load event only fires when its src attribute actually
+     changes, and a quick scroll-past-and-back can flip phase
+     idle→playing→idle→playing fast enough that intermediate renders
+     never commit, so the src is left unchanged and no load event ever
+     fires. Keying off `phase` sidesteps that entirely: React guarantees
+     the effect (re)runs whenever phase settles on 'playing', and its
+     cleanup cancels the timers the instant phase moves on. */
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const knock = setTimeout(() => setSpilled(true), KNOCK_MS);
+    const done = setTimeout(() => setPhase('done'), END_SWAP_MS);
+    return () => {
+      clearTimeout(knock);
+      clearTimeout(done);
+    };
+  }, [phase]);
 
   useEffect(() => {
     const scene = sceneRef.current;
@@ -110,13 +123,22 @@ export default function Play() {
     );
 
     // once the scene is fully out of sight, rewind to the first-frame
-    // still so scrolling back replays the whole knock
+    // still so scrolling back replays the whole knock. Debounced —
+    // on lower-power hardware a busy main thread can make the observer
+    // report a spurious one-frame "not intersecting" blip mid-scroll,
+    // which would otherwise restart the whole knock (and visibly pop
+    // the gif back to its first frame) even though the scene never
+    // really left view
     const reset = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting) return;
-        clearTimers();
-        setPhase('idle');
-        setSpilled(false);
+        if (e.isIntersecting) {
+          clearTimeout(resetTimerRef.current);
+          return;
+        }
+        resetTimerRef.current = setTimeout(() => {
+          setPhase('idle');
+          setSpilled(false);
+        }, 200);
       },
       { threshold: 0 }
     );
@@ -124,23 +146,11 @@ export default function Play() {
     trigger.observe(scene);
     reset.observe(scene);
     return () => {
+      clearTimeout(resetTimerRef.current);
       trigger.disconnect();
       reset.disconnect();
-      clearTimers();
     };
   }, []);
-
-  /* Timers run from the moment the gif element actually loads, so a
-     slow fetch can't let the spill outrun the knock. Tracked in a ref
-     so a mid-play reset can cancel them. */
-  const onGifLoad = () => {
-    if (phaseRef.current !== 'playing') return;
-    clearTimers();
-    timersRef.current = [
-      setTimeout(() => setSpilled(true), KNOCK_MS),
-      setTimeout(() => setPhase('done'), END_SWAP_MS),
-    ];
-  };
 
   const src =
     phase === 'playing' ? bagGif : phase === 'done' ? bagEnd : bagStart;
@@ -160,7 +170,6 @@ export default function Play() {
           <img
             className="bag-gif"
             src={src}
-            onLoad={onGifLoad}
             alt="A drawn black cat knocking over a tote bag"
           />
           <ul className="bag-items">
