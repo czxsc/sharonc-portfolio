@@ -157,6 +157,45 @@ function Block({ block }) {
           ))}
         </div>
       )}
+
+      {block.kind === 'carousel' && (
+        <Carousel items={block.items} direction={block.direction} />
+      )}
+
+      {block.kind === 'image' && (
+        <figure className={`hp-accent ${block.align === 'right' ? 'hp-accent-right' : ''}`}>
+          <img src={block.src} alt={block.caption || ''} loading="lazy" />
+          {block.caption && <figcaption>{block.caption}</figcaption>}
+        </figure>
+      )}
     </section>
+  );
+}
+
+/* hover (or tap, for touch) to expand a strip of images — view-only,
+   nothing to link to, so each panel is a button rather than an anchor */
+function Carousel({ items, direction = 'horizontal' }) {
+  const [active, setActive] = useState(0);
+
+  return (
+    <div className={`hpb-carousel ${direction === 'vertical' ? 'is-vertical' : ''}`}>
+      {items.map((it, i) => (
+        <button
+          type="button"
+          key={it.caption}
+          className={`hpb-carousel-panel ${i === active ? 'is-active' : ''}`}
+          onMouseEnter={() => setActive(i)}
+          onFocus={() => setActive(i)}
+          onClick={() => setActive(i)}
+          aria-pressed={i === active}
+          aria-label={it.caption}
+        >
+          <img src={it.src} alt={it.caption} loading="lazy" />
+          <span className="hpb-carousel-caption" aria-hidden="true">
+            {it.caption}
+          </span>
+        </button>
+      ))}
+    </div>
   );
 }

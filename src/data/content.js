@@ -14,6 +14,12 @@ import dpkServosImg from '../assets/dpk_servos.webp';
 import dpkFlightModesImg from '../assets/dpk_flightmodes.webp';
 import littleWonderImg from '../assets/little_wonder.webp';
 import pokeleetDashboardImg from '../assets/pokeleet_dashboard_static.webp';
+import concertRoseImg from '../assets/rose_stage.jpg';
+import concertTwiceImg from '../assets/twice.jpg';
+import concertSunkisImg from '../assets/sunkis_closeup.jpg';
+import concertSlopeDayImg from '../assets/slope_grouppic.jpg';
+import concertKiofImg from '../assets/kiof_group.jpg';
+import receiptifyImg from '../assets/receiptify.png';
 
 export const meta = {
   name: 'Sharon Chen',
@@ -1425,6 +1431,9 @@ export const projects = [
        { kind: 'list',    title,  items: [{ name, meta, note }] }
        { kind: 'specs',   title,  rows:  [{ label, value }] }
        { kind: 'gallery', title,  items: [{ caption, src? }] } — no src → placeholder frame
+       { kind: 'carousel', title, direction?: 'horizontal'|'vertical', items: [{ caption, src }] }
+         — hover/tap-to-expand strip, view-only (no links)
+       { kind: 'image',   src, caption?, align?: 'left'|'right' } — small tilted accent photo
    TODO(sharon): all block content below is sample copy — swap in the
    real shows/books/games/parts, and add gallery image imports. */
 export const hobbies = [
@@ -1554,6 +1563,24 @@ export const hobbies = [
             { name: 'Clair de lune', meta: 'Debussy', note: 'The debugging soundtrack.' },
             { name: 'Merry Christmas Mr. Lawrence', meta: 'Ryuichi Sakamoto', note: 'For late trains and late commits.' },
             { name: 'Holocene', meta: 'Bon Iver', note: 'The walk-home track.' },
+          ],
+        },
+        {
+          kind: 'image',
+          src: receiptifyImg,
+          caption: 'receipts don’t lie',
+        },
+        {
+          kind: 'carousel',
+          title: 'Recently, live',
+          // TODO(sharon): confirm captions — guessed from filenames/on-screen
+          // signage where I could, but double check "TWICE" and "KIOF".
+          items: [
+            { caption: 'THE ROSE — Rosetopia', src: concertRoseImg },
+            { caption: 'TWICE', src: concertTwiceImg },
+            { caption: 'SUNKIS', src: concertSunkisImg },
+            { caption: 'Slope Day', src: concertSlopeDayImg },
+            { caption: 'KIOF', src: concertKiofImg },
           ],
         },
         {
