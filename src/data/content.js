@@ -25,8 +25,8 @@ export const meta = {
   name: 'Sharon Chen',
   role: 'Software engineer & designer',
   email: 'sharonc4747@gmail.com',
-  location: 'Ithaca, NY',
-  status: 'Open to 2026 opportunities',
+  location: 'Ithaca, NY and Dallas, TX',
+  status: 'Open to 2027 opportunities',
 };
 
 export const nav = [

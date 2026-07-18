@@ -84,11 +84,15 @@ export default function HobbyPage({ hobby, img, origin, onClose }) {
             <img className="hp-icon" src={img} alt="" />
           </header>
 
-          <div className="hp-blocks">
-            {hobby.page.blocks.map((b, i) => (
-              <Block key={i} block={b} />
-            ))}
-          </div>
+          {hobby.slug === 'music' ? (
+            <MusicBlocks blocks={hobby.page.blocks} />
+          ) : (
+            <div className="hp-blocks">
+              {hobby.page.blocks.map((b, i) => (
+                <Block key={i} block={b} />
+              ))}
+            </div>
+          )}
 
           <footer className="hp-foot">
             <button className="ulink hp-foot-back" onClick={requestClose}>
@@ -169,6 +173,68 @@ function Block({ block }) {
         </figure>
       )}
     </section>
+  );
+}
+
+/* Music gets its own composition rather than the generic stacked
+   blocks: a tracklist beside the Receiptify slip (the two belong
+   together), a pull-quote for the piano aside, then the concert
+   carousel opened up wider as the closing, most visual moment. */
+function MusicBlocks({ blocks }) {
+  const list = blocks.find((b) => b.kind === 'list');
+  const receipt = blocks.find((b) => b.kind === 'image');
+  const quote = blocks.find((b) => b.kind === 'text');
+  const carousel = blocks.find((b) => b.kind === 'carousel');
+
+  return (
+    <div className="hp-music">
+      <div className="hpm-top">
+        <div className="hpm-tracks">
+          <h2 className="hpb-label">
+            <span>{list.title}</span>
+            <span className="hpm-eq" aria-hidden="true">
+              <i /><i /><i />
+            </span>
+          </h2>
+          <ol className="hpm-tracklist">
+            {list.items.map((it, i) => (
+              <li key={it.name}>
+                <span className="hpm-num">{String(i + 1).padStart(2, '0')}</span>
+                <span className="hpm-info">
+                  <span className="hpm-name">{it.name}</span>
+                  {it.meta && <span className="hpm-meta">{it.meta}</span>}
+                </span>
+                {it.note && <span className="hpm-note">{it.note}</span>}
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        {receipt && (
+          <figure className="hpm-receipt">
+            <img src={receipt.src} alt={receipt.caption || ''} loading="lazy" />
+            {receipt.caption && <figcaption>{receipt.caption}</figcaption>}
+          </figure>
+        )}
+      </div>
+
+      {quote && (
+        <blockquote className="hpm-quote">
+          {quote.body.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
+        </blockquote>
+      )}
+
+      {carousel && (
+        <section className="hpm-live">
+          <h2 className="hpb-label">
+            <span>{carousel.title}</span>
+          </h2>
+          <Carousel items={carousel.items} direction={carousel.direction} />
+        </section>
+      )}
+    </div>
   );
 }
 
