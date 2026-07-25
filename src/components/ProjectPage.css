@@ -5,22 +5,46 @@
    set in this site's paper/ink system).
    ============================================================ */
 
+/* The overlay itself never fades — only the ground under it does.
+   That distinction is the whole trick: the hero has to fly from the
+   index at full opacity, and if `.pp` carried the fade the shared
+   image would be half-transparent for the first third of its flight
+   while the frame it left is still solid underneath. So the paper
+   closes over the index as a separate layer *behind* the hero, and
+   quicker than the flight, which is what makes the handoff read as
+   one image moving rather than two images dissolving. */
 .pp {
   position: fixed;
   inset: 0;
   z-index: 300; /* above nav (100) and skip-link (200) */
+}
+.pp::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: var(--paper);
   opacity: 0;
   transition: opacity 0.4s var(--ease);
 }
-.pp.is-open {
+.pp.has-flight::before {
+  transition: opacity 0.26s var(--ease);
+}
+.pp.is-open::before {
   opacity: 1;
 }
-.pp.is-closing {
+
+/* closing: held off just long enough for the return flight to be
+   underway, so the page dissolves around a moving image rather than
+   under a still one */
+.pp.is-closing::before,
+.pp.is-closing .pp-scroll,
+.pp.is-closing .pp-close,
+.pp.is-closing .pp-nav {
   opacity: 0;
-  transition: opacity 0.25s ease-out;
+  transition: opacity 0.32s var(--ease-exit) 0.13s;
 }
 
+/* later in the DOM than ::before, so it paints over the scrim */
 .pp-scroll {
   position: absolute;
   inset: 0;
@@ -28,18 +52,74 @@
   overscroll-behavior: contain;
 }
 
-/* article remounts per project; the rise replays when paging */
 .pp-page {
   width: 100%;
   max-width: 1080px;
   margin-inline: auto;
   padding: 26px var(--gutter) var(--sp-7);
-  animation: pp-in 0.55s var(--ease) both;
+}
+
+/* ---------- entrance ----------
+   The article can't rise as one block: the hero inside it is mid-
+   flight from the index, and a moving ancestor would drag it off its
+   own path. So the blocks around the hero arrive individually,
+   trailing it — the picture lands first and the page assembles
+   around it. `.pp-hero` is deliberately absent from this list. */
+.pp-topbar,
+.pp-head,
+.pp-intro,
+.pp-meta {
+  animation: pp-in 0.6s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 0.16s);
+}
+.pp-head { --i: 1; }
+.pp-intro { --i: 3; }
+.pp-meta { --i: 4; }
+/* the chrome comes last — it's the least of what the reader wants to
+   see. `backwards`, not `both`: a forwards fill would pin opacity at
+   1 and win over the closing transition above. */
+.pp-close,
+.pp-nav {
+  animation: pp-in 0.5s var(--ease) backwards;
+  animation-delay: 0.34s;
 }
 @keyframes pp-in {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(16px);
+  }
+}
+
+/* the title is type, so it sets rather than rises. Driven by an
+   animation, not SetType's usual `.is-visible` transition — this
+   lives in a portal that the page's IntersectionObserver never
+   sees, and it should play the moment it mounts anyway. */
+.pp-head .set-line-in {
+  animation: pp-set 0.78s var(--ease-set) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger) + 0.26s);
+}
+@keyframes pp-set {
+  from {
+    transform: translateY(130%);
+    letter-spacing: calc(var(--ls) + 0.035em);
+  }
+  to {
+    transform: none;
+    letter-spacing: var(--ls);
+  }
+}
+
+/* paging with ←/→ remounts the article: the hero slides in from the
+   side the reader asked for, so the arrows have a direction. Scoped
+   to `.is-paged` — on the *first* mount the hero is flying in from
+   the index and must not be touched. */
+.pp-page.is-paged .pp-hero {
+  animation: pp-page-slide 0.62s var(--ease-set) both;
+}
+@keyframes pp-page-slide {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--page-dir, 0) * 46px));
   }
 }
 

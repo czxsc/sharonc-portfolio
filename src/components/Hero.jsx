@@ -1,4 +1,5 @@
 import { hero, meta } from '../data/content.js';
+import SetType from './SetType.jsx';
 import { Coffee, ArrowDown } from './Doodles.jsx';
 import portrait from '../assets/portrait_tailless.webp';
 import catAnim from '../assets/cat_animation.gif';
@@ -56,7 +57,7 @@ export default function Hero() {
           <p className="eyebrow hero-anim" style={{ '--i': 0 }}>
             {hero.eyebrow}
           </p>
-          <p className="hero-note hero-anim" style={{ '--i': 5 }}>
+          <p className="hero-note hero-anim" style={{ '--i': 4 }}>
             <span aria-hidden="true">↳ </span>
             {hero.marginNote.split('\n').map((l, i) => (
               <span key={i} className="hero-note-line">
@@ -69,21 +70,19 @@ export default function Hero() {
 
         {/* main column — name + lead */}
         <div className="hero-main">
-          <h1 className="hero-name">
-            {hero.nameLines.map((line, i) => (
-              <span
-                key={line}
-                className="hero-name-line hero-anim"
-                style={{ '--i': 1 + i }}
-              >
-                {line}
-              </span>
-            ))}
-          </h1>
-          <p className="hero-lead hero-anim" style={{ '--i': 3 }}>
+          {/* the name is the first type on the page, so it gets the
+              site's entrance move rather than the generic rise the
+              margin/CTA use — the rest of the hero cascades around it */}
+          <SetType
+            as="h1"
+            className="hero-name"
+            lines={hero.nameLines}
+            style={{ '--set-delay': '0.22s' }}
+          />
+          <p className="hero-lead hero-anim" style={{ '--i': 2 }}>
             {hero.lead}
           </p>
-          <div className="hero-cta hero-anim" style={{ '--i': 4 }}>
+          <div className="hero-cta hero-anim" style={{ '--i': 3 }}>
             <a href="#work" className="btn btn-primary">
               View my work!
             </a>
@@ -95,7 +94,7 @@ export default function Hero() {
 
         {/* side column — portrait */}
         <div className="hero-side">
-          <figure className="hero-portrait hero-anim" style={{ '--i': 2 }}>
+          <figure className="hero-portrait hero-anim" style={{ '--i': 3 }}>
             <RoleWheel />
             <img
               className="hero-portrait-img"

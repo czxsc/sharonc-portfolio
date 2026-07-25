@@ -165,6 +165,31 @@ export function ArrowDown({ size = 24, ...p }) {
   );
 }
 
+/* A stroke to underline something by hand. Stretches to whatever it
+   sits under (preserveAspectRatio="none"); the non-scaling stroke is
+   what keeps the line an even weight while the box distorts, so a
+   long address and a short one get the same pen. Drawn by CSS
+   (stroke-dashoffset) — see .contact-rule. */
+export function HandRule({ className }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 200 10"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 6.6C33 3.4 66 2.4 99 3.2c30 .7 60 2.8 99 1.1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
 export function ArrowRight({ size = 20, ...p }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>

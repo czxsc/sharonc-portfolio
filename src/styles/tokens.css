@@ -65,10 +65,25 @@
   --gutter: clamp(18px, 3.5vw, 40px);
   --section-y: clamp(72px, 12vh, 148px);
 
-  /* — Motion — */
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --dur: 0.6s;
-  --dur-slow: 0.9s;
+  /* — Motion —
+     One language: ink and paper. Type is *set* (pressed, then released),
+     rules are *drawn*, surfaces *settle*. Pick the curve by what the
+     thing is made of, not by where it sits. */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);        /* paper settling — the default */
+  --ease-set: cubic-bezier(0.16, 1, 0.3, 1);     /* type rising out of its baseline */
+  --ease-rule: cubic-bezier(0.65, 0, 0.35, 1);   /* a line being drawn, both ends eased */
+  --ease-exit: cubic-bezier(0.55, 0, 0.85, 0.35); /* leaving — accelerate away */
+
+  --dur-quick: 0.18s;  /* hover/press feedback */
+  --dur: 0.42s;        /* standard state change */
+  --dur-slow: 0.72s;   /* entrances */
+  --dur-set: 0.8s;     /* a line of type setting */
+  --stagger: 60ms;     /* between lines of a heading */
+
+  /* travel distance for scroll reveals — rewritten by useReveal from
+     scroll velocity, so a fast scroll lands with more weight than a
+     slow one. Only hidden elements read it. */
+  --reveal-dist: 16px;
 
   /* — Misc — */
   --radius: 12px;

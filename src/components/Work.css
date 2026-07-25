@@ -72,6 +72,12 @@
      background it read as a faint white line at the frame's bottom */
   background: var(--liquid);
 }
+/* Covers don't crossfade in place — the incoming one wipes open from
+   the edge the selection came from (--ct/--cb, written by Work.jsx),
+   while the outgoing drifts a hair the other way behind it. The image
+   change is then caused by the gesture instead of merely following
+   it. The active cover sits on top, so the outgoing wipe is only ever
+   glimpsed at the frame's edges. */
 .preview-item {
   position: absolute;
   inset: 0;
@@ -81,15 +87,22 @@
     radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.16), transparent 55%),
     linear-gradient(145deg, var(--t1), var(--t2));
   opacity: 0;
-  transform: scale(1.04);
+  clip-path: inset(var(--ct, 100%) 0 var(--cb, 0%) 0);
+  transform: scale(1.04) translateY(calc(var(--dir, 1) * -1.5%));
   transition:
-    opacity 0.7s var(--ease),
-    transform 0.9s var(--ease);
-  will-change: opacity, transform;
+    opacity 0.34s var(--ease-exit),
+    clip-path 0.62s var(--ease-set),
+    transform 0.85s var(--ease);
+  will-change: opacity, transform, clip-path;
 }
 .preview-item.is-active {
   opacity: 1;
-  transform: scale(1);
+  clip-path: inset(0 0 0 0);
+  transform: scale(1) translateY(0);
+  transition:
+    opacity 0.2s linear,
+    clip-path 0.62s var(--ease-set),
+    transform 0.85s var(--ease);
   z-index: 2;
 }
 /* faux app chrome */
@@ -182,15 +195,68 @@
 
 /* ---------- list ---------- */
 .work-list {
+  position: relative; /* the tick and the rows' offsetTop measure from here */
   list-style: none;
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--line);
 }
+/* the list carries `.reveal` only to be observed — its rows do the
+   arriving, so the container itself must not also lift */
+.work-list.reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  will-change: auto;
+}
 /* opaque so rows occlude cleanly while sliding past each other
-   during the sort's FLIP animation */
+   during the sort's FLIP animation; `overflow: hidden` additionally
+   makes each row the mask its own title sets out of */
 .work-row {
   background: var(--paper);
+  overflow: hidden;
+}
+
+/* rows set one after another, in reading order. A CSS animation, not
+   a transition, because `.work-item` already transitions opacity for
+   the filter fade and a shared transition-delay would lag that too. */
+.work-list:not(.is-visible) .work-item {
+  transform: translateY(105%);
+}
+.work-list.is-visible .work-item {
+  animation: rowSet 0.68s var(--ease-set) both;
+  animation-delay: calc(var(--i, 0) * 42ms + 0.1s);
+}
+@keyframes rowSet {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* the espresso tick — parks beside whichever row is previewed and
+   slides between them; positioned by Work.jsx */
+.work-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: 2px;
+  height: 18px; /* MARK_H in Work.jsx */
+  background: var(--espresso);
+  border-radius: 1px;
+  pointer-events: none;
+  transition:
+    transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s var(--ease) 0.42s;
+}
+/* nothing to track until the rows have finished setting — it's
+   already in position, it just isn't inked yet */
+.work-list:not(.is-visible) .work-mark {
+  opacity: 0;
+  transition: none;
 }
 .work-item {
   width: 100%;
@@ -302,11 +368,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .preview-item {
+  .preview-item,
+  .preview-item.is-active {
     transition: opacity 0.2s linear;
     transform: none;
+    clip-path: none;
   }
-  .preview-item.is-active {
+  /* rows arrive already set; the tick still marks the row, it just
+     doesn't travel (durations are zeroed globally) */
+  .work-list .work-item {
     transform: none;
+    animation: none;
   }
 }

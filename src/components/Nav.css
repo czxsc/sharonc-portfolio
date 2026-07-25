@@ -60,9 +60,21 @@
 
 /* links */
 .nav-links {
+  position: relative; /* the travelling dot is placed against this box */
   display: flex;
   align-items: center;
   gap: clamp(14px, 2.4vw, 34px);
+}
+/* the marker itself — one dot for the whole nav; Nav.jsx moves it */
+.nav-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--espresso);
+  pointer-events: none;
 }
 .nav-link {
   font-family: var(--mono);
@@ -89,8 +101,9 @@
 .nav-link.is-active {
   color: var(--ink);
 }
+/* the ring stays a station under the dot; only its rim brightens, so
+   the filled marker is unambiguously the one that moves */
 .nav-link.is-active .nav-link-idx {
-  background: var(--espresso);
   border-color: var(--espresso);
 }
 
@@ -98,6 +111,8 @@
   .nav-mark-role { display: none; }
   .nav-link { font-size: 0.66rem; }
   .nav-link-idx { display: none; }
+  /* no stations to travel between at this width */
+  .nav-dot { display: none; }
   .nav-links { gap: 16px; }
 }
 @media (max-width: 460px) {

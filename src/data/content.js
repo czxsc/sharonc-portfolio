@@ -1327,6 +1327,8 @@ export const projects = [
     href: '#work',
     page: {
       status: 'Completed',
+      // show the whole demo screenshot instead of the 21:9 hero crop
+      hero: { fit: true },
       subtitle: 'Restaurant recommendations from plain-language cravings.',
       intro:
         'Dishcovery answers the question review sites can’t: “somewhere quiet with great hand-pulled noodles, under $20.” It parses free-form queries about food, ambiance, and price, and ranks restaurants against thousands of reviews.',
@@ -1370,7 +1372,7 @@ export const projects = [
           body: [
             'The demo consistently beat keyword search on ambiance-heavy queries in our evaluation set, and the evidence-quoting pattern became the feature testers mentioned first.',
           ],
-          media: { src: dishcoveryImg, caption: 'Dishcovery results view — query to ranked shortlist.' },
+          media: { src: dishcoveryImg, fit: true, caption: 'Dishcovery results view — query to ranked shortlist.' },
         },
       ],
     },
@@ -1623,7 +1625,8 @@ export const hobbies = [
 ];
 
 export const contact = {
-  title: 'Let’s make something!',
+  /* one line per set line — see SetType */
+  title: ['Let’s make', 'something!'],
   body:
     'I’m open to 2027 internships and collaborations. The fastest way to reach me is email.',
 };

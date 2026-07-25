@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { hobbies } from '../data/content.js';
 import HobbyPage from './HobbyPage.jsx';
+import SectionSeam from './SectionSeam.jsx';
+import SetType from './SetType.jsx';
 import laptopImg from '../assets/laptop.webp';
 import bookImg from '../assets/book.webp';
 import coffeeImg from '../assets/coffee.webp';
@@ -158,9 +160,13 @@ export default function Play() {
   return (
     <section id="play" className="section play">
       <div className="container">
-        <div className="section-head reveal">
-          <h2>Off the Clock</h2>
-          <p className="head-note">Dabbling in a bit of everything.</p>
+        <SectionSeam folio="03 — PLAY" note={`${hobbies.length} things`} />
+
+        <div className="section-head">
+          <SetType as="h2" lines="Off the Clock" />
+          <p className="head-note reveal" style={{ '--reveal-delay': '0.24s' }}>
+            Dabbling in a bit of everything.
+          </p>
         </div>
 
         <div
@@ -168,7 +174,7 @@ export default function Play() {
           className={`bag-scene ${spilled ? 'is-spilled' : ''}`}
         >
           <img
-            className="bag-gif"
+            className="bag-gif reveal"
             src={src}
             alt="A drawn black cat knocking over a tote bag"
           />

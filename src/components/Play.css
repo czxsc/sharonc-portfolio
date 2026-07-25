@@ -24,6 +24,15 @@
      paint pass with the actively-decoding gif and visibly stutter it */
   will-change: transform;
 }
+/* the cat arrives before it does anything — otherwise the scene is
+   simply already there when the section scrolls up, and the knock
+   reads as the first event rather than the second */
+.bag-gif.reveal {
+  --reveal-delay: 0.12s;
+}
+.bag-gif.reveal.is-visible {
+  will-change: transform; /* keep the layer the comment above is about */
+}
 
 .bag-items {
   list-style: none;
@@ -57,6 +66,34 @@
     transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
     opacity 0.35s ease-out;
   transition-delay: calc(var(--i) * 95ms);
+}
+
+/* ----- idle life -------------------------------------------------
+   Once everything has landed the flat-lay would otherwise be a
+   photograph: perfectly still, and noticeably so next to a cat that
+   is still swishing its tail. Each object breathes on its own clock
+   — a few pixels and half a degree, phased apart by negative delays
+   so nothing beats in time with anything else.
+
+   Uses the independent `translate` / `rotate` properties rather than
+   `transform`, which the hover pickup owns; the two compose instead
+   of one cancelling the other. The delay clears the spill first. */
+@keyframes bagDrift {
+  50% {
+    translate: 0 -3.5px;
+    rotate: 0.5deg;
+  }
+}
+.is-spilled .bag-item-btn {
+  animation: bagDrift calc(6.4s + var(--i) * 0.65s) ease-in-out infinite;
+  /* negative delay: already mid-breath when it starts, so the run-in
+     isn't six objects simultaneously beginning to move */
+  animation-delay: calc(var(--i) * -1.37s);
+}
+/* picking one up interrupts its breathing — hold it still while held */
+.bag-item-btn:hover,
+.bag-item-btn:focus-visible {
+  animation-play-state: paused;
 }
 
 /* ----- item as a button: hover picks it up off the table ----------

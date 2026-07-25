@@ -2,7 +2,11 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { projects } from '../data/content.js';
 import { ArrowRight } from './Doodles.jsx';
 import ProjectPage from './ProjectPage.jsx';
+import SectionSeam from './SectionSeam.jsx';
+import SetType from './SetType.jsx';
 import './Work.css';
+
+const MARK_H = 18; // px — height of the espresso tick that tracks the list
 
 /* disciplines worth a filter button — tags shared by 2+ projects
    (singletons like Autonomous Systems would just re-sort one row) */
@@ -21,12 +25,16 @@ const matches = (i, tag) => projects[i].category.split(' · ').includes(tag);
 export default function Work() {
   const [active, setActive] = useState(0);
   const [openIndex, setOpenIndex] = useState(null); // case study overlay
+  const [origin, setOrigin] = useState(null); // preview rect the overlay grows from
   const [order, setOrder] = useState(projects.map((_, i) => i));
   const [hoverTag, setHoverTag] = useState(null); // previewed via hover/focus
   const [pinTag, setPinTag] = useState(null); // clicked: sorted + held lit
   const btnRefs = useRef([]);
   const rowRefs = useRef([]);
+  const markRef = useRef(null);
+  const frameRef = useRef(null);
   const flipFrom = useRef(null); // row tops captured just before a sort
+  const prevPos = useRef(0); // previewed row's position last time round
 
   // hover previews over an existing pin; second click clears both
   const litTag = hoverTag ?? pinTag;
@@ -70,12 +78,49 @@ export default function Work() {
     }
   }, [order]);
 
+  /* The tick that tracks the list.
+     A row lighting up is a state change; a marker sliding to it is a
+     movement, and movement is what makes running down the index feel
+     like moving a bookmark rather than toggling six buttons. Driven
+     off offsetTop (layout position) rather than a rect, so a sort's
+     FLIP transforms mid-flight can't drag it off course. */
+  useLayoutEffect(() => {
+    const row = rowRefs.current[active];
+    const mark = markRef.current;
+    if (!row || !mark) return;
+    const y = row.offsetTop + row.offsetHeight / 2 - MARK_H / 2;
+    mark.style.transform = `translateY(${y}px)`;
+  }, [active, order]);
+
+  /* Which way the eye just travelled, handed to the preview as the
+     direction its cover should wipe in from: move down the list and
+     the new cover opens upward from the bottom edge, meeting you.
+     Written as CSS vars rather than state — nothing here needs a
+     re-render, and the class change and the direction must land in
+     the same frame or the outgoing cover wipes the wrong way. */
+  useLayoutEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    const pos = order.indexOf(active);
+    const dir = pos < prevPos.current ? -1 : 1; // ties keep the downward read
+    prevPos.current = pos;
+    frame.style.setProperty('--dir', dir);
+    frame.style.setProperty('--ct', dir > 0 ? '100%' : '0%');
+    frame.style.setProperty('--cb', dir > 0 ? '0%' : '100%');
+  }, [active, order]);
+
   const rowState = (i) =>
     litTag ? (matches(i, litTag) ? 'is-lit' : 'is-faded') : '';
 
+  /* The case study opens *out of* the preview frame, so hand the
+     overlay the rect it should grow from. Measured at click time —
+     the page behind is frozen from here on, so it stays valid for the
+     return trip too. */
   const openProject = (i) => {
     setActive(i);
     setOpenIndex(i);
+    const r = frameRef.current?.getBoundingClientRect();
+    setOrigin(r ? { top: r.top, left: r.left, width: r.width, height: r.height } : null);
   };
 
   // desktop hover already previews a row before it's clicked, so a mouse
@@ -104,10 +149,13 @@ export default function Work() {
   return (
     <section id="work" className="section work">
       <div className="container">
-        <div className="section-head reveal">
-          <h2>Projects</h2>
+        <SectionSeam folio="02 — WORK" note={`${projects.length} selected`} />
+
+        <div className="section-head">
+          <SetType as="h2" lines="Projects" />
           <div
-            className="work-filters"
+            className="work-filters reveal"
+            style={{ '--reveal-delay': '0.22s' }}
             role="group"
             aria-label="Sort projects by discipline"
           >
@@ -131,15 +179,19 @@ export default function Work() {
           </div>
         </div>
 
-        <div className="work-gallery reveal">
-          {/* list */}
-          <ol className="work-list">
-            {order.map((i) => {
+        <div className="work-gallery">
+          {/* list — rows set line by line, in the order they read */}
+          <ol className="work-list reveal">
+            {/* the tick rides in the gutter the active row's indent
+                opens up, so the two moves are one gesture */}
+            <span className="work-mark" ref={markRef} aria-hidden="true" />
+            {order.map((i, pos) => {
               const p = projects[i];
               return (
                 <li
                   key={p.name}
                   className="work-row"
+                  style={{ '--i': pos }}
                   ref={(el) => (rowRefs.current[i] = el)}
                 >
                   <button
@@ -165,9 +217,10 @@ export default function Work() {
             })}
           </ol>
 
-          {/* preview — stacked covers crossfade */}
-          <div className="work-preview" aria-hidden="true">
-            <div className="work-frame">
+          {/* preview — stacked covers, wiped in the direction the
+              selection just moved (see the --dir effect above) */}
+          <div className="work-preview reveal" aria-hidden="true">
+            <div className="work-frame" ref={frameRef}>
               {projects.map((p, i) => (
                 <div
                   key={p.name}
@@ -195,6 +248,7 @@ export default function Work() {
       {openIndex !== null && (
         <ProjectPage
           index={openIndex}
+          origin={origin}
           onNavigate={setOpenIndex}
           onClose={closeProject}
         />

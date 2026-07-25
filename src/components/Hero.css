@@ -45,14 +45,23 @@
 .hero-main {
   min-width: 0;
 }
+.set.hero-name {
+  /* out-specifies SetType's own `.set { --ls }` default regardless of
+     which stylesheet Vite emits first */
+  --ls: -0.035em;
+}
 .hero-name {
   font-size: var(--fs-display);
   line-height: 0.88;
   letter-spacing: -0.035em;
   margin-bottom: clamp(20px, 3vw, 34px);
 }
-.hero-name-line {
-  display: block;
+/* the display face is set tightest of all (0.88) — its glyphs spill
+   furthest past the line box, so the mask needs more relief than the
+   shared default */
+.hero-name .set-line {
+  --relief-top: 0.4em;
+  --relief-bottom: 0.3em;
 }
 .hero-lead {
   font-family: var(--grot);
@@ -76,8 +85,13 @@
   color: var(--ink-soft);
 }
 
-/* shared button */
+/* shared button — the espresso doesn't cross-fade in, it fills the
+   pill from the left like a cup being poured into. Same idea as the
+   pour above it, at the scale of a control. */
 .btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -88,17 +102,43 @@
   padding: 13px 22px;
   border-radius: 999px;
   border: 1px solid var(--ink);
-  transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
-    transform var(--dur) var(--ease);
+  transition:
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    transform var(--dur-quick) var(--ease);
 }
 .btn-primary {
   background: var(--ink);
   color: var(--paper);
 }
-.btn-primary:hover {
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background: var(--espresso);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur) var(--ease-rule);
+}
+.btn-primary:hover,
+.btn-primary:focus-visible {
   border-color: var(--espresso);
   transform: translateY(-2px);
+}
+.btn-primary:hover::before,
+.btn-primary:focus-visible::before {
+  transform: scaleX(1);
+}
+/* drains back out the way it came, quicker */
+.btn-primary:not(:hover)::before {
+  transform-origin: right center;
+  transition: transform var(--dur-quick) var(--ease-exit);
+}
+/* press: the lift settles back down before the page changes */
+.btn-primary:active {
+  transform: translateY(0);
+  transition-duration: 90ms;
 }
 
 /* portrait */

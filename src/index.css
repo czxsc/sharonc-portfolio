@@ -105,9 +105,9 @@ p {
   scroll-margin-top: var(--nav-h);
   position: relative;
 }
-.section + .section {
-  border-top: 1px solid var(--line);
-}
+/* NOTE: no border between sections — the rule between them is drawn by
+   SectionSeam, which each section renders at the top of its own
+   container. A static border there would double it. */
 
 /* eyebrow / mono label */
 .eyebrow {
@@ -119,10 +119,18 @@ p {
   color: var(--ink-faint);
 }
 
-/* section header: folio + title, editorial */
+/* section header: folio + title, editorial.
+
+   Aligned on the bottom edge rather than the baseline: SetType wraps
+   each line in an `overflow: hidden` mask, and a box with clipped
+   overflow no longer offers its text baseline up to the flex parent —
+   it synthesises one from its bottom margin edge, which would drop
+   the note and the filters by a fraction of a line. The bottom edge
+   is the same with or without masks, so the alignment is stable
+   whichever kind of heading a section uses. */
 .section-head {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   gap: var(--sp-3);
   margin-bottom: var(--sp-5);
 }
@@ -159,18 +167,27 @@ p {
   height: 1px;
   background: currentColor;
   transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--dur) var(--ease);
+  /* the rule draws in from the left and retracts to the RIGHT — the
+     pointer's origin flips with the state, so the line reads as one
+     stroke passing through rather than a bar being switched on and
+     off. The retract is quicker: leaving should feel decided. */
+  transform-origin: right;
+  transition: transform var(--dur-quick) var(--ease-exit);
 }
 .ulink:hover::after,
 .ulink:focus-visible::after {
   transform: scaleX(1);
+  transform-origin: left;
+  transition: transform var(--dur) var(--ease-rule);
 }
 
-/* ---------- reveal on scroll ---------- */
+/* ---------- reveal on scroll ----------
+   `--rd` is the direction (set by useReveal: 1 arriving from below,
+   -1 from above) and `--reveal-dist` the velocity-scaled travel. Both
+   are only ever read in the hidden state. */
 .reveal {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(calc(var(--rd, 1) * var(--reveal-dist, 16px)));
   transition:
     opacity var(--dur-slow) var(--ease),
     transform var(--dur-slow) var(--ease);
@@ -180,6 +197,7 @@ p {
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+  will-change: auto;
 }
 
 /* image mask reveal — clip wipes open */
@@ -190,6 +208,52 @@ p {
 }
 .img-reveal.is-visible {
   clip-path: inset(0 0 0 0);
+}
+
+/* ---------- SetType — type that sets itself ----------
+   Each line rides in its own overflow mask and rises out from behind
+   its baseline. The tell that separates this from "text slides up" is
+   the tracking: letters travel slightly loose and tighten to their
+   final spacing as the line lands, so it reads as type being pressed
+   into paper. One entrance move, used for every title on the site.
+
+   `--ls` is the heading's resting letter-spacing; the block must
+   declare it wherever that differs from the -0.02em heading default. */
+.set {
+  --ls: -0.02em;
+  display: block;
+}
+.set-line {
+  /* Every heading here is set tighter than 1.0, so the glyphs
+     overflow their own line boxes — a mask sized to the line box
+     would shave the caps and the descenders. The relief pads the
+     mask out past both and the negative margins hand the space
+     straight back, so nothing about the layout moves. */
+  --relief-top: 0.3em;
+  --relief-bottom: 0.22em;
+  display: block;
+  overflow: hidden;
+  padding-top: var(--relief-top);
+  margin-top: calc(var(--relief-top) * -1);
+  padding-bottom: var(--relief-bottom);
+  margin-bottom: calc(var(--relief-bottom) * -1);
+}
+.set-line-in {
+  display: block;
+  /* past 100% — the extra clears the bottom relief, so a line waiting
+     its turn is properly gone rather than showing a sliver of itself */
+  transform: translateY(130%);
+  letter-spacing: calc(var(--ls) + 0.035em);
+  transition:
+    transform var(--dur-set) var(--ease-set),
+    letter-spacing var(--dur-set) var(--ease-set);
+  transition-delay: calc(var(--i, 0) * var(--stagger) + var(--set-delay, 0s));
+  will-change: transform;
+}
+.set.is-visible .set-line-in {
+  transform: none;
+  letter-spacing: var(--ls);
+  will-change: auto;
 }
 
 /* ---------- focus ---------- */
@@ -245,5 +309,12 @@ html.lenis body {
     opacity: 1;
     transform: none;
     clip-path: none;
+  }
+  .set-line {
+    overflow: visible;
+  }
+  .set-line-in {
+    transform: none;
+    letter-spacing: var(--ls);
   }
 }

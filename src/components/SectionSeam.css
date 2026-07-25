@@ -1,0 +1,64 @@
+/* ============================================================
+   SectionSeam — the ruled line between two sections.
+   Geometry only; the drawing is scrubbed in SectionSeam.jsx.
+   ============================================================ */
+
+.seam {
+  position: relative;
+  /* the seam sits inside the section it opens, above the heading —
+     close enough to belong to it, far enough to still read as the
+     boundary the section starts from */
+  margin-bottom: clamp(30px, 5.5vh, 60px);
+}
+.seam-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(14px, 2vw, 26px);
+}
+
+.seam-folio,
+.seam-note {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: var(--op, 1);
+  white-space: nowrap;
+}
+.seam-folio {
+  color: var(--espresso);
+  font-variant-numeric: tabular-nums;
+  /* the stamp scales about the number's own left edge so it presses
+     down onto the margin instead of drifting off it */
+  transform-origin: left center;
+}
+.seam-note {
+  color: var(--ink-faint);
+  text-align: right;
+}
+
+/* the drawn line — a 1px hairline scaled on the x axis, so the growth
+   stays on the compositor and never touches layout */
+.seam-rule {
+  height: 1px;
+  background: var(--line);
+  transform-origin: left center;
+  transform: scaleX(0);
+  will-change: transform;
+}
+.seam-static .seam-rule {
+  transform: none;
+}
+
+@media (max-width: 620px) {
+  /* the note is the first thing to go — at this width the rule needs
+     the room more than the fact does */
+  .seam-note {
+    display: none;
+  }
+  .seam-inner {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}

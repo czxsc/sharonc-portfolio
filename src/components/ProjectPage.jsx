@@ -1,24 +1,70 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { projects } from '../data/content.js';
 import { useOverlayPage } from '../hooks/useOverlayPage.js';
 import StackDiagram from './StackDiagram.jsx';
 import FlowDiagram from './FlowDiagram.jsx';
 import ArchMap from './ArchMap.jsx';
+import SetType from './SetType.jsx';
 import './ProjectPage.css';
 
 /* ------------------------------------------------------------------
    Full-screen project case study (layout modeled on dousanmiao.com's
    case pages): title + status pill, hero media, intro with link
-   chips, labeled meta rows, then the case sections. Professional
-   registers only — a calm fade/rise, no iris.
+   chips, labeled meta rows, then the case sections.
+
+   The case study doesn't appear over the index — it opens *out of*
+   it. `origin` is the rect of the preview frame the reader was
+   already looking at, and the hero image travels from there to its
+   place on the page while the rest of the article sets around it
+   (see flipHero). Closing puts it back where it came from, so the
+   index is where you left it rather than somewhere you return to.
 
    ← / → (buttons or arrow keys) move between projects without
    closing; the single history entry from useOverlayPage still means
    one browser-back closes the whole thing.
    ------------------------------------------------------------------ */
 
-const CLOSE_MS = 300; // covers the .25s closing fade in ProjectPage.css
+const CLOSE_MS = 480; // covers the reverse flight + the fade behind it
+const OPEN_MS = 620;
+const BACK_MS = 420;
+const FLIP_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+/* Grow/return the hero between `rect` and its laid-out place.
+
+   The two boxes have different proportions (the index frame is
+   16:9.5, the case hero 21:9), so a single scale would visibly
+   stretch the photograph. Instead the figure takes the non-uniform
+   scale — it's the *frame* that changes shape — and the image inside
+   takes the inverse on Y, which leaves the picture itself scaling
+   evenly. Standard two-element FLIP; the reason it's here is that a
+   distorting photo is exactly the tell that gives a transition away.
+
+   Returns the animation so callers can await/cancel it. */
+function flipHero(fig, rect, { reverse = false, duration } = {}) {
+  const img = fig?.querySelector('img');
+  if (!fig || !img || !rect) return null;
+
+  const to = fig.getBoundingClientRect();
+  if (!to.width || !to.height) return null;
+
+  const dx = rect.left + rect.width / 2 - (to.left + to.width / 2);
+  const dy = rect.top + rect.height / 2 - (to.top + to.height / 2);
+  const sx = rect.width / to.width;
+  const sy = rect.height / to.height;
+
+  const away = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+  const frames = reverse ? ['none', away] : [away, 'none'];
+  const counter = reverse ? ['none', `scale(1, ${sx / sy})`] : [`scale(1, ${sx / sy})`, 'none'];
+  const opts = {
+    duration: duration ?? (reverse ? BACK_MS : OPEN_MS),
+    easing: FLIP_EASE,
+    fill: 'both',
+  };
+
+  img.animate(counter.map((transform) => ({ transform })), opts);
+  return fig.animate(frames.map((transform) => ({ transform })), opts);
+}
 
 /* small stroke icons for section.points tiles (pain-point summaries) */
 const POINT_ICONS = {
@@ -77,11 +123,14 @@ const POINT_ICONS = {
   ),
 };
 
-export default function ProjectPage({ index, onNavigate, onClose }) {
+export default function ProjectPage({ index, origin, onNavigate, onClose }) {
   const project = projects[index];
   const page = project.page;
   const backRef = useRef(null);
   const scrollRef = useRef(null);
+  const heroRef = useRef(null);
+  const flownRef = useRef(false); // the flight is the *opening*, not a page change
+  const [dir, setDir] = useState(0); // which way ←/→ last moved
   const { state, requestClose } = useOverlayPage({
     slug: project.slug,
     closeMs: CLOSE_MS,
@@ -89,12 +138,41 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
     focusRef: backRef,
   });
 
+  const reduce =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Outbound flight, once, before paint. */
+  useLayoutEffect(() => {
+    if (reduce || flownRef.current || !origin) return;
+    flownRef.current = true;
+    flipHero(heroRef.current, origin);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* Return flight. If the reader has scrolled the hero off screen
+     there is nothing left to fly — sending an off-screen element on a
+     journey nobody can see just delays the close — so the page falls
+     back to its plain fade. */
+  const flying = useRef(false);
+  useLayoutEffect(() => {
+    if (state !== 'closing' || reduce || !origin || flying.current) return;
+    const fig = heroRef.current;
+    if (!fig) return;
+    const r = fig.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) return;
+    flying.current = true;
+    flipHero(fig, origin, { reverse: true });
+  }, [state, origin, reduce]);
+
   // which toggle.sections branch is showing (page.toggle.options[0] by
   // default); only meaningful for projects that define page.toggle
   const [view, setView] = useState(page.toggle?.options[0]?.id);
 
-  const go = (dir) =>
-    onNavigate((index + dir + projects.length) % projects.length);
+  const go = (d) => {
+    setDir(d);
+    onNavigate((index + d + projects.length) % projects.length);
+  };
 
   // fresh case study starts from the top, and the toggle resets to its
   // default branch — the article itself doesn't remount, so this state
@@ -120,7 +198,8 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
     <div
       className={`pp ${state === 'open' ? 'is-open' : ''} ${
         state === 'closing' ? 'is-closing' : ''
-      }`}
+      } ${origin ? 'has-flight' : ''}`}
+      style={{ '--page-dir': dir }}
     >
       <div
         className="pp-scroll"
@@ -132,7 +211,10 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
       >
         {/* key remounts the article per project so the entrance rise
             replays when paging with the arrows */}
-        <article className="pp-page" key={project.slug}>
+        <article
+          className={`pp-page ${dir ? 'is-paged' : ''}`}
+          key={project.slug}
+        >
           <div className="pp-topbar">
             <button ref={backRef} className="pp-back" onClick={requestClose}>
               <span className="pp-back-ring" aria-hidden="true">
@@ -170,7 +252,7 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
 
           <header className="pp-head">
             <div className="pp-head-text">
-              <h1>{project.name}</h1>
+              <SetType as="h1" lines={project.name} />
               <p className="pp-subtitle">{page.subtitle}</p>
             </div>
             <span className="pp-status" data-status={page.status}>
@@ -184,6 +266,7 @@ export default function ProjectPage({ index, onNavigate, onClose }) {
             media={{ src: project.image, ...page.hero }}
             className="pp-hero"
             alt={`${project.name} preview`}
+            figRef={heroRef}
           />
 
           <div className="pp-intro">
@@ -353,9 +436,12 @@ function Section({ s }) {
 /* media panel: real image when given, labeled placeholder otherwise;
    media.fit shows the whole image at its own ratio instead of the
    21:9 crop (for screenshots that crop badly) */
-function Media({ media, className, alt }) {
+function Media({ media, className, alt, figRef }) {
   return (
-    <figure className={`pp-media ${className} ${media.fit ? 'is-fit' : ''}`}>
+    <figure
+      ref={figRef}
+      className={`pp-media ${className} ${media.fit ? 'is-fit' : ''}`}
+    >
       {media.src ? (
         <img
           src={media.src}

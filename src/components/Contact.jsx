@@ -1,5 +1,7 @@
 import { contact, meta, links } from '../data/content.js';
-import { Sparkle, Coffee, Heart } from './Doodles.jsx';
+import { Sparkle, Coffee, Heart, HandRule } from './Doodles.jsx';
+import SectionSeam from './SectionSeam.jsx';
+import SetType from './SetType.jsx';
 import './Contact.css';
 
 const social = [
@@ -13,29 +15,50 @@ export default function Contact() {
   return (
     <section id="contact" className="section contact">
       <div className="container">
-        <div className="section-head reveal">
-          <h2>Contact</h2>
-          <p className="head-note">{meta.status}</p>
+        <SectionSeam folio="04 — CONTACT" note={meta.status} />
+
+        <div className="section-head">
+          <SetType as="h2" lines="Contact" />
         </div>
 
-        <div className="contact-main reveal">
-          <h3 className="contact-title">
-            {contact.title}
-            <Sparkle size={30} className="contact-sparkle" />
-          </h3>
-          <p className="contact-body">{contact.body}</p>
+        <div className="contact-main">
+          {/* title lines are declared in content.js — where a headline
+              breaks is a typographic call, and SetType gives each of
+              those lines its own beat */}
+          <SetType
+            as="h3"
+            className="contact-title"
+            lines={[
+              contact.title[0],
+              <>
+                {contact.title[1]}
+                <Sparkle size={30} className="contact-sparkle" />
+              </>,
+            ]}
+            style={{ '--set-delay': '0.1s' }}
+          />
+          <p className="contact-body reveal" style={{ '--reveal-delay': '0.18s' }}>
+            {contact.body}
+          </p>
 
-          <a href={links.email} className="contact-email ulink">
+          {/* the address is the one place the pen comes out — a drawn
+              rule rather than the hairline every other link gets */}
+          <a
+            href={links.email}
+            className="contact-email reveal"
+            style={{ '--reveal-delay': '0.26s' }}
+          >
             {meta.email}
+            <HandRule className="contact-rule" />
           </a>
         </div>
 
-        <ul className="contact-links reveal" style={{ '--reveal-delay': '0.08s' }}>
-          {social.map((s) => (
-            <li key={s.label}>
+        <ul className="contact-links">
+          {social.map((s, i) => (
+            <li key={s.label} style={{ '--i': i }}>
               <a
                 href={s.href}
-                className="contact-link"
+                className="contact-link reveal"
                 target={s.href.startsWith('http') ? '_blank' : undefined}
                 rel={s.href.startsWith('http') ? 'noreferrer' : undefined}
               >
