@@ -1,14 +1,13 @@
 .contact {
   padding-bottom: 0;
 }
-.contact-main {
-  max-width: 60ch;
+.contact-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: clamp(40px, 8vw, 128px);
+  align-items: start;
 }
-.contact-main {
-  position: relative;
-}
-/* the sparkle rides at the end of the copy, so it belongs to the last
-   word rather than arriving as its own object */
+.contact-main { position: relative; }
 .contact-sparkle {
   color: var(--espresso);
   display: inline-block;
@@ -16,20 +15,28 @@
   margin-left: 10px;
 }
 .contact-body {
-  font-size: var(--fs-lead);
+  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
   line-height: 1.55;
   color: var(--ink-soft);
   max-width: 48ch;
+}
+.contact-status {
+  margin-top: var(--sp-3);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--espresso);
 }
 .contact-email {
   position: relative;
   display: inline-block;
   font-family: var(--serif);
   font-weight: 500;
-  font-size: clamp(1.5rem, 4vw, 2.8rem);
+  font-size: clamp(1.25rem, 2.35vw, 2rem);
   letter-spacing: -0.02em;
   color: var(--ink);
-  margin-top: clamp(28px, 4vw, 48px);
+  margin-top: clamp(24px, 3vw, 36px);
   /* the wash needs room to sit around the letters without touching
      the copy above it */
   padding: 0.06em 0.16em;
@@ -62,25 +69,20 @@
   color: var(--espresso);
 }
 
-/* link row */
 .contact-links {
   list-style: none;
   padding: 0;
-  margin-top: clamp(48px, 8vw, 96px);
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  margin: 0;
   border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line);
 }
-/* each link's rule is drawn rather than printed: the row rules come
-   in one after another, left to right across the grid, and the
-   label rides up behind its own */
 .contact-link {
   position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: var(--sp-4) 0;
-  padding-right: var(--sp-3);
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 17px 0;
   transition: transform var(--dur) var(--ease);
 }
 .contact-link.reveal {
@@ -123,13 +125,13 @@
 }
 .contact-link-label {
   font-family: var(--serif);
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: var(--ink);
 }
 .contact-link-note {
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.67rem;
   letter-spacing: 0.04em;
   color: var(--ink-faint);
   display: inline-flex;
@@ -148,7 +150,7 @@
 
 /* footer */
 .footer {
-  margin-top: clamp(64px, 10vw, 120px);
+  margin-top: clamp(56px, 8vw, 96px);
   border-top: 1px solid var(--line);
   padding-block: var(--sp-4);
 }
@@ -185,14 +187,13 @@
 }
 
 @media (max-width: 720px) {
-  .contact-links {
-    grid-template-columns: 1fr 1fr;
+  .contact-layout {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
   }
 }
 @media (max-width: 460px) {
-  .contact-links {
-    grid-template-columns: 1fr;
-  }
+  .contact-link { align-items: flex-start; flex-direction: column; gap: 4px; }
   .footer-inner {
     justify-content: flex-start;
   }

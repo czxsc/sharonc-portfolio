@@ -15,10 +15,14 @@
 /* ---------- scroll runway + pinned stage ---------- */
 
 /* TUNE: total scroll distance for the transition.
-   230vh = 100vh of hero + 130vh of pinned scrub. */
+   265vh = 100vh of hero + 165vh of pinned scrub. The last ~33vh of
+   the scrub is deliberately empty of new motion: the About finishes
+   assembling at p = 0.80 (const T in the JSX) and then just sits
+   there, which is the only stretch of scroll where it can actually
+   be read. Shortening this steals the reading, not the animation. */
 .pour {
   position: relative;
-  height: 230vh;
+  height: 265vh;
 }
 
 .pour-stage {
@@ -98,18 +102,11 @@
   will-change: transform;
   z-index: 2;
 }
-/* chalky grain over the whole body — wave and fill together, so the
-   surface reads as one mass (screen-blend is invisible over the paper) */
-.pour-body::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--pour-grain);
-  background-size: 140px 140px;
-  opacity: 0.08;
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
+/* NOTE: the grain used to live here as .pour-body::after at inset: 0.
+   It has moved into .pour-flow (see .pour-grain) so that it shares the
+   clip: at inset: 0 it reached the transparent strip above the wave
+   crest, where screen-blending against nothing left a faint haze
+   rectangle standing over the paper. */
 
 /* liquid surface: two wave trains scrolling continuously in opposite
    directions at different speeds (the classic pour-fill technique —
@@ -159,14 +156,301 @@
   right: 0;
   top: calc(var(--wave-h) - 2px); /* 2px overlap hides the seam */
   bottom: 0;
-  background: var(--liquid);
+  /* a pool is darker at the bottom — costs nothing, and it's most of
+     what separates "body of liquid" from "filled rectangle" before
+     the convection layer even moves */
+  background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgb(var(--liquid-deep) / 0.3) 100%
+    ),
+    var(--liquid);
 }
 
-/* ---------- About content over the liquid ----------
-   Opacity/pointer-events arrive via CSS vars (--op / --pe) set by
-   Motion — plain style-value MotionValues don't re-render on scroll
-   in motion v12.42, but CSS variables and transforms do. Fallbacks
-   (1 / auto-none) keep the reduced-motion static markup visible. */
+/* ---------- convection ----------
+   Five lobes drifting under the surface. See LiquidFlow() in the JSX
+   for why there is no filter: blur() here — the softness is entirely
+   in the gradient stops, so the layer never leaves the compositor.
+
+   Every lobe fades to its OWN colour at zero alpha rather than to
+   `transparent`: `transparent` computes to rgba(0,0,0,0) and sRGB
+   interpolation toward it drags a grey cast through the midpoint,
+   which on a warm brown reads as a dirty halo. */
+.pour-flow {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* NO opacity here, and no isolation/z-index either. An earlier cut
+     capped the whole group at 0.6 to protect text contrast, but that
+     clamps the dark end and the bright end together — and only the
+     bright end is actually constrained. Removing it is what let the
+     field's luminance spread go from 24 to 39 levels. The ceiling is
+     now set per-lobe, verified against the worst composite the
+     animation can produce.
+
+     Keeping this element out of the stacking-context business also
+     matters: .pour-grain below blends with the fill underneath, which
+     it can only reach if nothing here isolates it. */
+}
+.pour-lobes {
+  position: absolute;
+  inset: 0;
+}
+
+/* Inside the rising body the field is clipped to exactly the fill's
+   box — see the note in the JSX for why the crests must paint after.
+   Clipping alone isn't enough though: the crests are drawn in flat
+   --liquid, so a bright lobe sitting immediately under them put a
+   ~50-level horizontal step across the whole pour. Both layers ramp
+   in over the first wave-height below the surface instead, which puts
+   zero contrast at the join. None of this is visible once the pool is
+   full — by then the wave band has travelled above the frame. */
+.pour-body > .pour-flow {
+  top: calc(var(--wave-h) - 2px);
+}
+.pour-body > .pour-flow .pour-lobes,
+.pour-body > .pour-flow .pour-grain {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 var(--wave-h));
+  mask-image: linear-gradient(180deg, transparent 0, #000 var(--wave-h));
+}
+
+/* Each lobe is a composited layer sized larger than the pool, so the
+   five together cost roughly 35MB of GPU texture at 1440p. That's the
+   deliberate price of doing this without filter: blur() — a blur would
+   be cheaper in memory and far more expensive per frame, which is the
+   wrong trade underneath a scrubbed pin. */
+.pour-lobe {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  animation-iteration-count: infinite;
+  /* symmetric sine-ish curve: an ease-out would visibly park at each
+     turnaround, and liquid this slow never stops */
+  animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* Every lobe is far LARGER than the pool — roughly 1.1–1.5× it in
+   each axis. That scale is the whole difference between this and a
+   lava lamp: a lobe sized to the frame puts a tight core inside it
+   and reads as a glowing orb on a dark ground with a dead patch
+   between orbs, whereas a lobe this large crosses the pool with only
+   a gentle part of its falloff, so the masses meet along soft
+   diagonal boundaries. Rotation gives those boundaries their grain.
+
+   Alphas are set per-lobe against the measured worst case, INCLUDING
+   the grain — which is not contrast-neutral: it screen-blends, so it
+   only ever lightens, and it lifts the whole field about 8 levels.
+   Tuned against the post-grain composite, --on-liquid-faint holds
+   5.0:1 and --on-liquid-soft 6.1:1 at the brightest frame. The dark
+   lobes are free to run near full strength — darkening the ground
+   only ever improves cream-on-liquid contrast, and it's where most of
+   the field's range comes from. */
+
+/* the pool's own shadow, low and to the left. Strongest lobe in the
+   set: this is what gives the field depth instead of a lighter wash */
+.pour-lobe-c {
+  left: -35%;
+  bottom: -50%;
+  width: 130%;
+  height: 115%;
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--liquid-deep) / 0.92) 0%,
+    rgb(var(--liquid-deep) / 0.48) 50%,
+    rgb(var(--liquid-deep) / 0) 86%
+  );
+  animation-name: pour-convect-c;
+  animation-duration: 11s;
+  animation-delay: -5s;
+}
+
+/* a second shadow high on the right, so the dark isn't all pooled at
+   one end and the two crema masses can't settle into a mirror */
+.pour-lobe-e {
+  right: -40%;
+  top: -42%;
+  width: 105%;
+  height: 110%;
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--liquid-deep) / 0.72) 0%,
+    rgb(var(--liquid-deep) / 0.34) 50%,
+    rgb(var(--liquid-deep) / 0) 86%
+  );
+  animation-name: pour-convect-e;
+  animation-duration: 15s;
+  animation-delay: -9s;
+}
+
+/* the main body of crema, sweeping down out of the top-left */
+.pour-lobe-a {
+  left: -50%;
+  top: -50%;
+  width: 125%;
+  height: 155%;
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--liquid-lobe) / 0.58) 0%,
+    rgb(var(--liquid-lobe) / 0.3) 50%,
+    rgb(var(--liquid-lobe) / 0) 86%
+  );
+  animation-name: pour-convect-a;
+  animation-duration: 9s;
+  animation-delay: -3s;
+}
+
+/* the second mass pushes back from the bottom-right in a redder
+   roast — the field needs a hue difference and not just a lightness
+   one, or it reads as a spotlight rather than as two liquids */
+.pour-lobe-b {
+  right: -45%;
+  bottom: -45%;
+  width: 110%;
+  height: 135%;
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--liquid-warm) / 0.5) 0%,
+    rgb(var(--liquid-warm) / 0.26) 50%,
+    rgb(var(--liquid-warm) / 0) 86%
+  );
+  animation-name: pour-convect-b;
+  animation-duration: 13s;
+  animation-delay: -8s;
+}
+
+/* light lying across the surface. Wide and shallow rather than round,
+   so it reads as sheen and not a fifth mass */
+.pour-lobe-d {
+  left: 4%;
+  top: 10%;
+  width: 92%;
+  height: 42%;
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--liquid-glint) / 0.09) 0%,
+    rgb(var(--liquid-glint) / 0.042) 50%,
+    rgb(var(--liquid-glint) / 0) 80%
+  );
+  animation-name: pour-convect-d;
+  animation-duration: 17s;
+  animation-delay: -6s;
+}
+
+/* Film grain over the whole field. Lives inside .pour-flow so it
+   shares the clip — on .pour-body it used to paint a faint haze above
+   the liquid line too. Screen-blends against the fill beneath, which
+   is why nothing in this layer may create a stacking context. */
+.pour-grain {
+  position: absolute;
+  inset: 0;
+  background-image: var(--pour-grain);
+  background-size: 140px 140px; /* 1:1 with the SVG — no resampling */
+  /* 0.24, up from an original 0.08. The reference's grain measures
+     ~2.9 levels of high-pass sigma, but that reading comes off a
+     downscaled video, which averages noise away and under-reports it;
+     this sits at ~3.6 and reads as film rather than as dirt. 0.08
+     landed near 1.5 — present in the code, not on screen. */
+  opacity: 0.24;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Each lobe travels, deforms AND turns. Translation alone reads as a
+   drifting ball; it's the non-uniform scale plus the rotation that
+   sells it as something viscous. Because each keyframe rewrites
+   `transform` wholesale, every one has to restate the resting angle.
+
+   Amplitudes and durations are set from a measurement, not by feel.
+   The reference field shifts ~5.6% of its luminance range every half
+   second; the first version of this ran on 31–53s periods and managed
+   0.63 levels per half second, which is under the threshold at which
+   a large smooth gradient reads as moving at all — hence "I can't see
+   any movement". These durations put it at ~1.8 levels, about two
+   thirds of the reference's rate, which is as far as it can go before
+   it stops feeling calm. */
+@keyframes pour-convect-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1, 1) rotate(-24deg);
+  }
+  25% {
+    transform: translate3d(11%, -8%, 0) scale(1.2, 0.89) rotate(-14deg);
+  }
+  50% {
+    transform: translate3d(-5%, 9%, 0) scale(0.88, 1.18) rotate(-33deg);
+  }
+  75% {
+    transform: translate3d(-9%, -2%, 0) scale(1.09, 1.03) rotate(-19deg);
+  }
+}
+@keyframes pour-convect-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1, 1) rotate(20deg);
+  }
+  33% {
+    transform: translate3d(-12%, 8%, 0) scale(1.24, 0.93) rotate(9deg);
+  }
+  66% {
+    transform: translate3d(8%, -9%, 0) scale(0.86, 1.15) rotate(30deg);
+  }
+}
+@keyframes pour-convect-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1, 1) rotate(-13deg);
+  }
+  30% {
+    transform: translate3d(-13%, -6%, 0) scale(1.18, 1.12) rotate(-3deg);
+  }
+  70% {
+    transform: translate3d(12%, 3%, 0) scale(0.9, 0.89) rotate(-22deg);
+  }
+}
+@keyframes pour-convect-d {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1, 1) rotate(-12deg);
+  }
+  40% {
+    transform: translate3d(12%, 9%, 0) scale(1.28, 1.2) rotate(-5deg);
+  }
+  75% {
+    transform: translate3d(-8%, 5%, 0) scale(0.86, 1.06) rotate(-18deg);
+  }
+}
+@keyframes pour-convect-e {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1, 1) rotate(14deg);
+  }
+  33% {
+    transform: translate3d(10%, 7%, 0) scale(1.22, 0.91) rotate(24deg);
+  }
+  66% {
+    transform: translate3d(-9%, -5%, 0) scale(0.89, 1.16) rotate(5deg);
+  }
+}
+
+/* ==============================================================
+   About content over the liquid.
+
+   Composition: a top rule, a left column carrying the greeting →
+   statement → aside, a chronological rail on the right, and a
+   toolkit colophon closing the bottom. Deliberately not centred and
+   not two equal columns — the left column outweighs the right about
+   2:1, and the two full-width rules frame the whole thing like a
+   printed spread.
+
+   Every group is handed ONE 0→1 ramp as --rv by Motion (plain
+   style-value MotionValues don't re-render on scroll in v12.42, but
+   CSS variables and transforms do). Opacity, travel and per-child
+   stagger are all derived from it here, so the JS stays a timing
+   sheet and the styling stays in CSS. --rv unset falls back to 1,
+   which is what lets the same markup serve as the static
+   reduced-motion version.
+   ============================================================== */
 .pour-about {
   position: absolute;
   top: 0;
@@ -187,71 +471,241 @@
   pointer-events: var(--pe, none);
 }
 
-.pour-about-title {
-  font-size: var(--fs-h1);
-  color: var(--on-liquid);
-  margin-bottom: clamp(18px, 3.5vh, 40px);
-  opacity: var(--op, 1);
-}
-.pour-about-body,
-.pour-about-side {
-  opacity: var(--op, 1);
-}
-
 .pour-about-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: clamp(32px, 6vw, 88px);
+  /* ~2:1, not two near-equal columns — the statement needs the measure
+     to hold its three declared line breaks without wrapping */
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.72fr);
+  grid-template-areas:
+    'rule rule'
+    'main rail'
+    'colo colo';
+  column-gap: clamp(36px, 6vw, 96px);
+  row-gap: clamp(20px, 3.6vh, 44px);
   align-items: start;
 }
 
-/* body carries the column alone under the headline, so it sits a
-   step larger than default body text */
-.pour-about-para {
-  font-size: clamp(1rem, 1.2vw, 1.1rem);
-  line-height: 1.7;
-  color: var(--on-liquid-soft);
-  max-width: 56ch;
-}
-.pour-about-para + .pour-about-para {
-  margin-top: var(--sp-3);
-}
-/* the first line after the heading reads brighter, easing the jump
-   from display serif to body text */
-.pour-about-para:first-child {
-  color: var(--on-liquid);
+/* the whole block lifts as it arrives; --rv also drives opacity per
+   group, so nothing appears before the liquid is under it */
+.pour-rule,
+.pour-greeting,
+.pour-note,
+.pour-rail,
+.pour-colophon {
+  opacity: var(--rv, 1);
+  transform: translateY(calc((1 - var(--rv, 1)) * 16px));
 }
 
-/* ---- right column: experience, then toolkit ---- */
-.pour-side-label {
+/* ---- top rule: label — hairline — the one fact worth reading first ---- */
+.pour-rule {
+  grid-area: rule;
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 26px);
+}
+.pour-rule-label {
   font-family: var(--mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.18em;
+  font-size: 0.64rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--on-liquid-faint);
+  flex: none;
+}
+/* drawn, not switched on — the rule reads as one stroke across */
+.pour-rule-line {
+  flex: 1;
+  height: 1px;
+  background: var(--on-liquid-line);
+  transform: scaleX(var(--rv, 1));
+  transform-origin: left;
+}
+
+/* ---- left column ---- */
+.pour-about-main {
+  grid-area: main;
+}
+
+/* italic, and deliberately small: the hero already set the name at
+   display size a screen ago, so repeating it big would spend the
+   loudest type on the least new information */
+.pour-greeting {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-style: italic;
+  font-size: clamp(1.02rem, 1.5vw, 1.28rem);
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: var(--on-liquid-soft);
+}
+
+/* ---- the statement — largest type in the section ---- */
+.pour-statement {
+  margin-top: clamp(10px, 1.8vh, 20px);
+  font-family: var(--serif);
+  font-weight: 600;
+  /* vh in the middle term keeps the display size honest on short
+     laptop screens, where the section has one viewport and no more */
+  font-size: clamp(1.6rem, min(3.4vw, 5.2vh), 2.9rem);
+  line-height: 1.16;
+  letter-spacing: -0.022em;
+  color: var(--on-liquid);
+}
+/* Same move as SetType: each line rides its own mask and rises out
+   from behind its baseline, tracking loose → tight as it lands. Not
+   SetType itself — that's IntersectionObserver-driven, and inside a
+   pinned stage every line is already "in view" from the start, so
+   this one has to come off the scrub instead.
+
+   The relief pads the mask past the cap height and past the inked
+   underline below the baseline; the negative margins hand the space
+   straight back so the layout doesn't move. */
+.pour-set-line {
+  --relief-top: 0.2em;
+  --relief-bottom: 0.46em;
+  display: block;
+  overflow: hidden;
+  padding-top: var(--relief-top);
+  margin-top: calc(var(--relief-top) * -1);
+  padding-bottom: var(--relief-bottom);
+  margin-bottom: calc(var(--relief-bottom) * -1);
+}
+/* each line's own 0→1, offset by its index: line 0 is done by the
+   time line 2 starts, so the block sets top-down like a cascade
+   rather than three lines moving as one slab */
+.pour-set-in {
+  --lv: clamp(0, calc(var(--rv, 1) * 2.2 - var(--i, 0) * 0.6), 1);
+  display: block;
+  transform: translateY(calc((1 - var(--lv)) * 135%));
+  letter-spacing: calc(-0.022em + (1 - var(--lv)) * 0.035em);
+}
+
+/* ---- the signature: hand-inked marks under the three disciplines ---- */
+.pour-mark {
+  position: relative;
+  white-space: nowrap;
+}
+.pour-mark-ink {
+  position: absolute;
+  left: -0.05em;
+  right: -0.05em;
+  bottom: -0.2em;
+  width: auto;
+  /* the left/right offsets size it; the global `svg { max-width:100% }`
+     reset would shave the overhang back off */
+  max-width: none;
+  height: 0.32em;
+  overflow: visible;
+}
+.pour-mark-ink path {
+  /* this mark's own 0→1, offset by its position in the line so the
+     three strokes land left to right rather than all at once */
+  --mv: clamp(0, calc(var(--ink, 1) * 2.4 - var(--mi, 0) * 0.7), 1);
+  fill: none;
+  stroke: var(--on-liquid-ink);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  /* pathLength="1" normalises the squiggle, so drawing it is just
+     dashoffset 1 → 0 — no getTotalLength(), no layout read */
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--mv));
+  transition: stroke-width var(--dur) var(--ease-rule),
+    stroke var(--dur) var(--ease);
+}
+/* the nib presses a little harder under the cursor */
+.pour-mark:hover .pour-mark-ink path {
+  stroke-width: 2.6;
+  stroke: var(--on-liquid);
+}
+
+/* ---- the aside: one short paragraph, annotated in the margin ---- */
+.pour-note {
+  position: relative;
+  margin-top: clamp(20px, 3.4vh, 38px);
+  padding-left: clamp(20px, 2.4vw, 34px);
+  max-width: 54ch;
+  font-size: clamp(0.85rem, 1vw, 0.97rem);
+  line-height: 1.72;
+  color: var(--on-liquid-soft);
+}
+/* same turned arrow the hero's margin note uses — one annotation
+   voice across the site, inked in crema to tie back to the marks */
+.pour-note-turn {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--on-liquid-ink);
+}
+
+/* ---- right rail: experience as a timeline ----
+   The list is chronological and the order carries meaning, so it gets
+   a rule and dots rather than four stacked blocks. */
+.pour-rail {
+  grid-area: rail;
+  padding-top: clamp(2px, 1vh, 12px);
+}
+.pour-rail-label {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--on-liquid-faint);
   padding-bottom: var(--sp-2);
-  margin-bottom: var(--sp-3);
-  border-bottom: 1px solid var(--on-liquid);
-}
-.pour-toolkit-label {
-  margin-top: clamp(18px, 3vh, 32px);
+  margin-bottom: clamp(12px, 2.2vh, 20px);
+  border-bottom: 1px solid var(--on-liquid-line);
 }
 
-.pour-exp-list {
+.pour-exp {
+  position: relative;
   list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(12px, 2vh, 20px);
+  padding: 0 0 0 22px;
 }
+/* the spine draws downward with the rail */
+.pour-exp::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0.5em;
+  bottom: 0.6em;
+  width: 1px;
+  background: var(--on-liquid-line);
+  transform: scaleY(var(--rv, 1));
+  transform-origin: top;
+}
+
 .pour-exp-item {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
+  /* rows arrive one after another down the spine */
+  --ev: clamp(0, calc(var(--rv, 1) * 2 - var(--i, 0) * 0.28), 1);
+  opacity: var(--ev);
+  transform: translateY(calc((1 - var(--ev)) * 10px));
+}
+.pour-exp-item + .pour-exp-item {
+  margin-top: clamp(10px, 1.9vh, 20px);
+}
+.pour-exp-dot {
+  position: absolute;
+  left: -22px;
+  top: 0.5em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--on-liquid-faint);
+  background: var(--liquid);
+  transition: background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+/* still running — the only two filled dots on the timeline */
+.pour-exp-item.is-now .pour-exp-dot {
+  background: var(--on-liquid-ink);
+  border-color: var(--on-liquid-ink);
 }
 .pour-exp-date {
   font-family: var(--mono);
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   letter-spacing: 0.06em;
   color: var(--on-liquid-faint);
   font-variant-numeric: tabular-nums;
@@ -259,37 +713,66 @@
 .pour-exp-org {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: clamp(1.02rem, 1.4vw, 1.18rem);
-  line-height: 1.2;
+  font-size: clamp(0.98rem, 1.3vw, 1.14rem);
+  line-height: 1.24;
   letter-spacing: -0.01em;
   color: var(--on-liquid);
   text-wrap: balance;
+  transition: color var(--dur) var(--ease);
 }
 .pour-exp-role {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
   color: var(--on-liquid-soft);
 }
+.pour-exp-item:hover .pour-exp-dot {
+  background: var(--on-liquid);
+  border-color: var(--on-liquid);
+}
 
-.pour-chips {
+/* ---- colophon: the toolkit as a printed strip, not a chip cloud ---- */
+.pour-colophon {
+  grid-area: colo;
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: clamp(16px, 2.4vw, 32px);
+  padding-top: clamp(12px, 1.8vh, 18px);
+}
+.pour-colophon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--on-liquid-line);
+  transform: scaleX(var(--rv, 1));
+  transform-origin: left;
+}
+.pour-tools {
   list-style: none;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 2px 15px;
 }
-.pour-chips li {
+.pour-tools li {
+  position: relative;
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   letter-spacing: 0.01em;
   color: var(--on-liquid-soft);
-  border: 1px solid var(--on-liquid-line);
-  border-radius: 7px;
-  padding: 5px 10px;
-  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  transition: color var(--dur-quick) var(--ease);
 }
-.pour-chips li:hover {
+.pour-tools li + li::before {
+  content: '·';
+  position: absolute;
+  left: -10px;
+  color: var(--on-liquid-line);
+}
+.pour-tools li:hover {
   color: var(--on-liquid);
-  border-color: var(--on-liquid);
 }
 
 /* ---------- anchor marker ----------
@@ -312,39 +795,99 @@
   margin: clamp(10px, 1.6vw, 22px);
   border-radius: var(--radius-lg);
   background-color: var(--liquid);
+  background-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgb(var(--liquid-deep) / 0.3) 100%
+  );
   color: var(--on-liquid);
   padding-block: var(--section-y);
   scroll-margin-top: var(--nav-h);
   overflow: hidden;
 }
-/* same subtle grain as the animated fill */
-.pour-static::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: var(--pour-grain);
-  background-size: 140px 140px;
-  opacity: 0.08;
-  mix-blend-mode: screen;
-  pointer-events: none;
+/* the flow layer is the first child, so the content has to be lifted
+   off it explicitly */
+.pour-static > .container {
+  position: relative;
+  z-index: 1;
+}
+/* grain comes with LiquidFlow here too — no ::after needed */
+
+/* Nothing is scrubbed here, so every --rv sits at its fallback of 1
+   and the composition is simply at rest. The masks are released too —
+   matching index.css's treatment of .set-line, so a hairline of
+   relief error can never shave a glyph for someone who will never
+   see the line move anyway. */
+@media (prefers-reduced-motion: reduce) {
+  .pour-set-line {
+    overflow: visible;
+  }
+  /* the lobes hold their resting pose — the pool keeps its depth and
+     its warm/cool structure, it just stops convecting */
+  .pour-lobe,
+  .pour-wave {
+    animation: none;
+  }
 }
 
 /* ---------- responsive ---------- */
-@media (max-width: 940px) {
+
+/* Short laptop screens: the section gets exactly one viewport, so the
+   display size has to give before the copy does. */
+@media (max-height: 760px) {
   .pour-about-grid {
-    grid-template-columns: 1fr;
-    gap: var(--sp-5);
+    row-gap: clamp(16px, 2.8vh, 30px);
+  }
+  .pour-statement {
+    font-size: clamp(1.5rem, min(3vw, 4.6vh), 2.4rem);
+  }
+  .pour-note {
+    margin-top: clamp(14px, 2.4vh, 24px);
+    line-height: 1.6;
   }
 }
+
+/* Reorganised rather than scaled: the rail loses its column and
+   becomes a horizontal band under the statement, so the reading order
+   stays greeting → statement → aside → history → toolkit. */
+@media (max-width: 940px) {
+  .pour-about-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'rule'
+      'main'
+      'rail'
+      'colo';
+    row-gap: clamp(22px, 3.4vh, 40px);
+  }
+  .pour-note {
+    max-width: none;
+  }
+}
+
 @media (max-width: 620px) {
-  /* TUNE: shorter runway on phones — flick-scrolling covers distance fast */
+  /* TUNE: shorter runway on phones — flick-scrolling covers distance
+     fast; the hold at the end is preserved proportionally. */
   .pour {
-    height: 205vh;
+    height: 235vh;
   }
   .pour-about {
     padding-top: calc(var(--nav-h) + 16px);
   }
-  .pour-about-para {
-    font-size: 0.88rem;
+  .pour-rule-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+  }
+  .pour-note {
+    font-size: 0.86rem;
+  }
+  .pour-exp-item + .pour-exp-item {
+    margin-top: 14px;
+  }
+  /* the sheen carries no structure — at phone width it's a wide flat
+     band nobody can perceive, so it's pure compositor texture. The
+     four that actually shape the field stay. */
+  .pour-lobe-d {
+    display: none;
   }
 }

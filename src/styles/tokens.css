@@ -25,12 +25,35 @@
   --wip: #c9973b;  /* in development */
 
   /* — Color: liquid fill (hero pour transition) — */
-  --liquid: #332c29;          /* espresso pool — dark so on-liquid text stands out */
+  /* Darker than a mid-brown on purpose: the pool carries a moving
+     convection field, and the crema lobes can only read as light ON
+     something if the ground sits well below them. Espresso is nearly
+     black anyway. Every cream-on-liquid contrast improves with it. */
+  --liquid: #15110e;          /* espresso pool — dark so on-liquid text stands out */
   --liquid-soft: #5a4b3e;     /* crema crest above the liquid surface */
   --on-liquid: #f2ede7;       /* headings/emphasis on the liquid */
-  --on-liquid-soft: rgba(242, 237, 231, 0.78); /* body text on liquid */
-  --on-liquid-faint: rgba(242, 237, 231, 0.55); /* labels on liquid */
-  --on-liquid-line: rgba(242, 237, 231, 0.2);   /* hairlines on liquid */
+  /* These were 0.78 / 0.55 back when the pool was one flat colour.
+     It isn't any more: the convection field swings it across ~39
+     levels of luminance, and at those alphas the labels fell to
+     4.1:1 over the bright part of a lobe. Lifted for two reasons —
+     the measured worst case has to clear 4.5:1 (these hold 5.0:1 and
+     6.1:1), and low-alpha text over a LIVE ground visibly shimmers as
+     the field drifts beneath it. The step between them is smaller
+     than it was on flat paper, which is fine: hierarchy on the liquid
+     is carried by size, family and tracking. */
+  --on-liquid-soft: rgba(242, 237, 231, 0.86); /* body text on liquid */
+  --on-liquid-faint: rgba(242, 237, 231, 0.74); /* labels on liquid */
+  --on-liquid-line: rgba(242, 237, 231, 0.24);  /* hairlines on liquid */
+  --on-liquid-ink: #c9a179;   /* crema — the one accent that marks up the liquid */
+
+  /* Convection lobes, as bare channels: a radial gradient has to fade
+     to its OWN colour at zero alpha, not to `transparent` (which is
+     rgba(0,0,0,0) and drags the midpoint grey in sRGB). Channels let
+     the same colour be written at both ends of the ramp. */
+  --liquid-lobe: 90 75 62;    /* crema, matches --liquid-soft */
+  --liquid-warm: 112 74 46;   /* a redder roast — the field's hue spread */
+  --liquid-deep: 12 9 7;     /* the pool's own shadow — gives it a bottom */
+  --liquid-glint: 201 161 121; /* matches --on-liquid-ink; used very faint */
 
   /* project cover tones (muted, brand-consistent) */
   --tone-a1: #3f4a3e; --tone-a2: #2c3a4a;
@@ -109,8 +132,14 @@
     --ok: #82b98b;
     --wip: #d9b06a;
     /* liquid lifts a touch so the frame separates from the dark ground */
-    --liquid: #372f2a;
+    /* sits a few levels above the light theme's pool: here the ground
+       behind it is --paper #16130f, and the frame still has to read as
+       an object on it rather than a hole in it */
+    --liquid: #201a17;
     --liquid-soft: #574a3f;
+    --liquid-lobe: 87 74 63;
+    --liquid-warm: 108 72 46;
+    --liquid-deep: 16 12 10;
     --tone-a1: #3f4a3e; --tone-a2: #24303d;
     --tone-b1: #5a4636; --tone-b2: #7c6650;
     --tone-c1: #2c3a4a; --tone-c2: #3d5364;

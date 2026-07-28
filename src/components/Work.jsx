@@ -2,7 +2,6 @@ import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { projects } from '../data/content.js';
 import { ArrowRight } from './Doodles.jsx';
 import ProjectPage from './ProjectPage.jsx';
-import SectionSeam from './SectionSeam.jsx';
 import SetType from './SetType.jsx';
 import './Work.css';
 
@@ -161,10 +160,8 @@ export default function Work() {
   return (
     <section id="work" className="section work">
       <div className="container">
-        <SectionSeam folio="02 — WORK" note={`${projects.length} selected`} />
-
         <div className="section-head">
-          <SetType as="h2" lines="Projects" />
+          <SetType as="h2" lines="Work" />
           <div
             className="work-filters reveal"
             style={{ '--reveal-delay': '0.22s' }}

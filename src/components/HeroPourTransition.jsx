@@ -7,32 +7,51 @@ import {
   useReducedMotion,
 } from 'motion/react';
 import Hero from './Hero.jsx';
-import { about, experience, stack } from '../data/content.js';
+import { about, experience, meta, stack } from '../data/content.js';
 import './HeroPourTransition.css';
 
 /* ==================================================================
    Scroll choreography.
 
-   The runway (.pour) is 230vh tall (see CSS); the stage stays pinned
-   for the first 130vh of it (230vh − 100vh viewport). Every timing
+   The runway (.pour) is 265vh tall (see CSS); the stage stays pinned
+   for the first 165vh of it (265vh − 100vh viewport). Every timing
    below is a fraction (0 → 1) of that pinned distance.
+
+   The last window closes at 0.80, which is the point: the remaining
+   0.20 (~33vh of scroll) is HOLD — the fully-set About sitting still
+   while you read it. An earlier cut of this ran the last entrance to
+   0.86 of a shorter runway and the section was only assembled for
+   ~18vh before it slid away, which is most of why it never invited
+   anyone to stop.
 
    TUNE: shift these windows to re-time the sequence. Keep them in
    order and slightly overlapping — the overlap is what makes the
-   pour read as one continuous gesture instead of four steps.
+   pour read as one continuous gesture instead of four steps. Keep
+   the last one ending well before 1.0 to preserve the hold.
    ================================================================== */
 const T = {
-  cupTilt: [0.04, 0.18], // cup rotates into the pour
-  stream: [0.18, 0.28], // stream falls only once the cup is fully tilted
-  rise: [0.28, 0.84], // fill rises the moment the stream lands — no
-  //                     horizontal run, so nothing depends on frame width
-  heading: [0.58, 0.72], // "About" ghosts in as fill passes mid-viewport
-  body: [0.66, 0.8], // lead + paragraphs, once the liquid is under them
-  list: [0.72, 0.86], // experience + toolkit column arrives last
+  cupTilt: [0.03, 0.15], // cup rotates into the pour
+  stream: [0.15, 0.24], // stream falls only once the cup is fully tilted
+  rise: [0.22, 0.6], // fill rises the moment the stream lands — no
+  //                    horizontal run, so nothing depends on frame width.
+  //                    Finishes before the statement lands, so the display
+  //                    type sets onto settled liquid rather than a moving
+  //                    surface — only the top rule ghosts in early.
+  rule: [0.42, 0.52], // top hairline draws across; folio labels arrive
+  greet: [0.46, 0.56], // "Hello, I'm Sharon!" — the small italic line
+  set: [0.5, 0.72], // the statement, three lines cascading out of their masks
+  ink: [0.65, 0.77], // marks stroke under software / AI / design, in reading
+  //                    order and only once their line has finished setting
+  note: [0.64, 0.74], // the supporting aside, alongside the ink
+  rail: [0.66, 0.78], // experience timeline draws down
+  colophon: [0.74, 0.81], // toolkit strip closes the composition
 };
 
 const CUP_MAX_TILT = -42; // deg — final pouring angle of the cup
-const HERO_INERT_AT = 0.62; // hero unfocusable once mostly submerged
+const HERO_INERT_AT = 0.46; // hero unfocusable once mostly submerged. Kept
+//                             just ahead of the point where the About
+//                             overlay starts intercepting clicks (T.rule[1]),
+//                             so the two never both own the pointer.
 
 /* ------------------------------------------------------------------
    Pour / frame geometry.
@@ -79,45 +98,170 @@ const WAVE_BACK =
   'C872 34 942 64 1042 50 C1142 36 1212 66 1312 50 C1372 41 1412 45 1440 50 ' +
   'L1440 110 L0 110 Z';
 
+/* Convection in the pool.
+
+   Four soft lobes drifting and deforming under the surface, so the
+   espresso reads as a body of liquid rather than a rectangle of
+   paint. Each lobe is a radial gradient whose softness lives in its
+   colour stops — no `filter: blur()` anywhere, which matters because
+   this runs underneath a scroll-scrubbed pinned stage and a
+   full-frame blur would have to re-rasterise every frame. Transforms
+   only: the whole layer stays on the compositor.
+
+   Periods are deliberately non-harmonic (9 / 13 / 11 / 17 / 15s) so
+   the composite never visibly loops, and the negative delays start
+   each lobe mid-cycle so the field is already in motion on first
+   paint instead of easing out of a shared pose.
+
+   DOM order is paint order and it matters: the two dark masses go
+   down first and the crema rides over them, which is the way round
+   the real thing settles. The grain is last so it lies over the
+   whole field — and it lives in here, inside the same clip, rather
+   than on .pour-body, so it can never paint above the liquid line
+   either. */
+function LiquidFlow() {
+  return (
+    <div className="pour-flow" aria-hidden="true">
+      {/* the lobes are wrapped so the top-edge fade can be masked onto
+          them as a group WITHOUT putting a mask on .pour-flow itself —
+          a mask there would make it a stacking context and cut the
+          grain's screen blend off from the fill beneath it */}
+      <div className="pour-lobes">
+        <span className="pour-lobe pour-lobe-c" />
+        <span className="pour-lobe pour-lobe-e" />
+        <span className="pour-lobe pour-lobe-a" />
+        <span className="pour-lobe pour-lobe-b" />
+        <span className="pour-lobe pour-lobe-d" />
+      </div>
+      <span className="pour-grain" />
+    </div>
+  );
+}
+
+/* 0 → 1 across `range`, shaped by an ease-out — the scrub supplies
+   position, the curve supplies weight. Matches --ease-set closely
+   enough that scrubbed and transition-driven entrances agree. */
+const clamp01 = (t) => (t < 0 ? 0 : t > 1 ? 1 : t);
+const easeOut = (t) => 1 - (1 - t) ** 3;
+
+function useRamp(p, [a, b]) {
+  return useTransform(p, (v) => easeOut(clamp01((v - a) / (b - a))));
+}
+
+/* about.statement, pre-parsed once: *word* becomes an inked mark,
+   numbered left→right across the whole block so the strokes draw in
+   reading order rather than restarting on each line. */
+let markCount = 0;
+const STATEMENT = about.statement.map((line) =>
+  line.split('*').map((text, i) => (i % 2 ? { text, mark: markCount++ } : { text }))
+);
+
+/* One word, underlined by hand.
+
+   The squiggle is a single stroke in a 100×8 box stretched to the
+   word's width (preserveAspectRatio="none"), so it fits any measure;
+   non-scaling-stroke keeps the nib a constant weight through the
+   stretch. pathLength="1" normalises the path so the draw is just
+   dashoffset 1 → 0 — no measuring, no layout read. */
+function Mark({ text, index }) {
+  return (
+    <span className="pour-mark" style={{ '--mi': index }}>
+      {text}
+      <svg
+        className="pour-mark-ink"
+        viewBox="0 0 100 8"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M1 5.2 C14 2 27 6.9 40 4.3 S67 1.7 80 4.9 S95 6.5 99 3.4"
+          pathLength="1"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    </span>
+  );
+}
+
 /* Shared About content — used over the liquid and in the
-   reduced-motion static fallback. */
-function AboutInk({ headStyle, bodyStyle, listStyle }) {
+   reduced-motion static fallback.
+
+   Every group takes a single 0→1 ramp as `--rv` and derives its own
+   opacity, travel and stagger from it in CSS (see the stylesheet).
+   NOTE: it has to be a CSS var — motion v12.42 has a bug where plain
+   style-value MotionValues (opacity, pointerEvents) never re-render
+   on scroll, while transforms and CSS vars do. Unset, every --rv
+   falls back to 1, which is what makes this markup double as the
+   static reduced-motion version. */
+function AboutInk({ ruleStyle, greetStyle, setStyle, inkStyle, noteStyle, railStyle, colophonStyle }) {
   return (
     <div className="pour-about-grid">
-      {/* NOTE: opacity is driven via --op (see CSS) — motion v12.42 has a
-          bug where plain style-value MotionValues (opacity, pointerEvents)
-          never re-render on scroll, while transforms and CSS vars do. */}
-      {/* title lives inside the left column so the Experience column
-          top-aligns with it instead of hanging below the heading */}
+      {/* top rule: what this is, and the one fact worth reading first */}
+      <motion.div className="pour-rule" style={ruleStyle}>
+        <span className="pour-rule-label">About</span>
+        <span className="pour-rule-line" aria-hidden="true" />
+        <span className="pour-rule-label">{meta.status}</span>
+      </motion.div>
+
       <div className="pour-about-main">
-        <motion.h2 className="pour-about-title" style={headStyle}>
-          Hello, I&rsquo;m Sharon!
+        <motion.h2 className="pour-greeting" style={greetStyle}>
+          {about.greeting}
         </motion.h2>
-        <motion.div className="pour-about-body" style={bodyStyle}>
-          {about.body.map((p, i) => (
-            <p key={i} className="pour-about-para">
-              {p}
-            </p>
+
+        {/* the statement carries the largest type in the section — it's
+            the idea, not the name, that earns the display size */}
+        <motion.p className="pour-statement" style={{ ...setStyle, ...inkStyle }}>
+          {STATEMENT.map((line, li) => (
+            <span key={li} className="pour-set-line" style={{ '--i': li }}>
+              <span className="pour-set-in">
+                {line.map((chunk, ci) =>
+                  chunk.mark === undefined ? (
+                    <span key={ci}>{chunk.text}</span>
+                  ) : (
+                    <Mark key={ci} text={chunk.text} index={chunk.mark} />
+                  )
+                )}
+              </span>
+            </span>
           ))}
-        </motion.div>
+        </motion.p>
+
+        <motion.p className="pour-note" style={noteStyle}>
+          <span className="pour-note-turn" aria-hidden="true">
+            ↳
+          </span>
+          {about.note}
+        </motion.p>
       </div>
 
-      <motion.div className="pour-about-side" style={listStyle}>
-        <p className="pour-side-label">Experience</p>
-        <ol className="pour-exp-list">
-          {experience.map((e) => (
-            <li key={e.org} className="pour-exp-item">
+      {/* the list is chronological, so it gets a timeline rather than
+          a stack of rows — the order is information here */}
+      <motion.div className="pour-rail" style={railStyle}>
+        <p className="pour-rail-label">Experience</p>
+        <ol className="pour-exp">
+          {experience.map((e, i) => (
+            <li
+              key={e.org}
+              className={`pour-exp-item${e.date.includes('Present') ? ' is-now' : ''}`}
+              style={{ '--i': i }}
+            >
+              <span className="pour-exp-dot" aria-hidden="true" />
               <span className="pour-exp-date">{e.date}</span>
               <span className="pour-exp-org">{e.org}</span>
               <span className="pour-exp-role">{e.role}</span>
             </li>
           ))}
         </ol>
+      </motion.div>
 
-        <p className="pour-side-label pour-toolkit-label">Toolkit</p>
-        <ul className="pour-chips">
-          {stack.map((it) => (
-            <li key={it}>{it}</li>
+      {/* toolkit as a printed colophon strip, not a cloud of chips */}
+      <motion.div className="pour-colophon" style={colophonStyle}>
+        <span className="pour-rule-label">Toolkit</span>
+        <ul className="pour-tools">
+          {stack.map((it, i) => (
+            <li key={it} style={{ '--i': i }}>
+              {it}
+            </li>
           ))}
         </ul>
       </motion.div>
@@ -148,18 +292,22 @@ export default function HeroPourTransition() {
   // point far below the visible surface while the body is translated
   // down, shifting the whole liquid sideways off the frame edge.
 
-  /* — About text — (linear on purpose: the scrub itself provides the
-     easing; T's windows control how gradual each entrance feels) */
-  const headOp = useTransform(p, T.heading, [0, 1]);
-  const headY = useTransform(p, T.heading, [28, 0]);
-  const bodyOp = useTransform(p, T.body, [0, 1]);
-  const bodyLift = useTransform(p, T.body, [24, 0]);
-  const listOp = useTransform(p, T.list, [0, 1]);
-  const listLift = useTransform(p, T.list, [24, 0]);
+  /* — About text —
+     One ramp per group; each element derives opacity, travel and its
+     own stagger slot from it in CSS. Eased here rather than left
+     linear: a scrub gives you position, not weight, and type that
+     arrives at a constant rate reads mechanical. easeOutCubic is the
+     numeric twin of --ease-set, so scrubbed entrances and the site's
+     transition-driven ones land the same way. */
+  const ruleRv = useRamp(p, T.rule);
+  const greetRv = useRamp(p, T.greet);
+  const setRv = useRamp(p, T.set);
+  const inkRv = useRamp(p, T.ink);
+  const noteRv = useRamp(p, T.note);
+  const railRv = useRamp(p, T.rail);
+  const colophonRv = useRamp(p, T.colophon);
   // overlay only intercepts clicks once it is actually visible
-  const aboutPointer = useTransform(p, (v) =>
-    v > T.heading[0] ? 'auto' : 'none'
-  );
+  const aboutPointer = useTransform(p, (v) => (v > T.rule[1] ? 'auto' : 'none'));
 
 
   /* Hero links/buttons leave the tab order once submerged (and return
@@ -271,6 +419,10 @@ export default function HeroPourTransition() {
       <div id="top" ref={wrapRef}>
         <Hero />
         <section id="about" className="pour-static" aria-label="About">
+          {/* the lobes hold their resting pose here (CSS turns the
+              animation off), so the pool still has depth without
+              anything moving */}
+          <LiquidFlow />
           <div className="container">
             <AboutInk />
           </div>
@@ -300,6 +452,15 @@ export default function HeroPourTransition() {
             style={{ '--stream-scale': streamScale }}
           />
           <motion.div className="pour-body" style={{ y: bodyY }}>
+            <div className="pour-fill" />
+            {/* Convection, clipped to exactly the fill's box. Its hard
+                top edge lands 2px above the wave band's bottom, so the
+                crests — which paint AFTER it — cover the join. That
+                ordering is the whole fix for the tinted rectangle that
+                used to hang above the liquid line: nothing in this
+                layer can reach the transparent area over the crest,
+                where you are seeing paper rather than coffee. */}
+            <LiquidFlow />
             {/* two wave trains scrolling in opposite directions at
                 different speeds — the surface reads as moving liquid,
                 not a printed edge. Each svg holds two identical wave
@@ -323,7 +484,6 @@ export default function HeroPourTransition() {
                 <path d={WAVE_FRONT} transform="translate(1439 0)" />
               </svg>
             </div>
-            <div className="pour-fill" />
           </motion.div>
         </div>
 
@@ -335,9 +495,13 @@ export default function HeroPourTransition() {
         >
           <div className="container">
             <AboutInk
-              headStyle={{ '--op': headOp, y: headY }}
-              bodyStyle={{ '--op': bodyOp, y: bodyLift }}
-              listStyle={{ '--op': listOp, y: listLift }}
+              ruleStyle={{ '--rv': ruleRv }}
+              greetStyle={{ '--rv': greetRv }}
+              setStyle={{ '--rv': setRv }}
+              inkStyle={{ '--ink': inkRv }}
+              noteStyle={{ '--rv': noteRv }}
+              railStyle={{ '--rv': railRv }}
+              colophonStyle={{ '--rv': colophonRv }}
             />
           </div>
         </motion.section>

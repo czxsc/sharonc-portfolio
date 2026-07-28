@@ -105,11 +105,20 @@ export const hero = {
   marginNote: 'CS @ Cornell\nsoftware · design · AI',
 };
 
+/* The hero already sets the name at display size, so About spends its
+   biggest type on the idea instead. `statement` is set line by line —
+   the breaks are a typographic decision, not the layout engine's —
+   and *asterisks* mark the words that get a hand-inked underline
+   drawn under them as the section arrives. */
 export const about = {
-  body: [
-    'I\'m a Computer Science student at Cornell who enjoys building at the intersection of software engineering, AI, design, and autonomous systems. I\'m most drawn to spaces where different disciplines overlap, because that\'s often where the most interesting problems emerge from.',
-    'Whatever I\'m building, I strive to understand how each piece of a system influences the next, from the underlying algorithms and infrastructure to the interface people actually interact with. Whether I\'m building an AI application, developing autonomous plane software for my team, or designing user interfaces, I enjoy balancing complex systems with experiences that feel intuitive and approachable.',
+  greeting: 'Hello, I’m Sharon!',
+  statement: [
+    'I build in the overlap:',
+    '*software*, *AI*, *design*,',
+    'and the systems underneath.',
   ],
+  note:
+    'That’s usually where the interesting problems are. Whether it’s an ML pipeline, autopilot software for a plane, or an interface someone actually touches, I want to know how each layer moves the next — and to leave the top one feeling obvious.',
 };
 
 export const stack = [

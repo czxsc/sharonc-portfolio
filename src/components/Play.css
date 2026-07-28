@@ -1,19 +1,30 @@
 /* ============================================================
-   Play — "off the clock". The cat knocks over the tote (gif
-   plays once; Play.jsx swaps first-frame still → gif → last-
-   frame still) and the hobby icons spill out to the right in a
-   scrapbook flat-lay (references/whats_in_bag_ref.jpg).
+   Play — "off the clock". The cat knocks over the tote (Play.jsx
+   steps through the frames in src/assets/cat_push_bag/ once, then
+   holds the last one) and the hobby icons spill out to the right
+   in a scrapbook flat-lay (references/whats_in_bag_ref.jpg).
    ============================================================ */
+
+/* A third of the usual section tail. Every other section ends on a
+   block of ink that meets its own edge; this one ends on scattered
+   objects with air already built in around them, so a full
+   --section-y underneath reads as a hole, not as breathing room. */
+.play {
+  padding-bottom: calc(var(--section-y) * 0.3);
+}
 
 .bag-scene {
   position: relative;
-  aspect-ratio: 2.15 / 1;
+  /* The flat-lay's optical bottom is the lowest object, not the box:
+     the scatter tops out around y 62% and everything below that is
+     empty. Held just tight enough to clear the lowest item. */
+  aspect-ratio: 2.72 / 1;
   /* entry offsets (--fx/--fy) are tuned at desktop width; --k scales
      them down with the layout */
   --k: 1;
 }
 
-.bag-gif {
+.bag-cat {
   position: absolute;
   left: 0;
   bottom: 16%;
@@ -21,16 +32,16 @@
   height: auto;
   /* own compositing layer: on lower-power hardware, the burst of item
      transitions kicking off at the spill moment can otherwise share a
-     paint pass with the actively-decoding gif and visibly stutter it */
+     paint pass with the frame swap and visibly stutter it */
   will-change: transform;
 }
 /* the cat arrives before it does anything — otherwise the scene is
    simply already there when the section scrolls up, and the knock
    reads as the first event rather than the second */
-.bag-gif.reveal {
+.bag-cat.reveal {
   --reveal-delay: 0.12s;
 }
-.bag-gif.reveal.is-visible {
+.bag-cat.reveal.is-visible {
   will-change: transform; /* keep the layer the comment above is about */
 }
 
@@ -189,10 +200,10 @@
 
 @media (max-width: 700px) {
   .bag-scene {
-    aspect-ratio: 1.35 / 1;
+    aspect-ratio: 1.55 / 1;
     --k: 0.42;
   }
-  .bag-gif {
+  .bag-cat {
     width: 55%;
     bottom: 2%;
   }

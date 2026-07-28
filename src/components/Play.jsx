@@ -1,27 +1,42 @@
 import { useEffect, useRef, useState } from 'react';
 import { hobbies } from '../data/content.js';
 import HobbyPage from './HobbyPage.jsx';
-import SectionSeam from './SectionSeam.jsx';
 import SetType from './SetType.jsx';
 import laptopImg from '../assets/laptop.webp';
 import coffeeImg from '../assets/coffee.webp';
 import controllerImg from '../assets/controller.webp';
 import headphonesImg from '../assets/headphones.webp';
 import sketchbookImg from '../assets/sketchbook.webp';
-import bagGif from '../assets/cat_push_bag.gif';
-import bagStart from '../assets/cat_push_bag_start.png';
-import bagEnd from '../assets/cat_push_bag_end.png';
+import f0 from '../assets/cat_push_bag/f0.webp';
+import f1 from '../assets/cat_push_bag/f1.webp';
+import f2 from '../assets/cat_push_bag/f2.webp';
+import f3 from '../assets/cat_push_bag/f3.webp';
+import f4 from '../assets/cat_push_bag/f4.webp';
+import f5 from '../assets/cat_push_bag/f5.webp';
+import f6 from '../assets/cat_push_bag/f6.webp';
+import f7 from '../assets/cat_push_bag/f7.webp';
 import './Play.css';
 
 /* ------------------------------------------------------------------
-   The gif loops forever on its own, so it's bookended by stills:
-   first-frame still → (scrolled into view) the gif itself → swap to a
-   last-frame still just before the loop wraps. Both stills are
-   extracted from the gif (src/assets/cat_push_bag_*.png).
+   The knock used to be the gif itself (src/assets/cat_push_bag.gif),
+   bookended by stills. That can't hold sync: a gif's clock starts on
+   decode, not on the render that set its src, and a browser re-showing
+   an already-cached animated image picks up wherever the shared clock
+   happens to be — so on a second visit it would resume mid-fall, wrap,
+   and freeze on an arbitrary frame while the spill fired on its own
+   schedule.
+
+   So we own the clock. The gif's frames are unpacked to webp (frames 6
+   and 7 of the original were byte-identical, hence 8 files for 9
+   frames) and stepped through here, which makes the spill land on an
+   actual frame rather than near one.
    ------------------------------------------------------------------ */
-const GIF_TOTAL_MS = 2470; // 19 frames × 130ms — from the gif metadata
-const KNOCK_MS = 1900; // ~frame 15: the bag is visibly down; spill starts
-const END_SWAP_MS = GIF_TOTAL_MS - 90; // freeze just before the loop wraps
+const FRAMES = [f0, f1, f2, f3, f4, f5, f6, f7];
+// when each frame gives way to the next, ms — the original gif delays
+// (130, 130, 130, 390, 130, 650+130, 130), last frame held indefinitely
+const FRAME_END = [130, 260, 390, 780, 910, 1690, 1820];
+const LAST = FRAMES.length - 1;
+const SPILL_FRAME = 6; // the bag tips on this one — let go of the items with it
 
 const imgMap = {
   laptop: laptopImg,
@@ -50,12 +65,14 @@ const SCATTER = [
 export default function Play() {
   const sceneRef = useRef(null);
   const [phase, setPhase] = useState('idle'); // idle → playing → done
+  const [frame, setFrame] = useState(0);
   const [spilled, setSpilled] = useState(false);
   const phaseRef = useRef(phase); // observers outlive renders
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
   const resetTimerRef = useRef(null);
+  const framePool = useRef(null); // decoded frames, kept alive (see below)
   const btnRefs = useRef([]); // to return focus after a mini-page closes
   const [active, setActive] = useState(null); // { hobby, index, origin }
 
@@ -82,31 +99,40 @@ export default function Play() {
     );
   };
 
-  /* Drives the knock off `phase` itself rather than the gif's onLoad —
-     an <img>'s load event only fires when its src attribute actually
-     changes, and a quick scroll-past-and-back can flip phase
-     idle→playing→idle→playing fast enough that intermediate renders
-     never commit, so the src is left unchanged and no load event ever
-     fires. Keying off `phase` sidesteps that entirely: React guarantees
-     the effect (re)runs whenever phase settles on 'playing', and its
-     cleanup cancels the timers the instant phase moves on. */
+  /* Playback. One rAF-driven clock rather than a chain of setTimeouts:
+     the frame is a function of elapsed time, so a stalled main thread
+     costs a frame instead of pushing everything after it late — and a
+     backgrounded tab pauses rather than running the knock out of sight.
+     Cleanup stops it the instant phase moves on. */
   useEffect(() => {
     if (phase !== 'playing') return;
-    const knock = setTimeout(() => setSpilled(true), KNOCK_MS);
-    const done = setTimeout(() => setPhase('done'), END_SWAP_MS);
-    return () => {
-      clearTimeout(knock);
-      clearTimeout(done);
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = now - start;
+      let i = 0;
+      while (i < FRAME_END.length && t >= FRAME_END[i]) i++;
+      setFrame(i);
+      if (i >= SPILL_FRAME) setSpilled(true);
+      if (i < LAST) raf = requestAnimationFrame(tick);
+      else setPhase('done'); // landed — hold the last frame
     };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [phase]);
 
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
-    // warm the HTTP cache WITHOUT an <img> preload — browsers sync
-    // same-URL gif animations, so a hidden preloader would already
-    // have run the clock down before the visible copy appears
-    fetch(bagGif, { cache: 'force-cache' }).catch(() => {});
+    // fetch AND decode every frame up front, and hold the Image objects
+    // for the page's life so nothing gets evicted: a decode landing
+    // mid-knock would blank the swap and drop a frame
+    framePool.current = FRAMES.map((src) => {
+      const img = new Image();
+      img.src = src;
+      img.decode?.().catch(() => {});
+      return img;
+    });
 
     // play when the scene reaches the middle band of the viewport
     // (rootMargin shrinks the trigger area to the central 20%), so the
@@ -116,6 +142,7 @@ export default function Play() {
         if (!e.isIntersecting || phaseRef.current !== 'idle') return;
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           setPhase('done'); // skip straight to the aftermath
+          setFrame(LAST);
           setSpilled(true);
           return;
         }
@@ -139,6 +166,7 @@ export default function Play() {
         }
         resetTimerRef.current = setTimeout(() => {
           setPhase('idle');
+          setFrame(0);
           setSpilled(false);
         }, 200);
       },
@@ -154,16 +182,11 @@ export default function Play() {
     };
   }, []);
 
-  const src =
-    phase === 'playing' ? bagGif : phase === 'done' ? bagEnd : bagStart;
-
   return (
     <section id="play" className="section play">
       <div className="container">
-        <SectionSeam folio="03 — PLAY" note={`${hobbies.length} things`} />
-
         <div className="section-head">
-          <SetType as="h2" lines="Off the Clock" />
+          <SetType as="h2" lines="Play" />
           <p className="head-note reveal" style={{ '--reveal-delay': '0.24s' }}>
             Dabbling in a bit of everything.
           </p>
@@ -174,8 +197,10 @@ export default function Play() {
           className={`bag-scene ${spilled ? 'is-spilled' : ''}`}
         >
           <img
-            className="bag-gif reveal"
-            src={src}
+            className="bag-cat reveal"
+            src={FRAMES[frame]}
+            width="1000"
+            height="702"
             alt="A drawn black cat knocking over a tote bag"
           />
           <ul className="bag-items">
