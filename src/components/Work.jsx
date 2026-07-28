@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { projects } from '../data/content.js';
 import { ArrowRight } from './Doodles.jsx';
 import ProjectPage from './ProjectPage.jsx';
@@ -25,7 +25,6 @@ const matches = (i, tag) => projects[i].category.split(' · ').includes(tag);
 export default function Work() {
   const [active, setActive] = useState(0);
   const [openIndex, setOpenIndex] = useState(null); // case study overlay
-  const [origin, setOrigin] = useState(null); // preview rect the overlay grows from
   const [order, setOrder] = useState(projects.map((_, i) => i));
   const [hoverTag, setHoverTag] = useState(null); // previewed via hover/focus
   const [pinTag, setPinTag] = useState(null); // clicked: sorted + held lit
@@ -34,7 +33,6 @@ export default function Work() {
   const markRef = useRef(null);
   const frameRef = useRef(null);
   const flipFrom = useRef(null); // row tops captured just before a sort
-  const prevPos = useRef(0); // previewed row's position last time round
 
   // hover previews over an existing pin; second click clears both
   const litTag = hoverTag ?? pinTag;
@@ -92,35 +90,49 @@ export default function Work() {
     mark.style.transform = `translateY(${y}px)`;
   }, [active, order]);
 
-  /* Which way the eye just travelled, handed to the preview as the
-     direction its cover should wipe in from: move down the list and
-     the new cover opens upward from the bottom edge, meeting you.
-     Written as CSS vars rather than state — nothing here needs a
-     re-render, and the class change and the direction must land in
-     the same frame or the outgoing cover wipes the wrong way. */
-  useLayoutEffect(() => {
-    const frame = frameRef.current;
-    if (!frame) return;
-    const pos = order.indexOf(active);
-    const dir = pos < prevPos.current ? -1 : 1; // ties keep the downward read
-    prevPos.current = pos;
-    frame.style.setProperty('--dir', dir);
-    frame.style.setProperty('--ct', dir > 0 ? '100%' : '0%');
-    frame.style.setProperty('--cb', dir > 0 ? '0%' : '100%');
-  }, [active, order]);
-
   const rowState = (i) =>
     litTag ? (matches(i, litTag) ? 'is-lit' : 'is-faded') : '';
 
-  /* The case study opens *out of* the preview frame, so hand the
-     overlay the rect it should grow from. Measured at click time —
-     the page behind is frozen from here on, so it stays valid for the
-     return trip too. */
+  /* Where the case study grows out of, and returns to: the preview
+     shot the reader was already looking at.
+
+     A function rather than a rect captured on open, because the two
+     flights happen at different times and only one of them can trust
+     a stale measurement. The return has to land on wherever the
+     frame is *now* — after a scroll restore, a resize, a filter sort
+     that reflowed the list beside it. Measuring live costs one
+     getBoundingClientRect per flight and can't drift.
+
+     What's reported is the <img> box, not the frame: the frame
+     includes the faux window bar, and half the reason the old
+     transition landed wrong was that it aimed the picture at a box
+     ~34px taller than the one the picture is actually in. The
+     natural size and crop alignment travel with it — the flight has
+     to reproduce *this* crop (top-anchored cover) at its far end,
+     and it can't read those off an image it doesn't have. */
+  const getFrameRect = useCallback(() => {
+    const img = frameRef.current?.querySelector('.preview-item.is-active img');
+    const r = img?.getBoundingClientRect();
+    if (!r?.width || !img.naturalWidth) return null;
+    const cs = getComputedStyle(img);
+    return {
+      box: { top: r.top, left: r.left, width: r.width, height: r.height },
+      nw: img.naturalWidth,
+      nh: img.naturalHeight,
+      fit: cs.objectFit,
+      position: cs.objectPosition,
+    };
+  }, []);
+
+  /* Opening and paging both move the index behind the overlay, not
+     just the overlay. Nobody sees it happen — the page is covered —
+     but it's what the reader returns to, and it's what the closing
+     flight lands in: page ←/← to a third project and close, and the
+     picture settles into a frame already showing that project rather
+     than dissolving into a different one. */
   const openProject = (i) => {
     setActive(i);
     setOpenIndex(i);
-    const r = frameRef.current?.getBoundingClientRect();
-    setOrigin(r ? { top: r.top, left: r.left, width: r.width, height: r.height } : null);
   };
 
   // desktop hover already previews a row before it's clicked, so a mouse
@@ -217,10 +229,19 @@ export default function Work() {
             })}
           </ol>
 
-          {/* preview — stacked covers, wiped in the direction the
-              selection just moved (see the --dir effect above) */}
+          {/* preview — stacked covers, the active one developing up
+              through the ones behind it (see Work.css) */}
           <div className="work-preview reveal" aria-hidden="true">
-            <div className="work-frame" ref={frameRef}>
+            {/* `is-held`: while the overlay is up, the frame changes
+                project without animating. Nobody can see a crossfade
+                that happens under a full-screen page — but the
+                closing flight has to land on this exact box, and a
+                frame still easing into place is a box that has moved
+                by the time the picture gets there. */}
+            <div
+              className={`work-frame ${openIndex !== null ? 'is-held' : ''}`}
+              ref={frameRef}
+            >
               {projects.map((p, i) => (
                 <div
                   key={p.name}
@@ -248,8 +269,8 @@ export default function Work() {
       {openIndex !== null && (
         <ProjectPage
           index={openIndex}
-          origin={origin}
-          onNavigate={setOpenIndex}
+          getOrigin={getFrameRect}
+          onNavigate={openProject}
           onClose={closeProject}
         />
       )}

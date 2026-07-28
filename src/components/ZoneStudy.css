@@ -1,0 +1,209 @@
+/* ============================================================
+   ZoneStudy — four background compositions, four colour grades.
+   Layout is an asymmetric editorial block rather than a uniform
+   grid, so the four panels read as *one* composition set: the wide
+   corridor spans the top, two squares sit beneath it, and the tall
+   nexus runs the full height alongside.
+   ============================================================ */
+
+.lwz {
+  margin: var(--sp-4) 0 0;
+}
+
+/* ---------- head: label + layer tabs ---------- */
+.lwz-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.lwz-label {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.lwz-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.lwz-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition:
+    background var(--dur-quick) var(--ease),
+    color var(--dur-quick) var(--ease);
+}
+.lwz-tab:hover:not(.is-active) {
+  color: var(--ink);
+}
+.lwz-tab.is-active {
+  background: var(--paper-2);
+  color: var(--ink);
+}
+.lwz-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  /* the ramps run dark, so the dot needs an edge on dark paper */
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent);
+  transition: transform var(--dur-quick) var(--ease);
+}
+.lwz-tab.is-active .lwz-dot {
+  transform: scale(1.25);
+}
+
+/* ---------- the four panels ----------
+   Column ratio is derived, not guessed: with equal row heights the
+   nexus column has to be ~1.2× a square column for the portrait to
+   land at its own 3:4 without a meaningful crop. */
+.lwz-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 12px;
+  animation: lwz-in 0.5s var(--ease) both;
+}
+@keyframes lwz-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.lwz-cell {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  border: 1px solid var(--line-soft);
+}
+.lwz-cell img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-slow) var(--ease);
+}
+.lwz-cell:hover img {
+  transform: scale(1.03);
+}
+
+/* 4/1 is what makes the rest of the block land: it holds the corridor
+   near its own 4.55 (a 7/2 cell threw away a quarter of the painting's
+   width) *and* it sets the two row heights that the nexus spans, which
+   works out to 0.775 against the portrait's own 0.766. Both crops are
+   ~1%. Changing this re-crops the nexus — recompute, don't eyeball. */
+.lwz-cell.is-banner {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  aspect-ratio: 4 / 1;
+}
+.lwz-cell.is-cave {
+  grid-column: 1;
+  grid-row: 2;
+  aspect-ratio: 1;
+}
+.lwz-cell.is-grove {
+  grid-column: 2;
+  grid-row: 2;
+  aspect-ratio: 1;
+}
+/* no ratio of its own — it stretches across both rows, which is what
+   sets the whole block's proportions */
+.lwz-cell.is-nexus {
+  grid-column: 3;
+  grid-row: 1 / 3;
+}
+
+/* every background is painted dark, so one white caption treatment
+   works across all sixteen; the scrim keeps it legible over the few
+   bright cavern mouths */
+.lwz-cap {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  z-index: 1;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+  transition: color var(--dur-quick) var(--ease);
+}
+.lwz-cell::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 46%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.42), transparent);
+  pointer-events: none;
+}
+.lwz-cell:hover .lwz-cap {
+  color: #fff;
+}
+
+/* ---------- foot: the layer's ramp + one line on the grade ---------- */
+.lwz-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--sp-3) var(--sp-4);
+  margin-top: var(--sp-3);
+}
+.lwz-foot .pp-palette {
+  flex: 1 1 340px;
+}
+.lwz-note {
+  flex: 1 1 260px;
+  max-width: 44ch;
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 760px) {
+  .lwz-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  /* full width and still portrait. A 16/9 band here cut 57% off a 3:4
+     painting — the spire lost its top and base and the panel labelled
+     TALL read as a wide slab. 4/5 is the closest ratio to the source
+     that still fits two columns' worth of width. */
+  .lwz-cell.is-nexus {
+    grid-column: 1 / 3;
+    grid-row: 3;
+    aspect-ratio: 4 / 5;
+  }
+  .lwz-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .lwz-tab {
+    padding: 6px 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lwz-grid {
+    animation: none;
+  }
+  .lwz-cell:hover img {
+    transform: none;
+  }
+}

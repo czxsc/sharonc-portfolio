@@ -459,6 +459,58 @@
 .pp-gallery .pp-media img {
   aspect-ratio: 2 / 1;
 }
+/* …unless the panel opts into `fit`, where the whole image matters
+   more than an even row (the Little Wonder concept sheets carry notes
+   out at their edges that a 2:1 crop would cut off) */
+.pp-gallery .pp-media.is-fit img {
+  aspect-ratio: auto;
+  height: auto;
+  max-height: 340px;
+}
+
+/* ---------- the four graded tilesets ----------
+   Four across on one row on purpose: the whole point is that the grey
+   rock inside each is the same rock, and that only reads if they sit
+   side by side at the same size. Cut-out art on the paper, no panel
+   and no crop — a box around them would fight the transparency. */
+.pp-tiles {
+  margin: var(--sp-4) 0 0;
+}
+.pp-tiles ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pp-tiles img {
+  width: 100%;
+  height: auto;
+}
+.pp-tiles span {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+/* same caption treatment as every other figure on the page; the extra
+   top margin keeps it clear of the per-tile labels above it */
+.pp-tiles figcaption {
+  margin-top: var(--sp-3);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+@media (max-width: 760px) {
+  .pp-tiles ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
 /* labeled before/after pair */
 .pp-compare {
@@ -540,6 +592,59 @@
   font-size: var(--fs-small);
   line-height: 1.6;
   color: var(--ink-soft);
+}
+
+/* ---------- colour ramp ----------
+   Butted swatches, no gaps, so the run reads as one paint chip strip
+   and the neighbouring steps can be judged against each other; the
+   hex sits under its own swatch. Lives inside ZoneStudy, one ramp per
+   layer, beside the paintings it was sampled from. */
+.pp-palette {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  --swatch-edge: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+.pp-palette .pp-swatch {
+  display: block;
+  height: 52px;
+  background: var(--c);
+  /* Top and bottom only. Every ramp here starts near-black, and on dark
+     paper the first step has no edge of its own — 06131C and 010508 sit
+     within a few points of --paper and the strip looks like it begins at
+     step two. A hairline gives it one; keeping it off the vertical sides
+     means no lines appear *between* swatches, so the ramp stays a
+     continuous strip rather than a row of chips. */
+  box-shadow:
+    inset 0 1px 0 var(--swatch-edge),
+    inset 0 -1px 0 var(--swatch-edge);
+}
+/* only the outer ends round — and they carry the one vertical hairline
+   each, closing the outline around the strip */
+.pp-palette li:first-child .pp-swatch {
+  border-radius: var(--radius) 0 0 var(--radius);
+  box-shadow:
+    inset 0 1px 0 var(--swatch-edge),
+    inset 0 -1px 0 var(--swatch-edge),
+    inset 1px 0 0 var(--swatch-edge);
+}
+.pp-palette li:last-child .pp-swatch {
+  border-radius: 0 var(--radius) var(--radius) 0;
+  box-shadow:
+    inset 0 1px 0 var(--swatch-edge),
+    inset 0 -1px 0 var(--swatch-edge),
+    inset -1px 0 0 var(--swatch-edge);
+}
+.pp-palette code {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
 }
 
 /* ---------- close + project nav (fixed chrome) ---------- */

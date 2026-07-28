@@ -20,11 +20,41 @@ import concertSunkisImg from '../assets/sunkis_closeup.jpg';
 import concertSlopeDayImg from '../assets/slope_grouppic.jpg';
 import concertKiofImg from '../assets/kiof_group.jpg';
 import receiptifyImg from '../assets/receiptify.png';
+import pcBuildImg from '../assets/hobby/web/pc.webp';
+
+/* Little Wonder art direction. `web/` holds the sized webp exports of
+   the source art next to it — the originals run 2–17MB each and are
+   kept only as masters. */
+import lwBoard from '../assets/little_wonder/web/little_wonder_brainstorm_board.webp';
+import lwSketch from '../assets/little_wonder/web/early_landscape_sketch.webp';
+import lwEnvir from '../assets/little_wonder/web/early_envir_concept.webp';
+import lwConcept from '../assets/little_wonder/web/early_concept.webp';
+import lwGrass from '../assets/little_wonder/web/early_grass.webp';
+import lwTileOg from '../assets/little_wonder/web/grassy_tile.webp';
+import lwTileIn from '../assets/little_wonder/web/intermittent_tile.webp';
+import lwTileCr from '../assets/little_wonder/web/crystal_tile.webp';
+import lwTileBi from '../assets/little_wonder/web/biolum_tile.webp';
+import lwOgBanner from '../assets/little_wonder/web/overgrown_stalactites.webp';
+import lwOgCave from '../assets/little_wonder/web/overgrown_cave2048.webp';
+import lwOgGrove from '../assets/little_wonder/web/overgrown_mushrooms.webp';
+import lwOgNexus from '../assets/little_wonder/web/overgrown_nexus.webp';
+import lwInBanner from '../assets/little_wonder/web/intermittent_stalactites.webp';
+import lwInCave from '../assets/little_wonder/web/intermittent_cave.webp';
+import lwInGrove from '../assets/little_wonder/web/intermittent_mushrooms.webp';
+import lwInNexus from '../assets/little_wonder/web/intermittent_nexus.webp';
+import lwCrBanner from '../assets/little_wonder/web/crystal_stalactites.webp';
+import lwCrCave from '../assets/little_wonder/web/crstal_cave2048.webp';
+import lwCrGrove from '../assets/little_wonder/web/crystal_mushrooms.webp';
+import lwCrNexus from '../assets/little_wonder/web/crystal_nexus.webp';
+import lwBiBanner from '../assets/little_wonder/web/biolum_stalactites.webp';
+import lwBiCave from '../assets/little_wonder/web/biolum_cav2048.webp';
+import lwBiGrove from '../assets/little_wonder/web/biolum_mushrooms.webp';
+import lwBiNexus from '../assets/little_wonder/web/biolum_nexus.webp';
 
 export const meta = {
   name: 'Sharon Chen',
   role: 'Software engineer & designer',
-  email: 'sharonc4747@gmail.com',
+  email: 'sharonc.czx@gmail.com',
   location: 'Ithaca, NY and Dallas, TX',
   status: 'Open to 2027 opportunities',
 };
@@ -37,7 +67,7 @@ export const nav = [
 ];
 
 export const links = {
-  email: 'mailto:sharonc4747@gmail.com',
+  email: 'mailto:sharonc.czx@gmail.com',
   github: 'https://github.com/czxsc',
   linkedin: 'https://www.linkedin.com/in/sharon-chen-692595211',
   resume: '#', // TODO: real résumé link
@@ -327,7 +357,7 @@ export const projects = [
       hero: { fit: true },
       subtitle: 'Bringing pre-flight hardware setup into CUAIR’s custom ground control station.',
       intro:
-        'Every CUAIR test flight used to be divided between two different software platforms. Our team flies a custom ground control station, but hardware setup features, such as sensor calibration, radio checks, servo and flight-mode configuration, still lived in Mission Planner. Preflight moved that entire setup layer into our own GCS, where I built the main five workflows end to end, from the Svelte interface down to the MAVLink commands on the wire.',
+        'Every CUAIR test flight used to be divided between two different software platforms. Our team flies a custom ground control station, but hardware setup features like sensor calibration or servo output configuration still lived in Mission Planner. Preflight built that hardware setup layer into our own GCS, from the Svelte interface down to the MAVLink commands on the wire.',
       links: [{ label: 'CUAIR', href: 'https://cuair.org' }],
       meta: [
         { label: 'Category', value: 'Full-Stack, Autonomous Systems' },
@@ -339,7 +369,7 @@ export const projects = [
         {
           heading: 'Problem: Two ground stations',
           body: [
-            'Mission Planner is the de facto ground station for ArduPilot teams, and it covers everything. So even with our team\'s custom Ground Control Station flying the plane autonomously, hardware setup kept us still tethered to Mission Planner. Every test flight required pre-flight configuration in one tool then migrating to the other. However, when this year’s competition rules changed to include setup into the 45-minute mission window, this workflow became a significant problem that has to change.',
+            'Mission Planner is a free, open-source ground control station software, and is the de facto ground station for ArduPilot teams. So even with our team\'s custom Ground Control Station flying the plane autonomously, hardware setup kept us still tethered to Mission Planner. Every test flight required pre-flight configuration in one tool then migrating to the other. However, when this year’s competition rules changed to include setup into the 45-minute mission window, this workflow became a significant problem that has to change.',
             'Through surveying the team, I identified four key limitations of depending on Mission Planner for hardware setup:',
           ],
           points: [
@@ -842,7 +872,7 @@ export const projects = [
         { label: 'Category', value: 'Game Design & Development' },
         { label: 'My role', value: 'Design Lead & Game Programmer' },
         { label: 'Timeline', value: 'Spring 2026' },
-        { label: 'Skills', value: 'Java, libGDX, Box2D, game feel, level design' },
+        { label: 'Skills', value: 'Java, libGDX, Box2D, game feel, environment art, colour design' },
         { label: 'Team', value: 'Christian Amadeo, Caden Lau, Afram Ahmed, Paul Lukewesa, David Colle, Samantha Ahn, Thomas Myers' },
       ],
       // shared top section — same for both toggle views
@@ -1232,46 +1262,199 @@ export const projects = [
               ],
             },
           ],
-          // TODO(sharon): placeholder art-direction copy — replace with
-          // the real early concept art and implementation process.
           design: [
+            /* Order matters here and was wrong once: planning, then
+               concept art, then the two sections of finished assets.
+               Both early sections run body -> images -> limitations via
+               `imagesFirst`, so the shortfalls arrive after the reader
+               has seen the work they refer to. */
             {
-              heading: 'Concept art: An acorn’s-eye view',
+              heading: 'Setting the direction',
+              imagesFirst: true,
               body: [
-                'Before any code, I sketched what “big” and “small” would feel like from an acorn’s height — blades of grass as trees, dew drops as ponds. Early boards were about establishing scale and a warm, storybook palette rather than mechanics.',
+                'I was design lead and owned everything behind the player — background art, environment assets, and the tileset.',
+                'We started on a reference board rather than in a drawing, pulling in anything that felt right until a direction showed up: plants and fungi, acorns and mushrooms, a world scaled down to the floor of a forest. The course required twelve unique levels; an open map suited the game better, so we split it into four layers of three dungeons, each layer with a look of its own.',
+                'The first real art was a landscape painting, and it was not there to be used. It was there to pin down the general style and to standardise the lineart and colouring across three people who draw differently — as far as that could be standardised. Ground and props followed the same way: draw a strip of grass six ways, see which one the game wants.',
+              ],
+              media: {
+                src: lwBoard,
+                fit: true,
+                caption: 'Reference board — what we pulled from before any of the art existed.',
+              },
+              gallery: [
+                {
+                  src: lwSketch,
+                  fit: true,
+                  caption: 'Landscape attempt 1, with the notes that redirected it: more cavern, less vegetation, add fungal elements.',
+                },
+                {
+                  src: lwGrass,
+                  fit: true,
+                  caption: 'Ground and prop passes — grass strips, checkpoint acorns, hazards.',
+                },
               ],
               facts: [
                 {
-                  title: 'Palette first',
-                  text: 'A narrow, warm palette — moss, bark, amber — kept every biome feeling like the same forest, just a different corner of it.',
+                  title: 'It came out above ground',
+                  text: 'The first landscape read as forest, not cave. The notes on it are my own: go underground, cut the vegetation back, let fungus take over.',
                 },
                 {
-                  title: 'Scale studies',
-                  text: 'Thumbnail sketches compared the acorn sprite against grass blades, puddles, and the fence to calibrate exactly how “small” should read.',
+                  title: 'Style only half-standardised',
+                  text: 'I paint; both character designers work in cartoon lineart. We agreed on lineart weight and a colouring approach, and it still only got us part of the way.',
                 },
                 {
-                  title: 'Mood before mechanics',
-                  text: 'The earliest passes were about tone — cozy, storybook, a little melancholy — before any level layout existed.',
+                  title: 'Variations, not a system',
+                  text: 'Six versions of a grass strip is six drawings. Nothing here could be recombined yet — that problem is the whole rest of this page.',
                 },
               ],
             },
             {
-              heading: 'Implementation: From sketch to sprite',
+              heading: 'Concept art and the environment kit',
+              imagesFirst: true,
               body: [
-                'Concept art became a working spritesheet and tileset library, built to be remixed across levels rather than redrawn for each one.',
+                'With the direction fixed, the next pass was the actual vocabulary of the world: what a rock looks like, what a tree trunk looks like, how a mushroom is drawn so it reads as ours. I built it out as labelled sheets — plants, grasses, pebbles, rocks, trunks — plus a full-colour painting of the overworld village to prove the palette worked at scale.',
+              ],
+              gallery: [
+                {
+                  src: lwEnvir,
+                  fit: true,
+                  caption: 'The environment kit — plants, grasses, pebbles, rocks, trunks, each drawn once.',
+                },
+                {
+                  src: lwConcept,
+                  fit: true,
+                  caption: 'Concept sheet — mushroom studies, the overworld village, and the first ground and wall attempts.',
+                },
               ],
               facts: [
                 {
-                  title: 'Modular tileset',
-                  text: 'Environment pieces — grass, bark, stone — were built as a modular kit so new levels could be dressed without new art.',
+                  title: 'Too detailed',
+                  text: 'Concept-level detail is fine for one painting and impossible across sixteen backgrounds and a full tileset.',
                 },
                 {
-                  title: 'Readable silhouettes',
-                  text: 'The acorn sprite and hazards were designed to read clearly at a distance, so danger telegraphs visually as well as through level design.',
+                  title: 'Nothing repeated',
+                  text: 'Every piece was drawn once and reusable nowhere. Hand-drawn assets do not tile, and every new area meant new art.',
                 },
                 {
-                  title: 'Lightweight animation',
-                  text: 'A small frame count per animation kept the game feeling snappy and kept production scoped for a small team.',
+                  title: 'The scale did not work',
+                  text: 'Good as a bible for the world, unusable as a production pipeline. Everything after this point is about making the art repeatable.',
+                },
+              ],
+            },
+            {
+              heading: 'Backgrounds: four paintings, sixteen backgrounds',
+              body: [
+                'Sixteen hand-painted backgrounds was not a realistic scope. Reusing one background everywhere was worse — the reason to descend another layer is to see something new.',
+                'So I painted four compositions instead of sixteen: a wide corridor, two squares, and a tall nexus for each layer’s landing zone. Then I re-graded every set with curves into that layer’s ramp and accessorised with a few zone-specific props. Switch layers below — the composition never moves.',
+              ],
+              // the ZoneStudy panel (ZoneStudy.jsx): four layouts held
+              // fixed while the grade changes under them, which is the
+              // argument this section is making
+              zones: {
+                label: 'The four layers',
+                panels: [
+                  { id: 'banner', label: 'Wide — corridor' },
+                  { id: 'cave', label: 'Square — cavern' },
+                  { id: 'grove', label: 'Square — grove' },
+                  { id: 'nexus', label: 'Tall — nexus' },
+                ],
+                items: [
+                  // ramps sampled off the finished paintings rather than
+                  // the strips locked at the start — the art moved after
+                  // those were set, and the swatches should match what
+                  // is actually on screen beside them
+                  {
+                    id: 'overgrown',
+                    name: 'Overgrown',
+                    tone: '#399450',
+                    note: 'The first layer down, and the only one still lit like the surface — warm green light coming through a lot of rock.',
+                    palette: ['#0F3728', '#1A5E45', '#2A765A', '#399450', '#68BA7A', '#9ED190'],
+                    art: { banner: lwOgBanner, cave: lwOgCave, grove: lwOgGrove, nexus: lwOgNexus },
+                  },
+                  {
+                    id: 'intermittent',
+                    name: 'Intermittent',
+                    tone: '#297072',
+                    note: 'Where the green starts draining out. The same compositions cooled into teal — the first hint that you are heading somewhere colder.',
+                    palette: ['#06131C', '#1C325B', '#297072', '#54A18F', '#73D0BD', '#8AFEF7'],
+                    art: { banner: lwInBanner, cave: lwInCave, grove: lwInGrove, nexus: lwInNexus },
+                  },
+                  {
+                    id: 'crystal',
+                    name: 'Crystal Cove',
+                    tone: '#9E4FBC',
+                    note: 'The furthest the grade moves from the source paintings — a full rotation into violet, with the mid-tones lifted so the rock glows.',
+                    palette: ['#1E0C25', '#422267', '#9E4FBC', '#7DA9DD', '#48539A', '#1F224E'],
+                    art: { banner: lwCrBanner, cave: lwCrCave, grove: lwCrGrove, nexus: lwCrNexus },
+                  },
+                  {
+                    id: 'biolum',
+                    name: 'Bioluminescent',
+                    tone: '#459BC4',
+                    note: 'Deepest and darkest. Almost no warm value left in the ramp, so the mushrooms and pools carry all the light.',
+                    palette: ['#06111F', '#102238', '#28497A', '#375D98', '#459BC4', '#5AB9D6'],
+                    art: { banner: lwBiBanner, cave: lwBiCave, grove: lwBiGrove, nexus: lwBiNexus },
+                  },
+                ],
+              },
+            },
+            {
+              heading: 'Tilesets: one rock, one grass stamp',
+              body: [
+                'Tilesets were unfamiliar territory and took more iterations than anything else I made. The first was too detailed and turned to noise the moment it repeated. The second was clean but read as cartoon against painterly backgrounds. The third finally matched them — and then disappeared into them.',
+                'The fix was the background trick applied to ground.',
+              ],
+              facts: [
+                {
+                  title: 'One base block',
+                  text: 'A single neutral rock tile, flat enough in colour to sit under any of the four ramps.',
+                },
+                {
+                  title: 'A grass stamp',
+                  text: 'One overlay laid over the base, so ground reads as ground before it reads as a zone.',
+                },
+                {
+                  title: 'Four grades',
+                  text: 'The same curve pass as the backgrounds — one tileset, four zones, no redraws.',
+                },
+              ],
+              tiles: {
+                caption:
+                  'One block and one platform, graded four ways. The rock inside each is the same rock.',
+                items: [
+                  { label: 'Overgrown', src: lwTileOg },
+                  { label: 'Intermittent', src: lwTileIn },
+                  { label: 'Crystal Cove', src: lwTileCr },
+                  { label: 'Bioluminescent', src: lwTileBi },
+                ],
+              },
+            },
+            {
+              heading: 'What worked, and what I’d change',
+              body: [
+                'The variety landed. Entering a new layer felt like arriving somewhere, and the environment art drew the most consistent praise the game got.',
+                'The style mismatch I had worried about turned into an asset: painterly backgrounds behind cartoon-lineart tilesets and characters gave real separation between what you play on and what you look at.',
+              ],
+              /* Three, not four: the shared Challenges block directly
+                 below is also a points grid, and a fourth point here
+                 ("the game design kept moving, so assets got drawn and
+                 dropped") was the art-side restatement of its
+                 scrapped-systems point. Three leaves the row
+                 deliberately uneven against the 2×2 underneath, so the
+                 two blocks read as different thoughts. Everything left
+                 is specific to the art. */
+              points: [
+                {
+                  icon: 'platform',
+                  text: 'What scaled here scaled because it was built once and graded, never redrawn — sixteen backgrounds and four tilesets out of one small set of paintings.',
+                },
+                {
+                  icon: 'scope',
+                  text: 'Environment art was still too large a scope for one person. I delegated character art and animation and kept all of this, and the tilesets took the quality hit.',
+                },
+                {
+                  icon: 'identity',
+                  text: 'Set style guidelines earlier. At ship, characters, enemies, and backgrounds still read as three different hands.',
                 },
               ],
             },
@@ -1436,56 +1619,97 @@ export const projects = [
        { kind: 'carousel', title, direction?: 'horizontal'|'vertical', items: [{ caption, src }] }
          — hover/tap-to-expand strip, view-only (no links)
        { kind: 'image',   src, caption?, align?: 'left'|'right' } — small tilted accent photo
-   TODO(sharon): all block content below is sample copy — swap in the
-   real shows/books/games/parts, and add gallery image imports. */
+   Gaming and stories have bespoke compositions (GamingBlocks,
+   StoriesBlocks) that pick blocks by `id` rather than kind, so they can
+   use kinds of their own:
+       { kind: 'stance', body: [paragraphs], genres: [{ name, meta }], aside }
+       { kind: 'build',  src, alt, caption, hint, parts: [{ label, value, x?, y?, note? }] }
+         — x/y are % positions on the photo; a part with neither gets no
+           marker (it isn't visible in the shot) and shows `note` instead.
+       { kind: 'note',   body } — a single handwritten margin note
+   TODO(sharon): drinks / art below are still sample copy — swap in the
+   real ones, and add gallery image imports. */
 export const hobbies = [
   {
     icon: 'laptop',
-    slug: 'shows',
-    title: 'Shows',
-    note: 'Always mid-season on something.',
+    slug: 'stories',
+    title: 'Stories',
+    note: 'Books and screens, same appetite.',
     tone: 'var(--tone-c2)',
     page: {
       tagline:
-        'Comfort rewatches, one prestige drama at a time, and a rotating cast of shows I swear I’ll finish.',
+        'No real loyalty to the format — paperback, subtitles, whatever gets it across. Mostly I want to be somewhere else for a few hours.',
       blocks: [
         {
+          id: 'read',
           kind: 'list',
-          title: 'Currently mid-season',
+          title: 'Recently read',
           items: [
-            { name: 'Severance', meta: 'Apple TV+', note: 'Half the fun is the theories between episodes.' },
-            { name: 'The Bear', meta: 'FX', note: 'Came for the plot, stayed for the plating.' },
-            { name: 'Spy × Family', meta: 'anime', note: 'The palate cleanser.' },
+            {
+              name: 'Babel',
+              meta: 'R.F. Kuang · 2022',
+              note: 'Footnotes that argue with the text. I have never been so pleased to be lectured.',
+            },
+            {
+              name: 'Katabasis',
+              meta: 'R.F. Kuang · 2025',
+              note: 'Grad school as a literal descent into hell — somehow the least fantastical thing about it.',
+            },
+            {
+              name: 'Circe',
+              meta: 'Madeline Miller · 2018',
+              note: 'Three thousand years as somebody else’s footnote, finally given the page.',
+            },
+            {
+              name: 'Divine Rivals',
+              meta: 'Rebecca Ross · 2023',
+              note: 'Two typewriters and a war. I knew exactly what it was doing and I let it.',
+            },
+            {
+              name: 'Project Hail Mary',
+              meta: 'Andy Weir · 2021',
+              note: 'The only book that has made me cheer out loud at a unit conversion.',
+            },
+            {
+              name: 'The Thursday Murder Club',
+              meta: 'Richard Osman · 2020',
+              note: 'Four retirees, one cold case, zero urgency. Finished it in a weekend.',
+            },
           ],
         },
         {
-          kind: 'text',
-          body: ['The queue is longer than the watch history, and I’ve made peace with that.'],
-        },
-      ],
-    },
-  },
-  {
-    icon: 'book',
-    slug: 'reading',
-    title: 'Reading',
-    note: 'Paperbacks over ebooks, always.',
-    tone: 'var(--tone-b2)',
-    page: {
-      tagline: 'Paperbacks over ebooks, pencil marks over bookmarks.',
-      blocks: [
-        {
+          id: 'watched',
           kind: 'list',
-          title: 'Recent shelf',
+          title: 'Recently watched',
           items: [
-            { name: 'Klara and the Sun', meta: 'Kazuo Ishiguro', note: 'An AI narrator with better manners than most humans.' },
-            { name: 'The Design of Everyday Things', meta: 'Don Norman', note: 'Required reading that actually earns it.' },
-            { name: 'Piranesi', meta: 'Susanna Clarke', note: 'Read in two sittings, thought about for two weeks.' },
+            {
+              name: 'The Odyssey',
+              meta: 'film',
+              note: 'The myth at full scale. Went in knowing exactly how it ends and still sat forward the whole time.',
+            },
+            {
+              name: 'Spy × Family',
+              meta: 'anime',
+              note: 'The palate cleanser. Nobody in this household is telling the truth.',
+            },
+            {
+              name: 'Witch Hat Atelier',
+              meta: 'anime',
+              note: 'Magic drawn as ink on paper, which is exactly right.',
+            },
           ],
         },
         {
+          id: 'thread',
+          kind: 'note',
+          body: 'Circe first, then the film — same voyage, told by the one left on the island.',
+        },
+        {
+          id: 'close',
           kind: 'text',
-          body: ['Mostly fiction, with detours into design writing. The spines stay creased — books here are working objects, not shelf decor.'],
+          body: [
+            'Half of these were finished at 2am on a weeknight, which is the only review that really counts.',
+          ],
         },
       ],
     },
@@ -1520,30 +1744,126 @@ export const hobbies = [
     icon: 'controller',
     slug: 'gaming',
     title: 'Gaming',
-    note: 'Cozy sims and the occasional roguelike.',
+    note: 'Anything that waits while I think.',
     tone: 'var(--navy)',
     page: {
-      tagline: 'Cozy sims on weeknights, roguelikes when I have something to prove.',
+      tagline:
+        'A bit of everything, but the ones that stick are the games that wait while you think.',
       blocks: [
         {
-          kind: 'specs',
-          title: 'The build',
-          rows: [
-            { label: 'CPU', value: 'AMD Ryzen 5 7600' },
-            { label: 'GPU', value: 'NVIDIA RTX 4070' },
-            { label: 'Memory', value: '32 GB DDR5' },
-            { label: 'Storage', value: '1 TB NVMe' },
-            { label: 'Monitor', value: '27″ · 1440p · 165 Hz' },
-            { label: 'Keyboard', value: '75% mechanical, tactile' },
+          id: 'how',
+          kind: 'stance',
+          title: 'How I play',
+          body: [
+            'Ninety-minute indie mysteries, hundred-hour RPGs, and most things in between. What I keep coming back to is the pause — games that hand you all the pieces and then let you sit there arranging them.',
+          ],
+          genres: [
+            { name: 'Strategy & turn-based RPGs', meta: 'set the orders, commit, watch it hold' },
+            { name: 'Cozy sims', meta: 'no fail state, just a long list of small wants' },
+            { name: 'Mystery & puzzle', meta: 'you already have everything you need' },
+          ],
+          aside: 'I’d love to be better at platformers. My hands have their own plans.',
+        },
+        {
+          id: 'faves',
+          kind: 'list',
+          title: 'The permanent three',
+          items: [
+            {
+              name: 'Baldur’s Gate 3',
+              meta: '2023 · CRPG',
+              note: 'Every stupid idea I had was already accounted for. I have never felt so seen by a rules engine.',
+            },
+            {
+              name: 'Stardew Valley',
+              meta: '2016 · farm sim',
+              note: 'There is no version of my life in which I am not partway through a farm.',
+            },
+            {
+              name: 'Fire Emblem: Three Houses',
+              meta: '2019 · tactics',
+              note: 'Tactics I love, plus a cast I would rearrange a weekend for. Both halves earn it.',
+            },
           ],
         },
         {
+          id: 'now',
           kind: 'list',
-          title: 'On rotation',
+          title: 'In the save file now',
           items: [
-            { name: 'Stardew Valley', meta: 'cozy sim', note: 'Five hundred hours and the farm still isn’t done.' },
-            { name: 'Hades', meta: 'roguelike', note: 'The “something to prove” half.' },
-            { name: 'It Takes Two', meta: 'co-op', note: 'A friendship stress test.' },
+            {
+              name: 'Minecraft — Cobbleverse',
+              meta: 'modded',
+              note: 'Pokémon inside Minecraft. Two favourites, doing chores together.',
+            },
+            {
+              name: 'Minecraft — Sunlit Valley',
+              meta: 'modded',
+              note: 'Stardew inside Minecraft. I appear to have exactly one idea, and I stand by it.',
+            },
+            {
+              name: 'Unicorn Overlord',
+              meta: 'tactics',
+              note: 'Build the squads, commit, and watch the plan hold or fall apart without me.',
+            },
+            {
+              name: 'Disco Elysium',
+              meta: 'CRPG',
+              note: 'The hardest boss is your own internal monologue, and it is winning.',
+            },
+            {
+              name: 'Stardew Valley',
+              meta: 'perennial',
+              note: 'Also above. It has never actually left the rotation.',
+            },
+            {
+              name: 'Baldur’s Gate 3',
+              meta: 'also above',
+              note: 'Another run. I keep telling myself this one will be short.',
+            },
+          ],
+        },
+        {
+          id: 'shelf',
+          kind: 'list',
+          title: 'Also great',
+          items: [
+            { name: 'No Case Left Unsolved', meta: 'deduction' },
+            { name: 'Chants of Sennaar', meta: 'linguistics' },
+            { name: 'Outer Wilds', meta: 'knowledge is the only upgrade' },
+            { name: 'It Takes Two', meta: 'co-op, friendship-tested' },
+          ],
+        },
+        {
+          id: 'queue',
+          kind: 'list',
+          title: 'Up next',
+          items: [
+            { name: 'Clair Obscur: Expedition 33', note: 'Turn-based, and apparently gorgeous about it.' },
+            { name: 'Blue Prince', note: 'A house that rearranges itself between attempts.' },
+            { name: 'Return of the Obra Dinn', note: 'Sixty deaths, no hand-holding.' },
+            { name: 'Sovereign Tower' },
+            { name: 'Grave Seasons', note: 'A farming sim where one of the neighbours is a murderer.' },
+          ],
+        },
+        {
+          id: 'build',
+          kind: 'build',
+          title: 'The build',
+          src: pcBuildImg,
+          alt: 'A white Lian Li O11 Dynamic Mini V2 build, lit pink and cyan, with figurines and paper butterflies inside the case.',
+          hint: 'Pick a part',
+          caption: 'white everything, on purpose. the butterflies were not in the parts list.',
+          parts: [
+            { label: 'CPU', value: 'Ryzen 7 7700X', x: 41, y: 35, note: 'under the pump block' },
+            { label: 'Cooler', value: 'Lian Li Hydroshift II LCD 360', x: 52, y: 15 },
+            { label: 'Motherboard', value: 'ASUS B650E MAX GAMING WIFI W', x: 16, y: 30 },
+            { label: 'Memory', value: 'TEAMGROUP T-Force Delta RGB 16 GB (2×8) DDR5-6000', x: 51, y: 33 },
+            { label: 'GPU', value: 'Gigabyte AERO RTX 5060 Ti 16 GB', x: 33, y: 63 },
+            { label: 'Fans', value: '3× Lian Li UNI SL-Infinity 120 mm + 1× SL-INF Wireless', x: 55, y: 74 },
+            { label: 'Case', value: 'Lian Li O11 Dynamic Mini V2', x: 14, y: 86 },
+            { label: 'Storage', value: 'Crucial P310 2 TB NVMe', x: 34, y: 49, note: 'under the M.2 heatsink' },
+            { label: 'Power', value: 'Corsair RM750e 750 W', note: 'behind the panel' },
           ],
         },
       ],

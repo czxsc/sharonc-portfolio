@@ -19,14 +19,43 @@ export function useOverlayPage({ slug, closeMs, onClose, focusRef }) {
   const pushedRef = useRef(false); // our history entry exists
   const rafRef = useRef(0);
   const timerRef = useRef(0);
+  const scrollRef = useRef(0); // where the page behind was left
   const onCloseRef = useRef(onClose); // listeners outlive renders
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
 
+  /* Put the page behind back where the reader left it.
+
+     Closing goes through history.back(), and a history traversal is
+     the browser's cue to restore the scroll position it recorded for
+     that entry — which is not reliably the one we want. We set
+     scrollRestoration to 'manual' on the way in to stop it trying,
+     and this is the belt to that brace.
+
+     It has to run at the START of the close, not on unmount: the
+     scrim spends the second half of the close dissolving, and
+     whatever is underneath by then is what the reader sees. It also
+     has to be true before the return flight is measured, or the
+     image lands on a frame that has moved out from under it.
+
+     The document is `overflow: hidden` while the overlay is up, so
+     it can't be scrolled — lift that for the one synchronous
+     statement it takes to move, then put it back. Same frame, so
+     nothing paints in between. */
+  const restoreScroll = () => {
+    if (Math.abs(window.scrollY - scrollRef.current) < 1) return;
+    const html = document.documentElement;
+    const held = html.style.overflow;
+    html.style.overflow = '';
+    window.scrollTo(0, scrollRef.current);
+    html.style.overflow = held;
+  };
+
   const beginClose = () => {
     if (closingRef.current) return;
     closingRef.current = true;
+    restoreScroll();
     setState('closing');
     timerRef.current = setTimeout(() => onCloseRef.current(), closeMs);
   };
@@ -52,6 +81,10 @@ export function useOverlayPage({ slug, closeMs, onClose, focusRef }) {
   // while open: page behind is inert and its scroll is paused
   useEffect(() => {
     const root = document.getElementById('root');
+    scrollRef.current = window.scrollY;
+    // ours to restore, not the browser's to guess at — see restoreScroll
+    const prevRestoration = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
     getLenis()?.stop();
     root?.setAttribute('inert', '');
     document.documentElement.style.overflow = 'hidden';
@@ -59,7 +92,14 @@ export function useOverlayPage({ slug, closeMs, onClose, focusRef }) {
     return () => {
       root?.removeAttribute('inert');
       document.documentElement.style.overflow = '';
-      getLenis()?.start();
+      restoreScroll(); // last word, in case anything moved after the close began
+      const lenis = getLenis();
+      lenis?.start();
+      // Lenis interpolates towards its own idea of where the page is,
+      // and it has been stopped through all of the above — hand it the
+      // truth or it animates the page back to wherever it left off
+      lenis?.scrollTo(scrollRef.current, { immediate: true, force: true });
+      history.scrollRestoration = prevRestoration;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

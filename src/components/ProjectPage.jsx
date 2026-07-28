@@ -5,6 +5,7 @@ import { useOverlayPage } from '../hooks/useOverlayPage.js';
 import StackDiagram from './StackDiagram.jsx';
 import FlowDiagram from './FlowDiagram.jsx';
 import ArchMap from './ArchMap.jsx';
+import ZoneStudy from './ZoneStudy.jsx';
 import SetType from './SetType.jsx';
 import './ProjectPage.css';
 
@@ -14,11 +15,11 @@ import './ProjectPage.css';
    chips, labeled meta rows, then the case sections.
 
    The case study doesn't appear over the index — it opens *out of*
-   it. `origin` is the rect of the preview frame the reader was
-   already looking at, and the hero image travels from there to its
-   place on the page while the rest of the article sets around it
-   (see flipHero). Closing puts it back where it came from, so the
-   index is where you left it rather than somewhere you return to.
+   it. `getOrigin` reports the preview shot the reader was already
+   looking at, and the hero image travels from there to its place on
+   the page while the rest of the article sets around it (see
+   flyHero). Closing puts it back where it came from, so the index is
+   where you left it rather than somewhere you return to.
 
    ← / → (buttons or arrow keys) move between projects without
    closing; the single history entry from useOverlayPage still means
@@ -29,41 +30,186 @@ const CLOSE_MS = 480; // covers the reverse flight + the fade behind it
 const OPEN_MS = 620;
 const BACK_MS = 420;
 const FLIP_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+// the fades that hide the index end of the flight (see flyHero)
+const HANDOFF_OUT_MS = 110;
+const HANDOFF_BACK_MS = 150;
+const STEPS = 16; // sampled keyframes — see frameAt
 
-/* Grow/return the hero between `rect` and its laid-out place.
+/* Where an `object-fit` image actually paints inside its element box.
 
-   The two boxes have different proportions (the index frame is
-   16:9.5, the case hero 21:9), so a single scale would visibly
-   stretch the photograph. Instead the figure takes the non-uniform
-   scale — it's the *frame* that changes shape — and the image inside
-   takes the inverse on Y, which leaves the picture itself scaling
-   evenly. Standard two-element FLIP; the reason it's here is that a
-   distorting photo is exactly the tell that gives a transition away.
+   The box and the picture are two different rectangles: `cover`
+   scales the picture until it fills the box and lets the overflow be
+   clipped, so the painted rect is the larger one and object-position
+   decides which part of it the box keeps. That distinction is the
+   whole reason the transition used to break — the index crops the
+   shot top-anchored into a 16:9.5 window body and the case hero
+   crops it centred into a 21:9 band, so the two ends were showing
+   *different regions of the same photograph*, and no transform can
+   turn one crop into the other: scaling an element scales its clip
+   along with its content.
 
-   Returns the animation so callers can await/cancel it. */
-function flipHero(fig, rect, { reverse = false, duration } = {}) {
+   `fit` and `position` are used values of object-fit and
+   object-position. object-position resolves to a `<len-or-%>` pair;
+   only the percentage form is meaningful as an alignment fraction,
+   and percentages are all this site uses (plus the keywords, which
+   compute to them). Anything else falls back to centred. */
+function paintedRect(box, nw, nh, { fit, position }) {
+  const [x, y] = (position || '50% 50%').split(' ');
+  const frac = (v, d) => (v?.endsWith('%') ? parseFloat(v) / 100 : d);
+  const s =
+    fit === 'contain'
+      ? Math.min(box.width / nw, box.height / nh)
+      : Math.max(box.width / nw, box.height / nh);
+  const w = nw * s;
+  const h = nh * s;
+  return {
+    left: box.left + (box.width - w) * frac(x, 0.5),
+    top: box.top + (box.height - h) * frac(y, 0.5),
+    width: w,
+    height: h,
+  };
+}
+
+const lerp = (a, b, u) => a + (b - a) * u;
+const lerpRect = (a, b, u) => ({
+  left: lerp(a.left, b.left, u),
+  top: lerp(a.top, b.top, u),
+  width: lerp(a.width, b.width, u),
+  height: lerp(a.height, b.height, u),
+});
+
+/* Fly the hero between the index preview and its laid-out place.
+
+   A clone does the travelling rather than the hero itself, because
+   the two ends disagree about more than position: different box
+   proportions, different crops, and — for `page.hero.fit` projects —
+   a different fit mode entirely. The clone is a plain clip box with
+   a plainly-sized picture inside it, which makes both of those
+   animatable when the real elements' `object-fit` is not.
+
+   Two rectangles are interpolated, not one: the clip box (B) and the
+   painted picture (R). The picture keeps its own proportions the
+   whole way — R0 and R1 share the natural aspect ratio, so every
+   step between them does too — while the box changes shape around
+   it. That is what reads as one photograph being re-cropped rather
+   than two photographs swapping.
+
+   The two transforms are nested, so linearly interpolating both ends
+   would still bend the picture's aspect a couple of percent
+   mid-flight. Sampling the exact geometry at STEPS points and
+   letting the timing function ride over the top removes that; the
+   keyframes are geometry, the easing is time.
+
+   `origin` comes from Work.getFrameRect: the preview image's box,
+   its natural size, and its crop alignment. */
+function flyHero(fig, origin, { reverse = false } = {}) {
   const img = fig?.querySelector('img');
-  if (!fig || !img || !rect) return null;
+  const { nw, nh } = origin || {};
+  if (!fig || !img || !nw || !nh) return null;
 
-  const to = fig.getBoundingClientRect();
-  if (!to.width || !to.height) return null;
+  const B1 = img.getBoundingClientRect();
+  const B0 = origin.box;
+  if (!B1.width || !B1.height || !B0?.width || !B0?.height) return null;
 
-  const dx = rect.left + rect.width / 2 - (to.left + to.width / 2);
-  const dy = rect.top + rect.height / 2 - (to.top + to.height / 2);
-  const sx = rect.width / to.width;
-  const sy = rect.height / to.height;
+  const cs = getComputedStyle(img);
+  const R1 = paintedRect(B1, nw, nh, {
+    fit: cs.objectFit,
+    position: cs.objectPosition,
+  });
+  const R0 = paintedRect(B0, nw, nh, origin);
 
-  const away = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
-  const frames = reverse ? ['none', away] : [away, 'none'];
-  const counter = reverse ? ['none', `scale(1, ${sx / sy})`] : [`scale(1, ${sx / sy})`, 'none'];
+  /* Both transforms are written in the clone's own coordinates with
+     the origin at its top-left corner, which keeps them to a
+     translate and a scale each and the algebra to two lines. */
+  const frameAt = (u) => {
+    const B = lerpRect(B0, B1, u);
+    const R = lerpRect(R0, R1, u);
+    const sx = B.width / B1.width;
+    const sy = B.height / B1.height;
+    return {
+      box: `translate(${B.left - B1.left}px, ${B.top - B1.top}px) scale(${sx}, ${sy})`,
+      // undo the box's scale, then place the picture where this step
+      // wants it: the composition of the two lands on R exactly
+      pic:
+        `translate(${(R.left - B.left) / sx - (R1.left - B1.left)}px, ` +
+        `${(R.top - B.top) / sy - (R1.top - B1.top)}px) ` +
+        `scale(${R.width / sx / R1.width}, ${R.height / sy / R1.height})`,
+    };
+  };
+
+  // u runs index → hero; the return trip plays the same geometry back
+  const steps = Array.from({ length: STEPS + 1 }, (_, i) => frameAt(i / STEPS));
+  if (reverse) steps.reverse();
+
+  const clone = document.createElement('div');
+  clone.setAttribute('aria-hidden', 'true');
+  clone.style.cssText = `
+    position:fixed; left:${B1.left}px; top:${B1.top}px;
+    width:${B1.width}px; height:${B1.height}px;
+    overflow:hidden; border-radius:${cs.borderRadius};
+    transform-origin:0 0; will-change:transform;
+    pointer-events:none; z-index:320; contain:paint;`;
+
+  const pic = document.createElement('img');
+  pic.src = img.currentSrc || img.src;
+  pic.alt = '';
+  pic.style.cssText = `
+    position:absolute; left:${R1.left - B1.left}px; top:${R1.top - B1.top}px;
+    width:${R1.width}px; height:${R1.height}px;
+    transform-origin:0 0; will-change:transform;`;
+  clone.appendChild(pic);
+  document.body.appendChild(clone);
+
+  // the real hero would otherwise sit at the destination for the
+  // whole flight, under a clone that is only just arriving
+  img.style.visibility = 'hidden';
+
   const opts = {
-    duration: duration ?? (reverse ? BACK_MS : OPEN_MS),
+    duration: reverse ? BACK_MS : OPEN_MS,
     easing: FLIP_EASE,
     fill: 'both',
   };
+  const plays = [
+    clone.animate(steps.map((s) => ({ transform: s.box })), opts),
+    pic.animate(steps.map((s) => ({ transform: s.pic })), opts),
+  ];
+  const flight = plays[0];
 
-  img.animate(counter.map((transform) => ({ transform })), opts);
-  return fig.animate(frames.map((transform) => ({ transform })), opts);
+  /* The index end of the flight isn't only the picture: a scrim and
+     the blurb sit over the preview shot, and the clone covers them
+     the instant it appears. Fading the clone through that end — in
+     as it leaves, out as it lands — turns what would be a pop into
+     the label lifting off and settling back. It costs nothing at the
+     other end, where the clone and the hero are the same pixels.
+
+     Shorter on the way out than on the way back: leaving, the paper
+     is already washing in behind the clone, and a slow fade would
+     read as the picture briefly going pale. */
+  clone.animate(
+    reverse ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: 0 }, { opacity: 1 }],
+    {
+      duration: reverse ? HANDOFF_BACK_MS : HANDOFF_OUT_MS,
+      delay: reverse ? Math.max(0, BACK_MS - HANDOFF_BACK_MS) : 0,
+      easing: 'linear',
+      fill: 'both',
+    }
+  );
+
+  let landed = false;
+  const land = () => {
+    if (landed) return;
+    landed = true;
+    // order matters: unhide first, remove second, one paint for both
+    img.style.visibility = '';
+    clone.remove();
+  };
+  flight.finished.then(land, () => {});
+  // for an unmount mid-flight: nothing left to hand off to, so drop
+  // the clone rather than leave it parked on the body
+  return () => {
+    plays.forEach((a) => a.cancel());
+    land();
+  };
 }
 
 /* small stroke icons for section.points tiles (pain-point summaries) */
@@ -123,7 +269,7 @@ const POINT_ICONS = {
   ),
 };
 
-export default function ProjectPage({ index, origin, onNavigate, onClose }) {
+export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
   const project = projects[index];
   const page = project.page;
   const backRef = useRef(null);
@@ -142,28 +288,41 @@ export default function ProjectPage({ index, origin, onNavigate, onClose }) {
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Outbound flight, once, before paint. */
+  /* Outbound flight, once, before paint. The teardown is only ever
+     reached by an unmount mid-flight — closing that fast has to take
+     the clone with it. */
+  const abortRef = useRef(null);
   useLayoutEffect(() => {
-    if (reduce || flownRef.current || !origin) return;
+    if (reduce || flownRef.current || !getOrigin) return () => abortRef.current?.();
     flownRef.current = true;
-    flipHero(heroRef.current, origin);
+    abortRef.current = flyHero(heroRef.current, getOrigin());
+    return () => abortRef.current?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* Return flight. If the reader has scrolled the hero off screen
-     there is nothing left to fly — sending an off-screen element on a
-     journey nobody can see just delays the close — so the page falls
-     back to its plain fade. */
+  /* Return flight — measured fresh, not replayed from the outbound.
+     useOverlayPage has just put the page behind back where the
+     reader left it, so asking now is what makes the image land in
+     the preview frame it came out of rather than wherever that frame
+     happened to be a scroll ago.
+
+     Three ways out of it: the reader scrolled the hero off screen,
+     or scrolled the preview frame off screen, or the frame is no
+     longer measurable. The first two are journeys nobody can watch
+     that only delay the close. Each falls back to the plain fade. */
   const flying = useRef(false);
   useLayoutEffect(() => {
-    if (state !== 'closing' || reduce || !origin || flying.current) return;
+    if (state !== 'closing' || reduce || !getOrigin || flying.current) return;
     const fig = heroRef.current;
     if (!fig) return;
     const r = fig.getBoundingClientRect();
     if (r.bottom < 0 || r.top > window.innerHeight) return;
+    const to = getOrigin();
+    const b = to?.box;
+    if (!b || b.top + b.height < 0 || b.top > window.innerHeight) return;
     flying.current = true;
-    flipHero(fig, origin, { reverse: true });
-  }, [state, origin, reduce]);
+    abortRef.current = flyHero(fig, to, { reverse: true });
+  }, [state, getOrigin, reduce]);
 
   // which toggle.sections branch is showing (page.toggle.options[0] by
   // default); only meaningful for projects that define page.toggle
@@ -186,6 +345,12 @@ export default function ProjectPage({ index, origin, onNavigate, onClose }) {
   // arrow keys page between projects
   useEffect(() => {
     const onKey = (e) => {
+      /* Widgets inside the page that steer with ←/→ get first refusal:
+         they preventDefault, and their handlers sit below window, so
+         they have already run by the time this one does. Without this,
+         arrowing through the zone tablist pages to the next project
+         out from under the reader. */
+      if (e.defaultPrevented) return;
       if (e.key === 'ArrowLeft') go(-1);
       if (e.key === 'ArrowRight') go(1);
     };
@@ -198,7 +363,7 @@ export default function ProjectPage({ index, origin, onNavigate, onClose }) {
     <div
       className={`pp ${state === 'open' ? 'is-open' : ''} ${
         state === 'closing' ? 'is-closing' : ''
-      } ${origin ? 'has-flight' : ''}`}
+      } ${getOrigin ? 'has-flight' : ''}`}
       style={{ '--page-dir': dir }}
     >
       <div
@@ -349,14 +514,32 @@ export default function ProjectPage({ index, origin, onNavigate, onClose }) {
 
 /* one case-study section: heading, body copy, then whichever optional
    blocks the data provides (points / subs / facts / stack / flow /
-   compare / media / gallery) */
+   archMap / zones / tiles / compare / media / gallery).
+
+   `imagesFirst` lifts media + gallery to just under the body. The early
+   sections read "here is what we made -> here is the work -> here is
+   where it fell short", and with pictures pinned to the bottom the
+   shortfalls landed before the reader had seen the thing they are about. */
 function Section({ s }) {
+  const pictures = (
+    <>
+      {s.media && <Media media={s.media} className="pp-panel" alt="" />}
+      {s.gallery && (
+        <div className="pp-gallery">
+          {s.gallery.map((g) => (
+            <Media key={g.caption} media={g} className="pp-panel" alt="" />
+          ))}
+        </div>
+      )}
+    </>
+  );
   return (
     <section className="pp-section">
       <h2>{s.heading}</h2>
       {s.body.map((p, i) => (
         <p key={i}>{p}</p>
       ))}
+      {s.imagesFirst && pictures}
       {s.points && (
         <div className="pp-points">
           {s.points.map((pt) => (
@@ -400,6 +583,24 @@ function Section({ s }) {
       {s.stack && <StackDiagram stack={s.stack} />}
       {s.flow && <FlowDiagram flow={s.flow} />}
       {s.archMap && <ArchMap map={s.archMap} />}
+      {s.zones && <ZoneStudy zones={s.zones} />}
+      {/* the four graded tilesets, laid out so the shared grey rock
+          reads across the row — same argument as ZoneStudy, one floor
+          up. No panel behind them: they are cut-out art with real
+          transparency and they sit on the paper. */}
+      {s.tiles && (
+        <figure className="pp-tiles">
+          <ol>
+            {s.tiles.items.map((t) => (
+              <li key={t.label}>
+                <img src={t.src} alt={`${t.label} tileset`} loading="lazy" />
+                <span>{t.label}</span>
+              </li>
+            ))}
+          </ol>
+          {s.tiles.caption && <figcaption>{s.tiles.caption}</figcaption>}
+        </figure>
+      )}
       {s.compare && (
         <figure className="pp-compare">
           <div className="pp-compare-grid">
@@ -421,14 +622,7 @@ function Section({ s }) {
           {s.compare.caption && <figcaption>{s.compare.caption}</figcaption>}
         </figure>
       )}
-      {s.media && <Media media={s.media} className="pp-panel" alt="" />}
-      {s.gallery && (
-        <div className="pp-gallery">
-          {s.gallery.map((g) => (
-            <Media key={g.caption} media={g} className="pp-panel" alt="" />
-          ))}
-        </div>
-      )}
+      {!s.imagesFirst && pictures}
     </section>
   );
 }

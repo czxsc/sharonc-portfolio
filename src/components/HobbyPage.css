@@ -530,6 +530,653 @@
   }
 }
 
+/* ============================================================
+   Stories — bespoke composition. Two facing columns rather than
+   two stacked lists: reading takes the wide side at display size,
+   watching sits narrower and offset down across a hairline, and a
+   handwritten note in the gutter points back at the one pair that
+   belongs together. A mono tally runs across the top as a masthead.
+   ============================================================ */
+.hp-stories {
+  display: grid;
+  grid-template-columns: minmax(0, 1.42fr) minmax(0, 1fr);
+  grid-template-areas:
+    'tally tally'
+    'read  watch'
+    'close close';
+  column-gap: clamp(28px, 4vw, 64px);
+  row-gap: var(--sp-5);
+  align-items: start;
+  max-width: 1080px;
+  margin-top: var(--sp-6);
+  margin-left: clamp(0px, 8vw, 120px);
+}
+
+/* ---------- masthead tally ---------- */
+.hps-tally {
+  grid-area: tally;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.hps-tally b {
+  font-weight: 400;
+  color: var(--ink);
+}
+.hps-tally::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* ---------- the two columns ---------- */
+.hps-read {
+  grid-area: read;
+}
+/* offset down and set behind a hairline — the quieter half */
+.hps-watch {
+  grid-area: watch;
+  padding-left: clamp(24px, 3.5vw, 52px);
+  margin-top: clamp(40px, 7vw, 96px);
+  border-left: 1px solid var(--line);
+}
+
+.hps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hps-list li {
+  position: relative;
+  border-top: 1px solid var(--line);
+  transition: transform var(--dur) var(--ease);
+}
+.hps-list li:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.hps-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.hps-note {
+  color: var(--ink-soft);
+  font-size: var(--fs-small);
+}
+
+/* reads — name and author on a shared baseline, note beneath */
+.hps-read li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--sp-4);
+  padding-block: var(--sp-4);
+}
+.hps-read .hps-title {
+  font-size: clamp(1.4rem, 2.7vw, 2.05rem);
+}
+.hps-by {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.hps-read .hps-note {
+  grid-column: 1 / -1;
+  max-width: 48ch;
+  margin-top: var(--sp-2);
+}
+
+/* the bookmark — a tone ribbon slipped into the row's outer edge,
+   notched at the foot. scaleY rather than height so it stays on the
+   compositor; the notch squashes mid-move, which at 7px reads as
+   nothing at all */
+.hps-ribbon {
+  position: absolute;
+  top: -1px;
+  left: calc(-1 * clamp(12px, 1.6vw, 22px));
+  width: 7px;
+  height: 100%;
+  background: var(--tone);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 7px), 0 100%);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.5s var(--ease);
+}
+.hps-read li:hover .hps-ribbon {
+  transform: scaleY(1);
+}
+
+/* watches — the format leads, so the two columns don't read as the
+   same list twice */
+.hps-watch li {
+  padding-block: 18px;
+}
+.hps-tag {
+  display: block;
+  margin-bottom: 5px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  transition: color var(--dur-quick) var(--ease);
+}
+.hps-watch li:hover {
+  transform: translateX(4px);
+}
+.hps-watch li:hover .hps-tag {
+  color: var(--tone);
+}
+.hps-watch .hps-title {
+  display: block;
+  font-size: 1.25rem;
+}
+.hps-watch .hps-note {
+  display: block;
+  max-width: 34ch;
+  margin-top: 6px;
+}
+
+/* the one cross-column connection, set in the hand with a drawn arrow
+   pointing back up the page at Circe */
+.hps-thread {
+  position: relative;
+  max-width: 28ch;
+  margin: var(--sp-4) 0 0;
+  padding-left: 44px;
+  rotate: -1.2deg;
+  font-family: var(--hand);
+  font-size: 1.35rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+.hps-thread-arrow {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 34px;
+  height: 29px;
+  color: var(--ink-faint);
+  scale: 1 -1; /* point back up-left, toward the read column */
+}
+
+/* closing line — pushed right, under the narrow column, with a short
+   rule above it rather than a full-width one */
+.hps-close {
+  grid-area: close;
+  max-width: 44ch;
+  margin-left: auto;
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.hps-close p + p {
+  margin-top: var(--sp-3);
+}
+
+@media (max-width: 760px) {
+  .hp-stories {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'tally'
+      'read'
+      'watch'
+      'close';
+    row-gap: var(--sp-5);
+    margin-left: 0;
+  }
+  .hps-watch {
+    margin-top: 0;
+    padding-left: 0;
+    border-left: none;
+  }
+  .hps-read li {
+    grid-template-columns: 1fr;
+  }
+  .hps-by {
+    margin-top: 6px;
+  }
+  /* only the page gutter to sit in at this width */
+  .hps-ribbon {
+    left: -10px;
+    width: 5px;
+  }
+  .hps-thread {
+    max-width: none;
+  }
+  .hps-close {
+    margin-left: 0;
+    font-size: var(--fs-body);
+  }
+}
+
+/* ============================================================
+   Gaming — bespoke composition. Taste first, machine last: the
+   stance, the three favourites at display size, what's loaded
+   now, the shelf beside the queue, then the annotated build as
+   the closing visual. The build photo is the only saturated
+   colour on the page, so everything around it stays paper-quiet.
+   ============================================================ */
+.hp-gaming {
+  display: grid;
+  gap: var(--sp-6);
+  margin-top: var(--sp-6);
+}
+/* the reading column, offset right of the header like .hp-blocks;
+   the build section deliberately sits outside it, full width */
+.hpg-col {
+  max-width: 900px;
+  margin-left: clamp(0px, 8vw, 120px);
+}
+
+/* ---------- stance ---------- */
+.hpg-genres {
+  list-style: none;
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+}
+.hpg-genres li {
+  padding-block: 16px;
+  border-top: 1px solid var(--line);
+}
+.hpg-genres li:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.hpg-genre-name {
+  display: block;
+  font-family: var(--serif);
+  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+  letter-spacing: -0.015em;
+}
+.hpg-genre-meta {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  color: var(--ink-faint);
+}
+
+/* the honest footnote to the genre list — set as a margin note in the
+   hand, with a small drawn arrow pointing back up at what it answers */
+.hpg-aside {
+  position: relative;
+  max-width: 30ch;
+  margin: var(--sp-4) 0 0 auto;
+  padding-left: 46px;
+  font-family: var(--hand);
+  font-size: 1.35rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  rotate: -1.2deg;
+}
+.hpg-aside-arrow {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 36px;
+  height: 30px;
+  color: var(--ink-faint);
+  scale: 1 -1; /* flip the drawn curve so it points back up at the list */
+}
+
+/* ---------- the permanent three — the page's display type ---------- */
+.hpg-faves {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hpg-faves li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--sp-4);
+  padding-block: var(--sp-4);
+  border-top: 1px solid var(--line);
+}
+.hpg-faves li:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.hpg-fave-name {
+  font-family: var(--serif);
+  font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+.hpg-fave-meta {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.hpg-fave-note {
+  grid-column: 1 / -1;
+  max-width: 60ch;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-small);
+  color: var(--ink-soft);
+}
+
+/* ---------- shelf beside queue ---------- */
+.hpg-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: var(--sp-5) clamp(32px, 6vw, 80px);
+  align-items: start;
+}
+
+.hpg-shelf {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hpg-shelf li {
+  padding-block: 14px;
+  border-top: 1px solid var(--line);
+}
+.hpg-shelf li:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.hpg-shelf-name {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.2rem;
+}
+.hpg-shelf-meta {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+/* a queue, so it gets numbers and a rule threaded through them —
+   the one list on this page where order actually carries meaning */
+.hpg-queue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hpg-queue li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr);
+  column-gap: var(--sp-3);
+  padding-block: 14px;
+}
+.hpg-queue li::before {
+  content: '';
+  position: absolute;
+  left: 0.62rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+.hpg-queue li:first-child::before {
+  top: 50%;
+}
+.hpg-queue li:last-child::before {
+  bottom: 50%;
+}
+.hpg-queue-num {
+  position: relative;
+  z-index: 1;
+  padding-right: 0.5rem;
+  /* sits on the thread, so it needs the page ground behind it */
+  background: color-mix(in srgb, var(--tone) 6%, var(--paper));
+  font-family: var(--mono);
+  font-size: var(--fs-small);
+  color: var(--ink-faint);
+}
+.hpg-queue-name {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+}
+.hpg-queue-note {
+  grid-column: 2;
+  margin-top: 3px;
+  font-size: var(--fs-small);
+  color: var(--ink-soft);
+}
+
+/* ---------- the annotated build ---------- */
+/* the closing moment breaks out of the reading column to the page's
+   own gutters — label and grid share that wider left edge */
+.hpg-build {
+  margin-top: var(--sp-3);
+}
+/* .hpb-label's trailing hairline is a ::after, i.e. the last flex item;
+   ordering the hint after it puts the rule between title and hint */
+.hpg-hint {
+  order: 1;
+  flex: none;
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  color: var(--ink-faint);
+}
+
+.hpg-build-grid {
+  display: grid;
+  /* the photo is portrait; capping it keeps the two halves close in
+     height so the ledger doesn't float in a tall empty column */
+  grid-template-columns: minmax(0, 540px) minmax(0, 1fr);
+  gap: clamp(28px, 6vw, 96px);
+  align-items: center;
+  margin-top: var(--sp-5);
+}
+
+.hpg-photo {
+  margin: 0;
+
+  /* The pins sit on the photo, and the photo is a bright image in both
+     themes — reading --ink here would flip them to light-on-light in
+     dark mode. So they're held at their light-theme values: the only
+     colours on the page that don't follow the palette. The chip below
+     is a label plate on the page's own surface, so it still does. */
+  --pin: #1b1b1b; /* --ink */
+  --pin-halo: #f5f4f1; /* --paper */
+  --pin-on: #2c3a4a; /* --navy, the gaming tone */
+}
+.hpg-frame {
+  position: relative;
+}
+.hpg-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hpg-photo figcaption {
+  margin-top: var(--sp-3);
+  padding-left: clamp(0px, 6vw, 90px);
+  rotate: -1deg;
+  font-family: var(--hand);
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+}
+
+/* markers — pinned by percentage so they track the photo at any width */
+.hpg-marker {
+  position: absolute;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.hpg-marker-ring {
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--pin-halo);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pin) 62%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pin) 22%, transparent);
+  transition:
+    width var(--dur) var(--ease),
+    height var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+.hpg-marker.is-active .hpg-marker-ring,
+.hpg-marker:focus-visible .hpg-marker-ring {
+  width: 17px;
+  height: 17px;
+  background: var(--pin-on);
+}
+.hpg-marker:focus-visible {
+  outline: 2px solid var(--pin);
+  outline-offset: 1px;
+  border-radius: 50%;
+}
+/* the other markers step back once one is picked */
+.hpg-build.has-active .hpg-marker:not(.is-active) .hpg-marker-ring {
+  background: color-mix(in srgb, var(--pin) 26%, transparent);
+}
+
+/* fingers need a bigger target than a cursor does */
+@media (pointer: coarse) {
+  .hpg-marker {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.hpg-chip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  translate: 0 -50%;
+  margin-left: 4px;
+  padding: 4px 9px;
+  white-space: nowrap;
+  background: var(--card);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity var(--dur-quick) var(--ease);
+  pointer-events: none;
+}
+.hpg-marker[data-side='left'] .hpg-chip {
+  left: auto;
+  right: 100%;
+  margin: 0 4px 0 0;
+}
+.hpg-marker.is-active .hpg-chip,
+.hpg-marker:focus-visible .hpg-chip {
+  opacity: 1;
+}
+
+/* ledger — mirrors the markers; rows for parts that aren't in the shot
+   carry a note instead of a highlight */
+.hpg-ledger {
+  margin: 0;
+}
+.hpg-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--sp-3);
+  padding: 11px 10px 11px 12px;
+  margin-left: -12px;
+  border-top: 1px solid var(--line);
+  transition: background var(--dur-quick) var(--ease);
+}
+.hpg-row:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.hpg-row.is-active {
+  background: color-mix(in srgb, var(--tone) 9%, transparent);
+}
+.hpg-row dt {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-top: 3px;
+}
+.hpg-row.is-active dt {
+  color: var(--ink);
+}
+.hpg-row dd {
+  margin: 0;
+  font-size: var(--fs-small);
+}
+.hpg-row.is-unpinned dd {
+  color: var(--ink-soft);
+}
+.hpg-row-note {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+/* below this the ledger can't hold a part name on one line beside a
+   540px photo, so the two stack instead of both being cramped */
+@media (max-width: 1080px) {
+  .hpg-build-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+  }
+  .hpg-photo {
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 700px) {
+  .hpg-col {
+    margin-left: 0;
+  }
+  .hpg-band {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+  }
+  .hpg-aside {
+    margin-left: 0;
+    max-width: none;
+  }
+  .hpg-faves li {
+    grid-template-columns: 1fr;
+  }
+  .hpg-fave-meta {
+    margin-top: 6px;
+  }
+  .hpg-photo figcaption {
+    padding-left: 0;
+  }
+  .hpg-row {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+}
+
 /* ---------- image — small tilted accent photo, tucked beside a block
    like a taped-in print rather than a full section of its own ---------- */
 .hp-accent {

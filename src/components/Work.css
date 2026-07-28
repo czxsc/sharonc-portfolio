@@ -72,12 +72,21 @@
      background it read as a faint white line at the frame's bottom */
   background: var(--liquid);
 }
-/* Covers don't crossfade in place — the incoming one wipes open from
-   the edge the selection came from (--ct/--cb, written by Work.jsx),
-   while the outgoing drifts a hair the other way behind it. The image
-   change is then caused by the gesture instead of merely following
-   it. The active cover sits on top, so the outgoing wipe is only ever
-   glimpsed at the frame's edges. */
+/* Covers resolve rather than move.
+
+   A directional wipe was the obvious answer here and it was the
+   wrong one: running down the list faster than the wipe can finish
+   leaves several panels mid-flight travelling different ways, and
+   the frame reads as twitching. Anything whose *direction* depends
+   on the last input has that failure mode built in.
+
+   So nothing here is directional, and the only geometry is a single
+   slow settle inward — always inward, at 900ms, so interrupting it
+   just means it carries on from wherever it had got to. The change
+   itself is carried by opacity: the project's tone comes up first
+   and the screenshot resolves out of it, like a print developing.
+   Run the list at any speed and the worst you get is a soft bloom
+   of colour. */
 .preview-item {
   position: absolute;
   inset: 0;
@@ -87,23 +96,22 @@
     radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.16), transparent 55%),
     linear-gradient(145deg, var(--t1), var(--t2));
   opacity: 0;
-  clip-path: inset(var(--ct, 100%) 0 var(--cb, 0%) 0);
-  transform: scale(1.04) translateY(calc(var(--dir, 1) * -1.5%));
+  transform: scale(1.025);
   transition:
-    opacity 0.34s var(--ease-exit),
-    clip-path 0.62s var(--ease-set),
-    transform 0.85s var(--ease);
-  will-change: opacity, transform, clip-path;
+    opacity 0.22s var(--ease),
+    transform 0.9s var(--ease);
+  will-change: opacity, transform;
 }
 .preview-item.is-active {
   opacity: 1;
-  clip-path: inset(0 0 0 0);
-  transform: scale(1) translateY(0);
-  transition:
-    opacity 0.2s linear,
-    clip-path 0.62s var(--ease-set),
-    transform 0.85s var(--ease);
+  transform: scale(1);
   z-index: 2;
+}
+/* under an open case study: change project, don't animate doing it.
+   The closing flight measures this frame and lands the picture in
+   it, so it has to be still — see the `is-held` note in Work.jsx */
+.work-frame.is-held :is(.preview-item, .preview-img, .preview-label) {
+  transition: none;
 }
 /* faux app chrome */
 .preview-bar {
@@ -152,6 +160,14 @@
   /* anchor the top of the screenshot so its nav bar survives the crop —
      cover trims from the bottom instead */
   object-position: top center;
+  /* never fully out: at 0.4 the tone tints the outgoing shot rather
+     than replacing it, so a fast run down the list blooms instead of
+     flashing between six flat colours */
+  opacity: 0.4;
+  transition: opacity 0.5s var(--ease);
+}
+.preview-item.is-active .preview-img {
+  opacity: 1;
 }
 /* scrim so the label stays readable over any screenshot — fades to the
    same color as the window bar above (project tone + the bar's 30%
@@ -175,6 +191,17 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
+  /* small enough that overlapping copies never read as the frame
+     itself moving — this is where the liveliness goes now */
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s var(--ease) 0.06s,
+    transform 0.45s var(--ease) 0.06s;
+}
+.preview-item.is-active .preview-label {
+  opacity: 1;
+  transform: none;
 }
 /* no project name here — the active list row already carries it */
 .preview-blurb {

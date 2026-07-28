@@ -4,7 +4,6 @@ import HobbyPage from './HobbyPage.jsx';
 import SectionSeam from './SectionSeam.jsx';
 import SetType from './SetType.jsx';
 import laptopImg from '../assets/laptop.webp';
-import bookImg from '../assets/book.webp';
 import coffeeImg from '../assets/coffee.webp';
 import controllerImg from '../assets/controller.webp';
 import headphonesImg from '../assets/headphones.webp';
@@ -26,7 +25,6 @@ const END_SWAP_MS = GIF_TOTAL_MS - 90; // freeze just before the loop wraps
 
 const imgMap = {
   laptop: laptopImg,
-  book: bookImg,
   coffee: coffeeImg,
   controller: controllerImg,
   headphones: headphonesImg,
@@ -37,14 +35,16 @@ const imgMap = {
    x/y — final position, % of the scene box
    r/s — resting rotation (deg) and item width (px)
    fx/fy — entry offset in px back toward the tipped bag's mouth
-           (desktop scale; CSS multiplies by --k on small screens) */
+           (desktop scale; CSS multiplies by --k on small screens)
+   One slot per hobby, in hobbies order. Two ride high, three stagger
+   below — the gap that leaves at mid-right is deliberate, not a hole
+   where a seventh thing used to be. */
 const SCATTER = [
-  { x: 48, y: 12, r: -7, s: 150, fx: -118, fy: 284 },
-  { x: 62, y: 44, r: 8, s: 128, fx: -290, fy: 140 },
-  { x: 49, y: 60, r: -5, s: 112, fx: -142, fy: 60 },
-  { x: 76, y: 12, r: 10, s: 132, fx: -437, fy: 295 },
-  { x: 87, y: 44, r: -9, s: 118, fx: -565, fy: 120 },
-  { x: 68, y: 72, r: 6, s: 116, fx: -354, fy: -20 },
+  { x: 47, y: 10, r: -7, s: 150, fx: -105, fy: 300 },
+  { x: 47, y: 56, r: -5, s: 116, fx: -105, fy: 58 },
+  { x: 70, y: 12, r: 10, s: 132, fx: -380, fy: 300 },
+  { x: 84, y: 42, r: -9, s: 122, fx: -552, fy: 135 },
+  { x: 63, y: 62, r: 6, s: 120, fx: -294, fy: 20 },
 ];
 
 export default function Play() {
