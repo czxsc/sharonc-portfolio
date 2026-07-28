@@ -8,6 +8,21 @@
 
 .lwz {
   margin: var(--sp-4) 0 0;
+
+  /* ---- the grade handover ----
+     `close` is how long a layer takes to go behind its own colour, and
+     how long the incoming layer takes to arrive behind its own. They
+     run together, so the two flat fields are all that cross — the
+     paintings never do (see ZoneStudy.jsx for why they mustn't).
+
+     `open` is the incoming field lifting off its painting. It is much
+     the longer of the two because it is the half that is actually being
+     watched: covering is a beat, uncovering is the reveal. */
+  --lwz-close: 220ms;
+  --lwz-open: 380ms;
+  /* the set re-grades as one sweep rather than four panels blinking
+     together; small enough to read as a single gesture, not a queue */
+  --lwz-stagger: 44ms;
 }
 
 /* ---------- head: label + layer tabs ---------- */
@@ -51,8 +66,10 @@
 .lwz-tab:hover:not(.is-active) {
   color: var(--ink);
 }
+/* the selected pill carries a trace of the layer it selects, so the
+   control sits in the same grade as the panels below it */
 .lwz-tab.is-active {
-  background: var(--paper-2);
+  background: color-mix(in srgb, var(--c) 13%, var(--paper-2));
   color: var(--ink);
 }
 .lwz-dot {
@@ -91,14 +108,67 @@
   background: var(--paper-2);
   border: 1px solid var(--line-soft);
 }
-.lwz-cell img {
+
+/* ---------- the layer handover ----------
+   Four grades of the panel, each one an opaque painting under an opaque
+   field of its own colour. Only opacity moves, on elements that are
+   mounted once, so an interrupted switch has no direction to pick and
+   nothing to restart — every value simply re-aims from where it is.
+
+   The order below is what keeps the two paintings apart. On the layer
+   being left the field closes first and the layer only drops out once
+   it is behind it; on the layer arriving the reverse, and its field
+   waits for the layer to be fully up before it opens. Both halves are
+   driven by the same --lwz-close, so the outgoing field is at full as
+   the incoming one arrives and the crossing is colour against colour.
+
+   The stagger delay belongs to opacity alone. The hover zoom has to
+   fire immediately, and on all four grades at once or they drift. */
+.lwz-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  /* leaving: waits out its own field closing, then goes, unseen */
+  transition: opacity var(--lwz-close) var(--ease);
+  transition-delay: calc(var(--lwz-close) + var(--i) * var(--lwz-stagger));
+}
+.lwz-layer.is-on {
+  opacity: 1;
+  /* arriving: comes up behind its own field, so none of the painting
+     is on screen yet — what rises is the new colour, not the new art */
+  transition: opacity var(--lwz-close) var(--ease);
+  transition-delay: calc(var(--i) * var(--lwz-stagger));
+}
+
+.lwz-veil {
+  position: absolute;
+  inset: 0;
+  /* no z-index wanted: positioned, so it already sits over the static
+     image, and staying at auto leaves the cell's scrim and caption
+     above it — they carry straight through the dip instead of
+     blinking out with the painting */
+  background: var(--wipe);
+  opacity: 1;
+  /* closing over the layer being left, ahead of everything else */
+  transition: opacity var(--lwz-close) var(--ease);
+  transition-delay: calc(var(--i) * var(--lwz-stagger));
+}
+.lwz-layer.is-on .lwz-veil {
+  opacity: 0;
+  /* the reveal: slower than the cover, and held back until the layer
+     beneath it is certainly at full */
+  transition: opacity var(--lwz-open) var(--ease);
+  transition-delay: calc(var(--lwz-close) + var(--i) * var(--lwz-stagger));
+}
+
+.lwz-layer img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform var(--dur-slow) var(--ease);
 }
-.lwz-cell:hover img {
+.lwz-cell:hover .lwz-layer img {
   transform: scale(1.03);
 }
 
@@ -168,12 +238,38 @@
 .lwz-foot .pp-palette {
   flex: 1 1 340px;
 }
+
+/* The ramp is not replaced, it is re-graded: six flat swatches with no
+   composition to misregister, so these can do what the paintings can't
+   and simply walk to the new layer's colours. Timed off the handover
+   above, so the strip and the panels read as one instrument being
+   re-tuned. Left to right, since that is how a ramp is read. */
+.lwz-foot .pp-swatch {
+  transition: background-color var(--lwz-open) var(--ease);
+  transition-delay: calc(var(--lwz-close) + var(--i) * 26ms);
+}
+/* the hex can't tween, so it settles instead — from part-way up rather
+   than from nothing, which keeps a fast run through the tabs from
+   flickering the row */
+.lwz-foot code,
+.lwz-note {
+  animation: lwz-settle 0.34s var(--ease) both;
+}
+@keyframes lwz-settle {
+  from {
+    opacity: 0.25;
+  }
+}
+.lwz-foot code {
+  animation-delay: calc(var(--lwz-close) + var(--i) * 26ms);
+}
 .lwz-note {
   flex: 1 1 260px;
   max-width: 44ch;
   font-size: var(--fs-small);
   line-height: 1.6;
   color: var(--ink-soft);
+  animation-delay: 120ms;
 }
 
 /* ---------- responsive ---------- */
@@ -200,10 +296,21 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lwz-grid {
+  .lwz-grid,
+  .lwz-foot code,
+  .lwz-note {
     animation: none;
   }
-  .lwz-cell:hover img {
+  .lwz-cell:hover .lwz-layer img {
     transform: none;
+  }
+  /* the grade cuts rather than hands over — the panel still makes its
+     point, it just makes it in one frame */
+  .lwz-layer,
+  .lwz-layer.is-on,
+  .lwz-veil,
+  .lwz-layer.is-on .lwz-veil,
+  .lwz-foot .pp-swatch {
+    transition: none;
   }
 }

@@ -22,6 +22,28 @@ import concertKiofImg from '../assets/kiof_group.jpg';
 import receiptifyImg from '../assets/receiptify.png';
 import pcBuildImg from '../assets/hobby/web/pc.webp';
 
+/* Save-file snapshots for the permanent three — a `shot` on a favourite
+   is what the hover peek picks up (HobbyPage · FavesList). Titles without
+   one behave exactly as before, so the other two can land whenever the
+   screenshots do. */
+import shotStardew from '../assets/hobby/web/game_stardew.webp';
+import shotFireEmblem from '../assets/hobby/web/game_fire_emblem.webp';
+
+/* Book jackets for the Stories shelf — sized-down covers from the Open
+   Library cover archive, one per title in `read` below. */
+import coverBabel from '../assets/hobby/web/book_babel.webp';
+import coverKatabasis from '../assets/hobby/web/book_katabasis.webp';
+import coverCirce from '../assets/hobby/web/book_circe.webp';
+import coverDivineRivals from '../assets/hobby/web/book_divine_rivals.webp';
+import coverHailMary from '../assets/hobby/web/book_project_hail_mary.webp';
+import coverThursday from '../assets/hobby/web/book_thursday_murder_club.webp';
+
+/* Die-cut stickers for the Stories watch row — each one trimmed to its
+   subject on transparent, so the white outline is drawn in CSS. */
+import stickerOdyssey from '../assets/hobby/web/show_odyssey.webp';
+import stickerSpyFamily from '../assets/hobby/web/show_spy_family.webp';
+import stickerWitchHat from '../assets/hobby/web/show_witch_hat.webp';
+
 /* Little Wonder art direction. `web/` holds the sized webp exports of
    the source art next to it — the originals run 2–17MB each and are
    kept only as masters. */
@@ -1362,11 +1384,16 @@ export const projects = [
                   // ramps sampled off the finished paintings rather than
                   // the strips locked at the start — the art moved after
                   // those were set, and the swatches should match what
-                  // is actually on screen beside them
+                  // is actually on screen beside them.
+                  // `wipe` is the field the panel dips through while
+                  // the grade changes (ZoneStudy.jsx): the layer's hue
+                  // held at low chroma, so the handover reads as the
+                  // layer arriving rather than as a blackout.
                   {
                     id: 'overgrown',
                     name: 'Overgrown',
                     tone: '#399450',
+                    wipe: '#5F7048',
                     note: 'The first layer down, and the only one still lit like the surface — warm green light coming through a lot of rock.',
                     palette: ['#0F3728', '#1A5E45', '#2A765A', '#399450', '#68BA7A', '#9ED190'],
                     art: { banner: lwOgBanner, cave: lwOgCave, grove: lwOgGrove, nexus: lwOgNexus },
@@ -1375,6 +1402,7 @@ export const projects = [
                     id: 'intermittent',
                     name: 'Intermittent',
                     tone: '#297072',
+                    wipe: '#3F6F6B',
                     note: 'Where the green starts draining out. The same compositions cooled into teal — the first hint that you are heading somewhere colder.',
                     palette: ['#06131C', '#1C325B', '#297072', '#54A18F', '#73D0BD', '#8AFEF7'],
                     art: { banner: lwInBanner, cave: lwInCave, grove: lwInGrove, nexus: lwInNexus },
@@ -1383,6 +1411,7 @@ export const projects = [
                     id: 'crystal',
                     name: 'Crystal Cove',
                     tone: '#9E4FBC',
+                    wipe: '#6A5580',
                     note: 'The furthest the grade moves from the source paintings — a full rotation into violet, with the mid-tones lifted so the rock glows.',
                     palette: ['#1E0C25', '#422267', '#9E4FBC', '#7DA9DD', '#48539A', '#1F224E'],
                     art: { banner: lwCrBanner, cave: lwCrCave, grove: lwCrGrove, nexus: lwCrNexus },
@@ -1391,6 +1420,7 @@ export const projects = [
                     id: 'biolum',
                     name: 'Bioluminescent',
                     tone: '#459BC4',
+                    wipe: '#2F4C6B',
                     note: 'Deepest and darkest. Almost no warm value left in the ramp, so the mushrooms and pools carry all the light.',
                     palette: ['#06111F', '#102238', '#28497A', '#375D98', '#459BC4', '#5AB9D6'],
                     art: { banner: lwBiBanner, cave: lwBiCave, grove: lwBiGrove, nexus: lwBiNexus },
@@ -1622,11 +1652,17 @@ export const projects = [
    Gaming and stories have bespoke compositions (GamingBlocks,
    StoriesBlocks) that pick blocks by `id` rather than kind, so they can
    use kinds of their own:
-       { kind: 'stance', body: [paragraphs], genres: [{ name, meta }], aside }
-       { kind: 'build',  src, alt, caption, hint, parts: [{ label, value, x?, y?, note? }] }
+       { kind: 'tags',  lead, items: [tag strings] } — one inline row
+       { kind: 'shelf', title, items: [{ name, by, year, src }] } —
+         taped jackets in a scrapbook row; author and year are separate
+         so they can set as their own line
+       { kind: 'stickers', title, items: [{ name, meta, note, src }] } —
+         a row of die-cut sticker icons, each one beside its title
+       { kind: 'build',  src, alt, caption?, link?: { label, href },
+                         parts: [{ label, value, x?, y?, note? }] }
          — x/y are % positions on the photo; a part with neither gets no
            marker (it isn't visible in the shot) and shows `note` instead.
-       { kind: 'note',   body } — a single handwritten margin note
+         — link renders at the far end of the section label.
    TODO(sharon): drinks / art below are still sample copy — swap in the
    real ones, and add gallery image imports. */
 export const hobbies = [
@@ -1642,73 +1678,72 @@ export const hobbies = [
       blocks: [
         {
           id: 'read',
-          kind: 'list',
+          kind: 'shelf',
           title: 'Recently read',
+          /* the jackets carry these rows — cover, title, author, year,
+             and nothing else under them */
           items: [
             {
               name: 'Babel',
-              meta: 'R.F. Kuang · 2022',
-              note: 'Footnotes that argue with the text. I have never been so pleased to be lectured.',
+              by: 'R.F. Kuang',
+              year: '2022',
+              src: coverBabel,
             },
             {
               name: 'Katabasis',
-              meta: 'R.F. Kuang · 2025',
-              note: 'Grad school as a literal descent into hell — somehow the least fantastical thing about it.',
+              by: 'R.F. Kuang',
+              year: '2025',
+              src: coverKatabasis,
             },
             {
               name: 'Circe',
-              meta: 'Madeline Miller · 2018',
-              note: 'Three thousand years as somebody else’s footnote, finally given the page.',
+              by: 'Madeline Miller',
+              year: '2018',
+              src: coverCirce,
             },
             {
               name: 'Divine Rivals',
-              meta: 'Rebecca Ross · 2023',
-              note: 'Two typewriters and a war. I knew exactly what it was doing and I let it.',
+              by: 'Rebecca Ross',
+              year: '2023',
+              src: coverDivineRivals,
             },
             {
               name: 'Project Hail Mary',
-              meta: 'Andy Weir · 2021',
-              note: 'The only book that has made me cheer out loud at a unit conversion.',
+              by: 'Andy Weir',
+              year: '2021',
+              src: coverHailMary,
             },
             {
               name: 'The Thursday Murder Club',
-              meta: 'Richard Osman · 2020',
-              note: 'Four retirees, one cold case, zero urgency. Finished it in a weekend.',
+              by: 'Richard Osman',
+              year: '2020',
+              src: coverThursday,
             },
           ],
         },
         {
           id: 'watched',
-          kind: 'list',
+          kind: 'stickers',
           title: 'Recently watched',
           items: [
             {
               name: 'The Odyssey',
               meta: 'film',
+              src: stickerOdyssey,
               note: 'The myth at full scale. Went in knowing exactly how it ends and still sat forward the whole time.',
             },
             {
               name: 'Spy × Family',
               meta: 'anime',
+              src: stickerSpyFamily,
               note: 'The palate cleanser. Nobody in this household is telling the truth.',
             },
             {
               name: 'Witch Hat Atelier',
               meta: 'anime',
+              src: stickerWitchHat,
               note: 'Magic drawn as ink on paper, which is exactly right.',
             },
-          ],
-        },
-        {
-          id: 'thread',
-          kind: 'note',
-          body: 'Circe first, then the film — same voyage, told by the one left on the island.',
-        },
-        {
-          id: 'close',
-          kind: 'text',
-          body: [
-            'Half of these were finished at 2am on a weeknight, which is the only review that really counts.',
           ],
         },
       ],
@@ -1748,21 +1783,15 @@ export const hobbies = [
     tone: 'var(--navy)',
     page: {
       tagline:
-        'A bit of everything, but the ones that stick are the games that wait while you think.',
+        'I love playing a bit of everything, from short indie games to full-on triple-A titles but my favorite are games that make me plan and think',
       blocks: [
         {
-          id: 'how',
-          kind: 'stance',
-          title: 'How I play',
-          body: [
-            'Ninety-minute indie mysteries, hundred-hour RPGs, and most things in between. What I keep coming back to is the pause — games that hand you all the pieces and then let you sit there arranging them.',
-          ],
-          genres: [
-            { name: 'Strategy & turn-based RPGs', meta: 'set the orders, commit, watch it hold' },
-            { name: 'Cozy sims', meta: 'no fail state, just a long list of small wants' },
-            { name: 'Mystery & puzzle', meta: 'you already have everything you need' },
-          ],
-          aside: 'I’d love to be better at platformers. My hands have their own plans.',
+          id: 'genres',
+          kind: 'tags',
+          lead: 'My favorite genres',
+          /* plain strings — these render as inline tags, so they have to
+             stay short enough to sit on one line together */
+          items: ['Strategy', 'Turn-based RPGs', 'Cozy sims', 'Mystery', 'Puzzle'],
         },
         {
           id: 'faves',
@@ -1778,11 +1807,21 @@ export const hobbies = [
               name: 'Stardew Valley',
               meta: '2016 · farm sim',
               note: 'There is no version of my life in which I am not partway through a farm.',
+              shot: {
+                src: shotStardew,
+                alt: 'My Stardew Valley farm, laid out in neat crop blocks with sprinklers and paths between them.',
+                caption: 'the farm, currently',
+              },
             },
             {
               name: 'Fire Emblem: Three Houses',
               meta: '2019 · tactics',
               note: 'Tactics I love, plus a cast I would rearrange a weekend for. Both halves earn it.',
+              shot: {
+                src: shotFireEmblem,
+                alt: 'The Blue Lions house gathered around their professor in the classroom at Garreg Mach.',
+                caption: 'blue lions, never really a contest',
+              },
             },
           ],
         },
@@ -1811,16 +1850,6 @@ export const hobbies = [
               meta: 'CRPG',
               note: 'The hardest boss is your own internal monologue, and it is winning.',
             },
-            {
-              name: 'Stardew Valley',
-              meta: 'perennial',
-              note: 'Also above. It has never actually left the rotation.',
-            },
-            {
-              name: 'Baldur’s Gate 3',
-              meta: 'also above',
-              note: 'Another run. I keep telling myself this one will be short.',
-            },
           ],
         },
         {
@@ -1838,12 +1867,14 @@ export const hobbies = [
           id: 'queue',
           kind: 'list',
           title: 'Up next',
+          /* a queue is a list of intentions — names are enough, and
+             notes here would push the build photo off the screen */
           items: [
-            { name: 'Clair Obscur: Expedition 33', note: 'Turn-based, and apparently gorgeous about it.' },
-            { name: 'Blue Prince', note: 'A house that rearranges itself between attempts.' },
-            { name: 'Return of the Obra Dinn', note: 'Sixty deaths, no hand-holding.' },
+            { name: 'Clair Obscur: Expedition 33' },
+            { name: 'Blue Prince' },
+            { name: 'Return of the Obra Dinn' },
             { name: 'Sovereign Tower' },
-            { name: 'Grave Seasons', note: 'A farming sim where one of the neighbours is a murderer.' },
+            { name: 'Grave Seasons' },
           ],
         },
         {
@@ -1852,18 +1883,17 @@ export const hobbies = [
           title: 'The build',
           src: pcBuildImg,
           alt: 'A white Lian Li O11 Dynamic Mini V2 build, lit pink and cyan, with figurines and paper butterflies inside the case.',
-          hint: 'Pick a part',
-          caption: 'white everything, on purpose. the butterflies were not in the parts list.',
+          link: { label: 'PCPartPicker', href: 'https://pcpartpicker.com/b/wGjZxr' },
           parts: [
-            { label: 'CPU', value: 'Ryzen 7 7700X', x: 41, y: 35, note: 'under the pump block' },
+            { label: 'CPU', value: 'Ryzen 7 7700X', x: 41, y: 35 },
             { label: 'Cooler', value: 'Lian Li Hydroshift II LCD 360', x: 52, y: 15 },
             { label: 'Motherboard', value: 'ASUS B650E MAX GAMING WIFI W', x: 16, y: 30 },
             { label: 'Memory', value: 'TEAMGROUP T-Force Delta RGB 16 GB (2×8) DDR5-6000', x: 51, y: 33 },
             { label: 'GPU', value: 'Gigabyte AERO RTX 5060 Ti 16 GB', x: 33, y: 63 },
             { label: 'Fans', value: '3× Lian Li UNI SL-Infinity 120 mm + 1× SL-INF Wireless', x: 55, y: 74 },
             { label: 'Case', value: 'Lian Li O11 Dynamic Mini V2', x: 14, y: 86 },
-            { label: 'Storage', value: 'Crucial P310 2 TB NVMe', x: 34, y: 49, note: 'under the M.2 heatsink' },
-            { label: 'Power', value: 'Corsair RM750e 750 W', note: 'behind the panel' },
+            { label: 'Storage', value: 'Crucial P310 2 TB NVMe', x: 34, y: 49 },
+            { label: 'Power', value: 'Corsair RM750e 750 W' },
           ],
         },
       ],
@@ -1945,8 +1975,6 @@ export const hobbies = [
 ];
 
 export const contact = {
-  /* one line per set line — see SetType */
-  title: ['Let’s make', 'something!'],
   body:
     'I’m open to 2027 internships and collaborations. The fastest way to reach me is email.',
 };

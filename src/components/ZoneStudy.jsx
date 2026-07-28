@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
 import './ZoneStudy.css';
+import { useRef, useState } from 'react';
 
 /* ------------------------------------------------------------------
    Zone study — the background system for Little Wonder in one panel.
@@ -14,9 +14,29 @@ import './ZoneStudy.css';
    Data shape (content.js → section.zones):
    { label,
      panels: [{ id, label }],           // shared across every layer
-     items:  [{ id, name, tone, note,
+     items:  [{ id, name, tone, wipe, note,
                 palette: ['#rrggbb'], art: { [panelId]: src } }] }
    ------------------------------------------------------------------ */
+
+/* Two paintings are never on screen together. The grades look like one
+   composition but they aren't registered to it — the drawing carried on
+   between colourings, so lines sit a few pixels apart from layer to
+   layer. Any overlap puts that on display: a crossfade between them
+   doesn't read as a hue rotating, it reads as the picture shifting
+   under itself, which is the opposite of the claim the panel makes.
+
+   So the panel dips instead. Each grade carries its own opaque field in
+   its own colour, and a switch hands over between the two fields: the
+   outgoing layer closes behind its colour, the incoming layer rises
+   already covered by its own, and only then does that field open onto
+   the new painting. What you see is old painting → old colour → new
+   colour → new painting, and the misregistration has nowhere to show.
+
+   All of it is opacity on elements that are mounted once — no timers,
+   no scheduled swap, nothing to tear down, and no direction anywhere in
+   it. Selecting a layer re-points a set of opacity targets and CSS
+   carries each from wherever it currently is, so running the tabs
+   faster than the dip just re-aims them mid-flight. */
 
 export default function ZoneStudy({ zones }) {
   const [active, setActive] = useState(0);
@@ -26,8 +46,9 @@ export default function ZoneStudy({ zones }) {
   /* These are announced as tabs, so they have to behave like tabs: one
      stop in the page's tab order, and ←/→/Home/End to move between
      them. Without this a screen-reader user is told to use the arrow
-     keys and nothing happens. Focus follows selection, which is the
-     right pattern here — switching is instant and has no cost. */
+     keys and nothing happens. Focus follows selection — selection is
+     instant, only the grade takes a beat to settle — so arrowing
+     through the layers costs nothing. */
   const step = (i) => {
     const n = zones.items.length;
     const next = (i + n) % n;
@@ -46,19 +67,6 @@ export default function ZoneStudy({ zones }) {
       keys[e.key]();
     }
   };
-
-  /* The swap only reads as a re-grade if the new art is on screen the
-     instant the old art leaves. Decoding mid-fade would turn it into
-     two pictures dissolving — the exact reading this panel exists to
-     rule out — so every layer is warmed once on mount. All sixteen
-     together are smaller than a single one of the source PNGs. */
-  useEffect(() => {
-    zones.items.forEach((z) => {
-      Object.values(z.art).forEach((src) => {
-        new Image().src = src;
-      });
-    });
-  }, [zones]);
 
   return (
     <figure className="lwz">
@@ -98,35 +106,60 @@ export default function ZoneStudy({ zones }) {
         </div>
       </div>
 
-      {/* key replays the cross-fade on every switch; the grid itself
-          never moves, which is the point. The id is stable across
-          switches so the tabs' aria-controls stays valid — it is one
-          panel being re-graded, not four panels. */}
+      {/* Nothing here is keyed or rebuilt across a switch — the grid,
+          the cells and all sixteen images are mounted once and stay
+          put, so there is no layout to hold still. It holds still
+          because nothing ever moves. The captions and the frames sit
+          above the dip and never leave, which is what keeps the switch
+          reading as one panel being re-graded. */}
       <div
         className="lwz-grid"
-        key={zone.id}
         id="lwz-panel"
         role="tabpanel"
         aria-labelledby={`lwz-tab-${zone.id}`}
       >
-        {zones.panels.map((p) => (
-          <div className={`lwz-cell is-${p.id}`} key={p.id}>
-            <img src={zone.art[p.id]} alt={`${zone.name} — ${p.label}`} />
+        {zones.panels.map((p, i) => (
+          <div className={`lwz-cell is-${p.id}`} key={p.id} style={{ '--i': i }}>
+            {zones.items.map((z, zi) => (
+              <div
+                key={z.id}
+                className={`lwz-layer ${zi === active ? 'is-on' : ''}`}
+                style={{ '--wipe': z.wipe }}
+              >
+                <img
+                  src={z.art[p.id]}
+                  /* one description per cell: the grade on show owns
+                     it, the three behind it are the same panel in
+                     other grades and would only repeat themselves */
+                  alt={zi === active ? `${z.name} — ${p.label}` : ''}
+                  aria-hidden={zi === active ? undefined : 'true'}
+                  draggable="false"
+                />
+                {/* the layer's own colour, held over its own painting */}
+                <span className="lwz-veil" aria-hidden="true" />
+              </div>
+            ))}
             <span className="lwz-cap">{p.label}</span>
           </div>
         ))}
       </div>
 
       <figcaption className="lwz-foot">
+        {/* The ramp re-grades in place on the same sweep as the panels
+            above it: six swatches transitioning colour, no remount, so
+            the strip reads as the same instrument being re-tuned
+            rather than a new strip arriving. The hex settles after. */}
         <ol className="pp-palette" aria-label={`${zone.name} palette`}>
-          {zone.palette.map((c) => (
-            <li key={c} style={{ '--c': c }}>
+          {zone.palette.map((c, i) => (
+            <li key={i} style={{ '--c': c, '--i': i }}>
               <span className="pp-swatch" aria-hidden="true" />
-              <code>{c.replace('#', '')}</code>
+              <code key={c}>{c.replace('#', '')}</code>
             </li>
           ))}
         </ol>
-        <p className="lwz-note">{zone.note}</p>
+        <p className="lwz-note" key={zone.id}>
+          {zone.note}
+        </p>
       </figcaption>
     </figure>
   );

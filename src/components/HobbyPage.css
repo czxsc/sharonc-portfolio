@@ -11,6 +11,12 @@
   position: fixed;
   inset: 0;
   z-index: 300; /* above nav (100) and skip-link (200) */
+
+  /* the page's own ground — paper carrying a trace of the hobby's
+     tone. Named because anything that has to sit *opaquely* on the
+     page (the sticky back pill, a number breaking a rule) has to
+     match it exactly or it shows as a patch. */
+  --hp-ground: color-mix(in srgb, var(--tone) 6%, var(--paper));
 }
 
 .hp-circle {
@@ -24,7 +30,7 @@
   transition: transform 0.95s cubic-bezier(0.32, 0.08, 0.24, 1);
 }
 .hp-circle-page {
-  background: color-mix(in srgb, var(--tone) 6%, var(--paper));
+  background: var(--hp-ground);
   transition: transform 0.95s cubic-bezier(0.32, 0.08, 0.24, 1) 0.12s;
 }
 .hp.is-open .hp-circle {
@@ -69,7 +75,7 @@
   width: 100%;
   max-width: var(--maxw);
   margin-inline: auto;
-  padding: 0 var(--gutter) var(--sp-6);
+  padding: 0 var(--gutter) var(--sp-5);
   transform: translateY(16px);
   transition: transform 0.55s var(--ease);
 }
@@ -89,8 +95,16 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  margin-top: 26px;
-  padding: 0;
+  margin-top: 18px;
+  /* ground-coloured pill, matching the project pages: the button is
+     sticky, so without a backing the label sits directly on whatever
+     is scrolling past underneath it. The pill extends past the label
+     and the negative margin pulls the ring back onto the content edge,
+     so the padding costs no alignment. */
+  padding: 5px 20px 5px 5px;
+  margin-left: -5px;
+  border-radius: 999px;
+  background: var(--hp-ground);
   font-family: var(--mono);
   font-size: var(--fs-label);
   letter-spacing: 0.18em;
@@ -106,7 +120,7 @@
   border-radius: 50%;
   color: var(--ink);
   /* opaque over content that scrolls beneath the sticky button */
-  background: color-mix(in srgb, var(--tone) 6%, var(--paper));
+  background: var(--hp-ground);
   transition:
     background var(--dur) var(--ease),
     border-color var(--dur) var(--ease),
@@ -128,42 +142,56 @@
   transform: translateX(-2px);
 }
 
-/* ---------- header ---------- */
+/* ---------- header ----------
+   A masthead, not a title block: name, tagline and icon share one band
+   on a common bottom edge. These are casual pages — the header earns a
+   glance, not a screen, so it stays short enough that the content
+   under it starts above the fold. */
 .hp-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--sp-5);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: clamp(24px, 4vw, 64px);
   align-items: end;
-  max-width: 1080px;
-  margin-top: clamp(36px, 8vh, 84px);
+  max-width: 1240px;
+  margin-top: clamp(18px, 3vh, 36px);
+}
+.hp-head-id {
+  min-width: 0;
 }
 .hp-head h1 {
-  font-size: clamp(2.8rem, 6.5vw, 5rem);
-  margin-top: var(--sp-3);
+  font-size: clamp(2.2rem, 4.6vw, 3.6rem);
+  line-height: 1;
+  margin-top: var(--sp-2);
 }
+/* sits on the h1's baseline band, hanging in the space beside it */
+/* wide enough to hold a two-sentence tagline in two lines rather than
+   spilling a word onto a third — it's a masthead line, so it runs a
+   little past a body measure on purpose */
 .hp-tagline {
-  margin-top: var(--sp-4);
-  max-width: 46ch;
+  max-width: 80ch;
+  padding-bottom: 0.35em;
   font-family: var(--serif);
-  font-size: var(--fs-lead);
+  font-size: var(--fs-body);
   line-height: 1.45;
   color: var(--ink-soft);
 }
 .hp-icon {
-  width: clamp(130px, 17vw, 210px);
+  width: clamp(96px, 11vw, 148px);
   justify-self: end;
-  margin-right: clamp(0px, 4vw, 56px);
+  margin-right: clamp(0px, 2.5vw, 40px);
   rotate: -6deg;
   filter: drop-shadow(0 14px 22px rgb(0 0 0 / 0.12));
 }
 
 /* ---------- content blocks (column offset right of the header —
    the same asymmetry the rest of the site leans on) ---------- */
+/* wide enough that the art gallery lands in a single row of frames
+   rather than two — text inside still caps at its own measure */
 .hp-blocks {
   display: grid;
-  gap: var(--sp-6);
-  max-width: 820px;
-  margin-top: var(--sp-6);
+  gap: var(--sp-5);
+  max-width: 1040px;
+  margin-top: var(--sp-5);
   margin-left: clamp(0px, 8vw, 120px);
 }
 
@@ -172,7 +200,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
+  margin-bottom: var(--sp-3);
   font-family: var(--mono);
   font-size: var(--fs-label);
   font-weight: 400;
@@ -206,7 +234,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: var(--sp-4);
-  padding-block: 18px;
+  padding-block: 13px;
   border-top: 1px solid var(--line);
 }
 .hpb-list li:last-child {
@@ -226,6 +254,7 @@
 }
 .hpb-note {
   grid-column: 1 / -1;
+  max-width: 64ch;
   margin-top: 4px;
   font-size: var(--fs-small);
   color: var(--ink-soft);
@@ -261,8 +290,8 @@
 /* gallery — taped scrapbook frames, slightly off-square */
 .hpb-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: clamp(18px, 3vw, 34px);
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: clamp(16px, 2vw, 26px);
 }
 .hp-frame {
   position: relative;
@@ -376,21 +405,21 @@
   transform: none;
 }
 
-/* ---------- music — bespoke layout: tracklist beside the receipt,
-   a pull-quote, then the concert carousel opened up wider as the
-   closing, most visual moment ---------- */
+/* ---------- music — bespoke layout: tracklist beside the receipt with
+   the pull-quote under it in the same column, then the concert
+   carousel opened up wider as the closing, most visual moment ------ */
 .hp-music {
   display: grid;
-  gap: var(--sp-6);
-  max-width: 1040px;
-  margin-top: var(--sp-6);
+  gap: var(--sp-5);
+  max-width: 1000px;
+  margin-top: var(--sp-5);
   margin-left: clamp(0px, 8vw, 120px);
 }
 
 .hpm-top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--sp-6);
+  gap: clamp(32px, 5vw, 72px);
   align-items: start;
 }
 
@@ -425,7 +454,7 @@
   display: grid;
   grid-template-columns: 2.2rem minmax(0, 1fr);
   column-gap: var(--sp-3);
-  padding-block: 20px;
+  padding-block: 15px;
   border-top: 1px solid var(--line);
 }
 .hpm-tracklist li:last-child {
@@ -458,6 +487,7 @@
 }
 .hpm-note {
   grid-column: 2 / -1;
+  max-width: 60ch;
   margin-top: 6px;
   font-size: var(--fs-small);
   color: var(--ink-soft);
@@ -466,8 +496,8 @@
 /* the receipt — printed long and narrow, so let it stay that shape
    rather than cropping it into a square accent frame */
 .hpm-receipt {
-  width: clamp(128px, 13vw, 168px);
-  margin: var(--sp-2) 0 0;
+  width: clamp(124px, 12vw, 156px);
+  margin: 0 0 0 clamp(0px, 2vw, 28px);
   rotate: 2deg;
 }
 .hpm-receipt img {
@@ -484,14 +514,15 @@
   color: var(--ink-soft);
 }
 
+/* closes the tracklist column, hanging off the same left edge */
 .hpm-quote {
-  max-width: 56ch;
-  margin: 0;
-  padding-left: var(--sp-4);
+  max-width: 54ch;
+  margin: var(--sp-4) 0 0;
+  padding-left: var(--sp-3);
   border-left: 2px solid var(--tone);
   font-family: var(--serif);
   font-style: italic;
-  font-size: var(--fs-lead);
+  font-size: var(--fs-body);
   line-height: 1.5;
   color: var(--ink-soft);
 }
@@ -499,11 +530,14 @@
 .hpm-live {
   max-width: none;
 }
-.hpm-live .hpb-label {
-  margin-bottom: var(--sp-4);
-}
 .hpm-live .hpb-carousel {
-  height: clamp(280px, 30vw, 440px);
+  height: clamp(240px, 24vw, 340px);
+}
+
+@media (max-width: 860px) {
+  .hpm-top {
+    gap: var(--sp-5);
+  }
 }
 
 @media (max-width: 700px) {
@@ -515,11 +549,9 @@
     gap: var(--sp-4);
   }
   .hpm-receipt {
-    width: 118px;
+    width: 112px;
+    margin-left: 0;
     justify-self: start;
-  }
-  .hpm-quote {
-    font-size: var(--fs-body);
   }
 }
 
@@ -531,76 +563,23 @@
 }
 
 /* ============================================================
-   Stories — bespoke composition. Two facing columns rather than
-   two stacked lists: reading takes the wide side at display size,
-   watching sits narrower and offset down across a hairline, and a
-   handwritten note in the gutter points back at the one pair that
-   belongs together. A mono tally runs across the top as a masthead.
+   Stories — bespoke composition. The reading half is a scrapbook
+   shelf: the jackets are the content, pinned up at slightly
+   different angles and heights with a strip of tape each. Watching
+   follows underneath in three columns, each led by a die-cut
+   sticker. The only rules on the page are the two the section
+   labels trail — the pictures do the dividing.
    ============================================================ */
 .hp-stories {
   display: grid;
-  grid-template-columns: minmax(0, 1.42fr) minmax(0, 1fr);
-  grid-template-areas:
-    'tally tally'
-    'read  watch'
-    'close close';
-  column-gap: clamp(28px, 4vw, 64px);
+  grid-template-columns: minmax(0, 1fr);
   row-gap: var(--sp-5);
   align-items: start;
-  max-width: 1080px;
-  margin-top: var(--sp-6);
-  margin-left: clamp(0px, 8vw, 120px);
+  max-width: 1180px;
+  margin-top: var(--sp-5);
+  margin-left: clamp(0px, 6vw, 96px);
 }
 
-/* ---------- masthead tally ---------- */
-.hps-tally {
-  grid-area: tally;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  margin: 0;
-  font-family: var(--mono);
-  font-size: var(--fs-label);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-.hps-tally b {
-  font-weight: 400;
-  color: var(--ink);
-}
-.hps-tally::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
-
-/* ---------- the two columns ---------- */
-.hps-read {
-  grid-area: read;
-}
-/* offset down and set behind a hairline — the quieter half */
-.hps-watch {
-  grid-area: watch;
-  padding-left: clamp(24px, 3.5vw, 52px);
-  margin-top: clamp(40px, 7vw, 96px);
-  border-left: 1px solid var(--line);
-}
-
-.hps-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.hps-list li {
-  position: relative;
-  border-top: 1px solid var(--line);
-  transition: transform var(--dur) var(--ease);
-}
-.hps-list li:last-child {
-  border-bottom: 1px solid var(--line);
-}
 .hps-title {
   font-family: var(--serif);
   font-weight: 500;
@@ -612,59 +591,169 @@
   font-size: var(--fs-small);
 }
 
-/* reads — name and author on a shared baseline, note beneath */
-.hps-read li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  column-gap: var(--sp-4);
-  padding-block: var(--sp-4);
+/* ---------- the shelf ---------- */
+.hps-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: clamp(26px, 3.4vw, 44px) clamp(18px, 2.4vw, 34px);
+  list-style: none;
+  margin: 0;
+  /* the tape overhangs the top corner and the tilt swings the outer
+     jackets past the column edge — both need room to sit in */
+  padding: 12px 14px 0;
+  margin-left: -14px;
 }
-.hps-read .hps-title {
-  font-size: clamp(1.4rem, 2.7vw, 2.05rem);
+.hps-shelf li {
+  width: clamp(108px, 12.5vw, 148px);
+}
+
+/* nothing here lands on a grid line: each jacket takes its own angle
+   and rides a few pixels off its neighbours, so the row reads as
+   pinned up by hand rather than laid out */
+.hps-shelf li:nth-child(6n + 1) .hps-book { rotate: -2.2deg; }
+.hps-shelf li:nth-child(6n + 2) .hps-book { rotate: 1.5deg; }
+.hps-shelf li:nth-child(6n + 3) .hps-book { rotate: -0.9deg; }
+.hps-shelf li:nth-child(6n + 4) .hps-book { rotate: 2.4deg; }
+.hps-shelf li:nth-child(6n + 5) .hps-book { rotate: -1.6deg; }
+.hps-shelf li:nth-child(6n + 6) .hps-book { rotate: 1deg; }
+.hps-shelf li:nth-child(even) { margin-top: clamp(8px, 1.2vw, 18px); }
+.hps-shelf li:nth-child(3n) { margin-top: clamp(3px, 0.6vw, 9px); }
+
+/* a paper mount under the jacket — the cover is the only saturated
+   thing here, so the card around it stays hairline-quiet */
+.hps-book {
+  position: relative;
+  margin: 0;
+  padding: 8px 8px 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 20px -16px rgba(27, 27, 27, 0.55);
+  transition: rotate var(--dur) var(--ease), translate var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+/* hover straightens the jacket and lifts it off the page — the whole
+   interaction, no reveal, nothing to click through to */
+.hps-shelf li:hover .hps-book {
+  rotate: 0deg;
+  translate: 0 -5px;
+  box-shadow: 0 16px 28px -20px rgba(27, 27, 27, 0.6);
+}
+
+.hps-book img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background: var(--paper-2);
+}
+.hps-book figcaption {
+  padding: 10px 1px 11px;
+}
+.hps-shelf .hps-title {
+  display: block;
+  font-size: 0.98rem;
 }
 .hps-by {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 8px;
+  margin-top: 5px;
   font-family: var(--mono);
-  font-size: var(--fs-label);
-  letter-spacing: 0.14em;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
   text-transform: uppercase;
   color: var(--ink-faint);
-  white-space: nowrap;
-}
-.hps-read .hps-note {
-  grid-column: 1 / -1;
-  max-width: 48ch;
-  margin-top: var(--sp-2);
 }
 
-/* the bookmark — a tone ribbon slipped into the row's outer edge,
-   notched at the foot. scaleY rather than height so it stays on the
-   compositor; the notch squashes mid-move, which at 7px reads as
-   nothing at all */
-.hps-ribbon {
+/* the tape — one strip across the outer top corner, alternating sides
+   so six of them don't stamp out as a pattern */
+.hps-tape {
   position: absolute;
-  top: -1px;
-  left: calc(-1 * clamp(12px, 1.6vw, 22px));
-  width: 7px;
-  height: 100%;
-  background: var(--tone);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 7px), 0 100%);
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform 0.5s var(--ease);
+  top: -6px;
+  width: 44px;
+  height: 15px;
+  background: color-mix(in srgb, var(--tone) 26%, var(--paper-2));
+  opacity: 0.8;
 }
-.hps-read li:hover .hps-ribbon {
-  transform: scaleY(1);
+.hps-shelf li:nth-child(odd) .hps-tape {
+  left: -13px;
+  rotate: -34deg;
+}
+.hps-shelf li:nth-child(even) .hps-tape {
+  right: -13px;
+  rotate: 34deg;
 }
 
-/* watches — the format leads, so the two columns don't read as the
-   same list twice */
-.hps-watch li {
-  padding-block: 18px;
+/* watches — three columns under the shelf, each a sticker on the left
+   and everything the row says on the right. Nothing is ruled off: the
+   stickers do the dividing, which is what keeps this half reading as
+   picked out by hand rather than as the shelf's list twice. */
+.hps-shows {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: clamp(20px, 2.6vw, 40px);
+  list-style: none;
+  margin: 0;
+  padding: var(--sp-2) 0 0;
+}
+/* the sticker holds a column of its own, so no line of the text ever
+   runs past it; both cells centre on the row's full height */
+.hps-shows li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: clamp(14px, 1.6vw, 22px);
+  align-items: center;
+  transition: transform var(--dur) var(--ease);
+}
+.hps-shows li:hover {
+  transform: translateX(4px);
+}
+
+/* the sticker — a white die-cut edge drawn as stacked white shadows on
+   the cut-out art, then one soft grey shadow so it lifts off the page.
+   A block, not a grid: the cut-out inside is sized in percentages, and
+   against an auto-sized grid area those resolve to auto — which lets
+   the tall ones render at their own height and spill out of the box. */
+.hps-sticker {
+  display: block;
+  width: clamp(76px, 8.4vw, 112px);
+  height: clamp(76px, 8.4vw, 112px);
+  transition: rotate var(--dur) var(--ease), translate var(--dur) var(--ease);
+}
+/* contain rather than a max — each die-cut keeps its own shape and sits
+   centred in the square */
+.hps-sticker img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* four hard shadows, one per axis, each drawn on the last — the cut
+     grows a solid white edge that way, where blurred ones only ever
+     add up to a haze around it. The grey one goes last, so it falls
+     from the white edge rather than from the art inside it. */
+  filter: drop-shadow(1.6px 0 0 #fff) drop-shadow(-1.6px 0 0 #fff)
+    drop-shadow(0 1.6px 0 #fff) drop-shadow(0 -1.6px 0 #fff)
+    drop-shadow(0 4px 6px rgba(27, 27, 27, 0.18));
+}
+/* no two stuck on straight, and none of them straight to begin with */
+.hps-shows li:nth-child(3n + 1) .hps-sticker { rotate: -6deg; }
+.hps-shows li:nth-child(3n + 2) .hps-sticker { rotate: 4.5deg; }
+.hps-shows li:nth-child(3n + 3) .hps-sticker { rotate: -3deg; }
+.hps-shows li:hover .hps-sticker {
+  rotate: 0deg;
+  translate: 0 -3px;
+}
+
+.hps-show-body {
+  display: block;
+  min-width: 0;
 }
 .hps-tag {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   font-family: var(--mono);
   font-size: var(--fs-label);
   letter-spacing: 0.18em;
@@ -672,166 +761,114 @@
   color: var(--ink-faint);
   transition: color var(--dur-quick) var(--ease);
 }
-.hps-watch li:hover {
-  transform: translateX(4px);
-}
-.hps-watch li:hover .hps-tag {
+.hps-shows li:hover .hps-tag {
   color: var(--tone);
 }
-.hps-watch .hps-title {
+.hps-shows .hps-title {
   display: block;
   font-size: 1.25rem;
 }
-.hps-watch .hps-note {
+.hps-shows .hps-note {
   display: block;
-  max-width: 34ch;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
-/* the one cross-column connection, set in the hand with a drawn arrow
-   pointing back up the page at Circe */
-.hps-thread {
-  position: relative;
-  max-width: 28ch;
-  margin: var(--sp-4) 0 0;
-  padding-left: 44px;
-  rotate: -1.2deg;
-  font-family: var(--hand);
-  font-size: 1.35rem;
-  line-height: 1.35;
-  color: var(--ink-soft);
-}
-.hps-thread-arrow {
-  position: absolute;
-  left: 0;
-  top: 4px;
-  width: 34px;
-  height: 29px;
-  color: var(--ink-faint);
-  scale: 1 -1; /* point back up-left, toward the read column */
-}
-
-/* closing line — pushed right, under the narrow column, with a short
-   rule above it rather than a full-width one */
-.hps-close {
-  grid-area: close;
-  max-width: 44ch;
-  margin-left: auto;
-  padding-top: var(--sp-4);
-  border-top: 1px solid var(--line);
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: var(--fs-lead);
-  line-height: 1.5;
-  color: var(--ink-soft);
-}
-.hps-close p + p {
-  margin-top: var(--sp-3);
-}
-
+/* three across stops being readable here — they stack, and the shelf
+   comes down to two jackets a row */
 @media (max-width: 760px) {
   .hp-stories {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      'tally'
-      'read'
-      'watch'
-      'close';
-    row-gap: var(--sp-5);
+    row-gap: var(--sp-4);
     margin-left: 0;
   }
-  .hps-watch {
-    margin-top: 0;
-    padding-left: 0;
-    border-left: none;
+  .hps-shelf {
+    gap: clamp(20px, 5vw, 30px) clamp(16px, 4vw, 26px);
   }
-  .hps-read li {
+  .hps-shelf li {
+    width: calc(50% - 26px);
+    max-width: 168px;
+  }
+  .hps-shows {
     grid-template-columns: 1fr;
+    row-gap: var(--sp-4);
   }
-  .hps-by {
-    margin-top: 6px;
-  }
-  /* only the page gutter to sit in at this width */
-  .hps-ribbon {
-    left: -10px;
-    width: 5px;
-  }
-  .hps-thread {
-    max-width: none;
-  }
-  .hps-close {
-    margin-left: 0;
-    font-size: var(--fs-body);
+  /* stacked, each row has the width for a sticker at full size */
+  .hps-sticker {
+    width: 92px;
+    height: 92px;
   }
 }
 
 /* ============================================================
-   Gaming — bespoke composition. Taste first, machine last: the
-   stance, the three favourites at display size, what's loaded
-   now, the shelf beside the queue, then the annotated build as
-   the closing visual. The build photo is the only saturated
-   colour on the page, so everything around it stays paper-quiet.
+   Gaming — bespoke composition. The machine opens the page: genre
+   tags, then the annotated build photo, then the lists in bands of
+   paired columns underneath. Two bands rather than five stacked
+   sections is what keeps the page short. The build photo is the
+   only saturated colour here, so everything around it stays
+   paper-quiet.
    ============================================================ */
 .hp-gaming {
   display: grid;
-  gap: var(--sp-6);
-  margin-top: var(--sp-6);
+  gap: var(--sp-5);
+  margin-top: var(--sp-4);
 }
 /* the reading column, offset right of the header like .hp-blocks;
    the build section deliberately sits outside it, full width */
 .hpg-col {
-  max-width: 900px;
+  max-width: 1180px;
   margin-left: clamp(0px, 8vw, 120px);
 }
 
-/* ---------- stance ---------- */
+/* ---------- genre tags ---------- */
+/* one line of tags — a shape of taste read at a glance, where rows of
+   them would have been a third of a screen. It qualifies the tagline
+   directly above it, so it hangs at the page's own left edge rather
+   than in the offset reading column the lists use. */
 .hpg-genres {
-  list-style: none;
-  margin: var(--sp-5) 0 0;
-  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
 }
-.hpg-genres li {
-  padding-block: 16px;
-  border-top: 1px solid var(--line);
+/* the trailing hairline every other label on the site carries — it
+   makes the row read as a set line rather than pills left floating in
+   the whitespace */
+.hpg-genres::after {
+  content: '';
+  flex: 1;
+  min-width: 32px;
+  height: 1px;
+  margin-left: var(--sp-2);
+  background: var(--line);
 }
-.hpg-genres li:last-child {
-  border-bottom: 1px solid var(--line);
-}
-.hpg-genre-name {
-  display: block;
-  font-family: var(--serif);
-  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
-  letter-spacing: -0.015em;
-}
-.hpg-genre-meta {
-  display: block;
-  margin-top: 5px;
+/* espresso, like every other mono accent label on the site (.folio,
+   the seam numerals) — it's what makes the row read warm rather than
+   as grey furniture */
+.hpg-genres-lead {
+  margin-right: var(--sp-3);
   font-family: var(--mono);
-  font-size: var(--fs-small);
-  color: var(--ink-faint);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--espresso);
 }
-
-/* the honest footnote to the genre list — set as a margin note in the
-   hand, with a small drawn arrow pointing back up at what it answers */
-.hpg-aside {
-  position: relative;
-  max-width: 30ch;
-  margin: var(--sp-4) 0 0 auto;
-  padding-left: 46px;
-  font-family: var(--hand);
-  font-size: 1.35rem;
-  line-height: 1.35;
-  color: var(--ink-soft);
-  rotate: -1.2deg;
-}
-.hpg-aside-arrow {
-  position: absolute;
-  left: 0;
-  top: 2px;
-  width: 36px;
-  height: 30px;
-  color: var(--ink-faint);
-  scale: 1 -1; /* flip the drawn curve so it points back up at the list */
+/* Warm, and filled rather than outlined. Two things were making these
+   read wrong: an outlined pill is the site's *link* chip (.pp-chip),
+   so they looked clickable; and they were drawn in the page tone,
+   which on this page is navy and pulled the whole screen cold. The
+   palette's accent is espresso — neutral ground, warmth through the
+   browns — so that's what they're printed in: a warm wash for the
+   chip, the brown at full strength for the text. Mixed against
+   `transparent` so it composites over the tinted page ground rather
+   than guessing at it. */
+.hpg-tag {
+  padding: 6px 16px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--espresso) 13%, transparent);
+  font-family: var(--serif);
+  font-size: 1.02rem;
+  line-height: 1.25;
+  color: var(--espresso);
 }
 
 /* ---------- the permanent three — the page's display type ---------- */
@@ -845,7 +882,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: var(--sp-4);
-  padding-block: var(--sp-4);
+  padding-block: var(--sp-3);
   border-top: 1px solid var(--line);
 }
 .hpg-faves li:last-child {
@@ -853,7 +890,7 @@
 }
 .hpg-fave-name {
   font-family: var(--serif);
-  font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+  font-size: clamp(1.35rem, 2.1vw, 1.75rem);
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -869,39 +906,146 @@
 .hpg-fave-note {
   grid-column: 1 / -1;
   max-width: 60ch;
-  margin-top: var(--sp-2);
+  margin-top: 5px;
   font-size: var(--fs-small);
   color: var(--ink-soft);
 }
 
-/* ---------- shelf beside queue ---------- */
+/* ---------- the save-file peek ----------
+   A title with a screenshot behind it is marked by a dotted rule under
+   it — an annotation mark, not a link. The photo itself rides beside
+   the cursor (JS writes the transform on .hpg-peek; the card inside
+   only fades and settles, so the two never fight). */
+/* no `font: inherit` here — the title's own type is set by
+   .hpg-fave-name above, and the shorthand would wipe it back to body
+   size. The button only has to stop looking like a button. */
+.hpg-fave-peek-btn {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline dotted color-mix(in srgb, var(--ink-faint) 55%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+  transition: text-decoration-color var(--dur-quick) var(--ease);
+}
+.hpg-faves li.has-shot:hover .hpg-fave-peek-btn,
+.hpg-fave-peek-btn:focus-visible {
+  text-decoration-color: var(--espresso);
+}
+
+.hpg-peek {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 320; /* above the hobby overlay (300) */
+  pointer-events: none;
+  will-change: transform;
+}
+.hpg-peek-card {
+  width: clamp(280px, 34vw, 480px);
+  margin: 0;
+  padding: 7px 7px 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 44px -26px rgba(27, 27, 27, 0.45);
+  transform-origin: 15% 50%;
+  animation: hpg-peek-in 0.28s var(--ease) both;
+}
+.hpg-peek-card.is-out {
+  animation: hpg-peek-out 0.2s var(--ease-exit) both;
+}
+.hpg-peek-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hpg-peek-card figcaption {
+  padding: 8px 2px 9px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+@keyframes hpg-peek-in {
+  from {
+    opacity: 0;
+    transform: scale(0.965) rotate(0deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(-1.25deg);
+  }
+}
+@keyframes hpg-peek-out {
+  from {
+    opacity: 1;
+    transform: scale(1) rotate(-1.25deg);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.985) rotate(-1.25deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hpg-peek-card {
+    animation: hpg-peek-fade 0.2s linear both;
+    transform: rotate(-1.25deg);
+  }
+  .hpg-peek-card.is-out {
+    animation: hpg-peek-fade 0.2s linear reverse both;
+  }
+  @keyframes hpg-peek-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* ---------- the paired bands ---------- */
 .hpg-band {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: var(--sp-5) clamp(32px, 6vw, 80px);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: var(--sp-5) clamp(32px, 5vw, 72px);
   align-items: start;
 }
+/* Both bands share one template on purpose — the queue has to start on
+   the same left edge as "In the save file now" directly above it, or
+   the page reads as two unrelated grids. What stops the queue's
+   numerals from looking like they belong to the shelf on the left is
+   the shelf's own meta, set inline at the right edge of its rows: it
+   gives that column a visible terminus before the gutter. */
 
 .hpg-shelf {
   list-style: none;
   margin: 0;
   padding: 0;
 }
+/* name and genre on one baseline, like the games list above */
 .hpg-shelf li {
-  padding-block: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--sp-4);
+  padding-block: 11px;
   border-top: 1px solid var(--line);
 }
 .hpg-shelf li:last-child {
   border-bottom: 1px solid var(--line);
 }
 .hpg-shelf-name {
-  display: block;
   font-family: var(--serif);
   font-size: 1.2rem;
 }
 .hpg-shelf-meta {
-  display: block;
-  margin-top: 3px;
   font-family: var(--mono);
   font-size: var(--fs-label);
   letter-spacing: 0.08em;
@@ -920,7 +1064,7 @@
   display: grid;
   grid-template-columns: 2.6rem minmax(0, 1fr);
   column-gap: var(--sp-3);
-  padding-block: 14px;
+  padding-block: 9px;
 }
 .hpg-queue li::before {
   content: '';
@@ -942,7 +1086,7 @@
   z-index: 1;
   padding-right: 0.5rem;
   /* sits on the thread, so it needs the page ground behind it */
-  background: color-mix(in srgb, var(--tone) 6%, var(--paper));
+  background: var(--hp-ground);
   font-family: var(--mono);
   font-size: var(--fs-small);
   color: var(--ink-faint);
@@ -959,29 +1103,52 @@
 }
 
 /* ---------- the annotated build ---------- */
-/* the closing moment breaks out of the reading column to the page's
-   own gutters — label and grid share that wider left edge */
+/* the page opens on it, so it takes the page's own gutters rather than
+   the offset reading column the lists below it sit in */
 .hpg-build {
-  margin-top: var(--sp-3);
+  max-width: 1180px;
 }
-/* .hpb-label's trailing hairline is a ::after, i.e. the last flex item;
-   ordering the hint after it puts the rule between title and hint */
+/* The parts-list link, parked at the far end of the label line.
+   .hpb-label's trailing hairline is a ::after, i.e. the last flex item;
+   ordering the link after it puts the rule between title and link.
+   Cased and untracked, unlike the uppercase label it sits on — it's a
+   product name, and the difference is what marks it as the actionable
+   thing on the line. Espresso, like the site's other accents.
+   `.hpg-hint.ulink` rather than `.hpg-hint` so the colour beats
+   .ulink's own `color: var(--ink)` without depending on which
+   stylesheet the bundler emits first. */
 .hpg-hint {
   order: 1;
   flex: none;
-  font-size: var(--fs-label);
-  letter-spacing: 0.14em;
-  color: var(--ink-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-small);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.hpg-hint.ulink {
+  color: var(--espresso);
+}
+.hpg-hint svg {
+  width: 10px;
+  height: 10px;
+  /* the underline runs the full width, arrow included; nudging the
+     glyph up keeps it off the rule */
+  margin-bottom: 1px;
 }
 
 .hpg-build-grid {
   display: grid;
   /* the photo is portrait; capping it keeps the two halves close in
      height so the ledger doesn't float in a tall empty column */
-  grid-template-columns: minmax(0, 540px) minmax(0, 1fr);
-  gap: clamp(28px, 6vw, 96px);
+  /* the photo is portrait at 1:1.2, so its width sets the height of the
+     whole opening band — 420px lands the build inside the first screen
+     with the header above it */
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 80px);
   align-items: center;
-  margin-top: var(--sp-5);
+  margin-top: var(--sp-4);
 }
 
 .hpg-photo {
@@ -1096,11 +1263,13 @@
 .hpg-ledger {
   margin: 0;
 }
+/* the label column has to clear MOTHERBOARD — the longest part type —
+   with slack left over, or the value reads as crowded against it */
 .hpg-row {
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr);
-  gap: var(--sp-3);
-  padding: 11px 10px 11px 12px;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: var(--sp-4);
+  padding: 8px 10px 8px 12px;
   margin-left: -12px;
   border-top: 1px solid var(--line);
   transition: background var(--dur-quick) var(--ease);
@@ -1138,29 +1307,30 @@
   color: var(--ink-faint);
 }
 
-/* below this the ledger can't hold a part name on one line beside a
-   540px photo, so the two stack instead of both being cramped */
-@media (max-width: 1080px) {
-  .hpg-build-grid {
+/* below this the paired columns are too narrow to hold a title and a
+   note each, so the bands unstack */
+@media (max-width: 900px) {
+  .hpg-band {
     grid-template-columns: 1fr;
     gap: var(--sp-5);
   }
+}
+
+/* below this the ledger can't hold a part name on one line beside the
+   photo, so the two stack instead of both being cramped */
+@media (max-width: 900px) {
+  .hpg-build-grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
   .hpg-photo {
-    max-width: 520px;
+    max-width: 420px;
   }
 }
 
 @media (max-width: 700px) {
   .hpg-col {
     margin-left: 0;
-  }
-  .hpg-band {
-    grid-template-columns: 1fr;
-    gap: var(--sp-5);
-  }
-  .hpg-aside {
-    margin-left: 0;
-    max-width: none;
   }
   .hpg-faves li {
     grid-template-columns: 1fr;
@@ -1211,7 +1381,7 @@
 
 /* ---------- footer ---------- */
 .hp-foot {
-  margin-top: var(--sp-6);
+  margin-top: var(--sp-5);
   margin-left: clamp(0px, 8vw, 120px);
 }
 .hp-foot-back {
@@ -1221,14 +1391,34 @@
 }
 
 /* ---------- responsive ---------- */
+/* the tagline loses its measure long before the icon runs out of room,
+   so it drops under the name first and the icon stays put */
+@media (max-width: 940px) {
+  .hp-head {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: var(--sp-3);
+  }
+  .hp-tagline {
+    grid-column: 1;
+    grid-row: 2;
+    max-width: 52ch;
+    padding-bottom: 0;
+  }
+  .hp-icon {
+    grid-row: 1 / span 2;
+    align-self: center;
+  }
+}
+
 @media (max-width: 700px) {
   .hp-head {
     grid-template-columns: 1fr;
-    gap: var(--sp-4);
+    gap: var(--sp-3);
   }
   .hp-icon {
+    grid-row: auto;
     justify-self: start;
-    width: 120px;
+    width: 100px;
     margin: 0;
   }
   .hp-blocks,

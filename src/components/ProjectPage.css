@@ -1,8 +1,9 @@
 /* ============================================================
    ProjectPage — full-screen case study. Professional register:
-   calm fade/rise entrance, close top-right, prev/next arrows
-   bottom-right (layout modeled on dousanmiao.com case pages,
-   set in this site's paper/ink system).
+   calm fade/rise entrance, and one sticky topbar carrying everything
+   the reader can do with the page — back out on the left, switch
+   breakdown or page to the next project on the right (layout modeled
+   on dousanmiao.com case pages, set in this site's paper/ink system).
    ============================================================ */
 
 /* The overlay itself never fades — only the ground under it does.
@@ -37,9 +38,7 @@
    underway, so the page dissolves around a moving image rather than
    under a still one */
 .pp.is-closing::before,
-.pp.is-closing .pp-scroll,
-.pp.is-closing .pp-close,
-.pp.is-closing .pp-nav {
+.pp.is-closing .pp-scroll {
   opacity: 0;
   transition: opacity 0.32s var(--ease-exit) 0.13s;
 }
@@ -75,14 +74,6 @@
 .pp-head { --i: 1; }
 .pp-intro { --i: 3; }
 .pp-meta { --i: 4; }
-/* the chrome comes last — it's the least of what the reader wants to
-   see. `backwards`, not `both`: a forwards fill would pin opacity at
-   1 and win over the closing transition above. */
-.pp-close,
-.pp-nav {
-  animation: pp-in 0.5s var(--ease) backwards;
-  animation-delay: 0.34s;
-}
 @keyframes pp-in {
   from {
     opacity: 0;
@@ -123,9 +114,10 @@
   }
 }
 
-/* ---------- topbar: back button + code/design toggle (sticky while
-   the case scrolls, so the toggle — and the swapped content just
-   below it — stays reachable without scrolling back up) ---------- */
+/* ---------- topbar: back button, then the code/design toggle and the
+   project arrows (sticky while the case scrolls, so the toggle — and
+   the swapped content just below it — stays reachable without
+   scrolling back up, and the arrows with it) ---------- */
 .pp-topbar {
   position: sticky;
   top: 22px;
@@ -133,6 +125,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--sp-3);
+}
+.pp-topbar-end {
+  display: flex;
+  align-items: center;
   gap: var(--sp-3);
 }
 .pp-back {
@@ -647,8 +644,21 @@
   color: var(--ink-faint);
 }
 
-/* ---------- close + project nav (fixed chrome) ---------- */
-.pp-close,
+/* ---------- project nav ----------
+   Paging sits in the topbar rather than floating over the case study.
+   There was a fixed close cross up here and a fixed pair of arrows
+   down in the corner, which put two unrelated controls in two pieces
+   of chrome for one page — and the cross duplicated the Back button
+   three inches away from it. One bar now: leave on the left, move
+   sideways on the right, nothing hanging over the reading column.
+   Esc and browser-back still close, as they always did. */
+.pp-nav {
+  display: flex;
+  gap: 10px;
+  /* holds the right edge whether or not a toggle shares the row —
+     without it the arrows go wherever the toggle leaves them */
+  margin-left: auto;
+}
 .pp-nav-btn {
   display: grid;
   place-items: center;
@@ -663,34 +673,28 @@
     border-color var(--dur) var(--ease),
     color var(--dur) var(--ease);
 }
-.pp-close svg,
 .pp-nav-btn svg {
   width: 15px;
   height: 15px;
 }
-.pp-close:hover,
-.pp-close:focus-visible,
 .pp-nav-btn:hover,
 .pp-nav-btn:focus-visible {
   background: var(--ink);
   border-color: var(--ink);
   color: var(--paper);
 }
-.pp-close {
-  position: fixed;
-  top: 22px;
-  right: max(var(--gutter), 22px);
-}
-.pp-nav {
-  position: fixed;
-  bottom: 26px;
-  right: max(var(--gutter), 22px);
-  display: flex;
-  gap: 10px;
-}
-
 /* ---------- responsive ---------- */
 @media (max-width: 700px) {
+  /* back on its own line, toggle and arrows sharing the next one —
+     three controls won't fit across a phone without the toggle's
+     labels shrinking to nothing */
+  .pp-topbar {
+    flex-wrap: wrap;
+    row-gap: var(--sp-2);
+  }
+  .pp-topbar-end {
+    width: 100%;
+  }
   .pp-head {
     flex-direction: column-reverse;
     gap: var(--sp-3);
@@ -712,9 +716,5 @@
   .pp-gallery,
   .pp-compare-grid {
     grid-template-columns: 1fr;
-  }
-  /* keep the fixed chrome clear of content on small screens */
-  .pp-page {
-    padding-bottom: 140px;
   }
 }

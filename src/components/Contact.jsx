@@ -1,5 +1,5 @@
 import { contact, meta, links } from '../data/content.js';
-import { Sparkle, Coffee, Heart, HandRule } from './Doodles.jsx';
+import { Sparkle, Coffee, Heart } from './Doodles.jsx';
 import SectionSeam from './SectionSeam.jsx';
 import SetType from './SetType.jsx';
 import './Contact.css';
@@ -22,34 +22,23 @@ export default function Contact() {
         </div>
 
         <div className="contact-main">
-          {/* title lines are declared in content.js — where a headline
-              breaks is a typographic call, and SetType gives each of
-              those lines its own beat */}
-          <SetType
-            as="h3"
-            className="contact-title"
-            lines={[
-              contact.title[0],
-              <>
-                {contact.title[1]}
-                <Sparkle size={30} className="contact-sparkle" />
-              </>,
-            ]}
-            style={{ '--set-delay': '0.1s' }}
-          />
-          <p className="contact-body reveal" style={{ '--reveal-delay': '0.18s' }}>
+          {/* no standing headline here — the one line of copy carries
+              the section, so it reads at lead size with the sparkle
+              riding its last word */}
+          <p className="contact-body reveal" style={{ '--reveal-delay': '0.1s' }}>
             {contact.body}
+            <Sparkle size={22} className="contact-sparkle" />
           </p>
 
-          {/* the address is the one place the pen comes out — a drawn
-              rule rather than the hairline every other link gets */}
+          {/* the address is the one place the ink pools — a warm wash
+              wipes in behind it rather than the hairline every other
+              link gets */}
           <a
             href={links.email}
             className="contact-email reveal"
-            style={{ '--reveal-delay': '0.26s' }}
+            style={{ '--reveal-delay': '0.2s' }}
           >
-            {meta.email}
-            <HandRule className="contact-rule" />
+            <span className="contact-email-text">{meta.email}</span>
           </a>
         </div>
 

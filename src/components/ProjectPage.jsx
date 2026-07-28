@@ -328,6 +328,8 @@ export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
   // default); only meaningful for projects that define page.toggle
   const [view, setView] = useState(page.toggle?.options[0]?.id);
 
+  // the list wraps, so there is always a project in both directions
+  const adjacent = (d) => projects[(index + d + projects.length) % projects.length];
   const go = (d) => {
     setDir(d);
     onNavigate((index + d + projects.length) % projects.length);
@@ -397,22 +399,51 @@ export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
                 the sticky topbar keeps it (and the swapped content
                 just below it) in view while scrolled through the case
                 study, instead of requiring a scroll back up. */}
-            {page.toggle && (
-              <div className="pp-toggle" role="tablist" aria-label="Breakdown">
-                {page.toggle.options.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={view === opt.id}
-                    className={`pp-toggle-btn ${view === opt.id ? 'is-active' : ''}`}
-                    onClick={() => setView(opt.id)}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="pp-topbar-end">
+              {page.toggle && (
+                <div className="pp-toggle" role="tablist" aria-label="Breakdown">
+                  {page.toggle.options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={view === opt.id}
+                      className={`pp-toggle-btn ${view === opt.id ? 'is-active' : ''}`}
+                      onClick={() => setView(opt.id)}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Paging lives here rather than floating over the page:
+                  the reader leaves a case study by the Back button at
+                  the other end of this bar, so the two things they can
+                  do with the page as a whole sit in the same band. The
+                  labels name the destination — an unlabelled pair of
+                  arrows says a project is next but never which. */}
+              <nav className="pp-nav" aria-label="More projects">
+                <button
+                  className="pp-nav-btn"
+                  onClick={() => go(-1)}
+                  aria-label={`Previous project: ${adjacent(-1).name}`}
+                >
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  className="pp-nav-btn"
+                  onClick={() => go(1)}
+                  aria-label={`Next project: ${adjacent(1).name}`}
+                >
+                  <svg viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </nav>
+            </div>
           </div>
 
           <header className="pp-head">
@@ -484,29 +515,6 @@ export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
           ))}
         </article>
       </div>
-
-      <button
-        className="pp-close"
-        onClick={requestClose}
-        aria-label="Close case study"
-      >
-        <svg viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-      </button>
-
-      <nav className="pp-nav" aria-label="More projects">
-        <button className="pp-nav-btn" onClick={() => go(-1)} aria-label="Previous project">
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        <button className="pp-nav-btn" onClick={() => go(1)} aria-label="Next project">
-          <svg viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </nav>
     </div>,
     document.body
   );
