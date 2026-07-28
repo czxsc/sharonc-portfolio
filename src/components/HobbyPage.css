@@ -147,13 +147,24 @@
    on a common bottom edge. These are casual pages — the header earns a
    glance, not a screen, so it stays short enough that the content
    under it starts above the fold. */
+/* two bands: the type, then the icon. The icon is the taller of the
+   two and so sets the row height — centring the type against it lifts
+   the name and tagline off the icon's bottom edge without the icon
+   itself moving a pixel. */
 .hp-head {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   column-gap: clamp(24px, 4vw, 64px);
-  align-items: end;
+  align-items: center;
   max-width: 1240px;
   margin-top: clamp(18px, 3vh, 36px);
+}
+.hp-head-text {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: clamp(24px, 4vw, 64px);
+  align-items: end;
+  min-width: 0;
 }
 .hp-head-id {
   min-width: 0;
@@ -1394,19 +1405,13 @@
 /* the tagline loses its measure long before the icon runs out of room,
    so it drops under the name first and the icon stays put */
 @media (max-width: 940px) {
-  .hp-head {
-    grid-template-columns: minmax(0, 1fr) auto;
+  .hp-head-text {
+    grid-template-columns: minmax(0, 1fr);
     row-gap: var(--sp-3);
   }
   .hp-tagline {
-    grid-column: 1;
-    grid-row: 2;
     max-width: 52ch;
     padding-bottom: 0;
-  }
-  .hp-icon {
-    grid-row: 1 / span 2;
-    align-self: center;
   }
 }
 
@@ -1416,7 +1421,6 @@
     gap: var(--sp-3);
   }
   .hp-icon {
-    grid-row: auto;
     justify-self: start;
     width: 100px;
     margin: 0;

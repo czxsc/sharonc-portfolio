@@ -80,11 +80,16 @@ export default function HobbyPage({ hobby, img, origin, onClose }) {
               header costs one band of height and the content below it
               starts inside the first screen */}
           <header className="hp-head">
-            <div className="hp-head-id">
-              <p className="eyebrow">Off the clock</p>
-              <h1>{hobby.title}</h1>
+            {/* name and tagline travel as one unit: they keep their own
+                baseline pairing, and the unit as a whole centres against
+                the icon instead of hanging off its bottom edge */}
+            <div className="hp-head-text">
+              <div className="hp-head-id">
+                <p className="eyebrow">Off the clock</p>
+                <h1>{hobby.title}</h1>
+              </div>
+              <p className="hp-tagline">{hobby.page.tagline}</p>
             </div>
-            <p className="hp-tagline">{hobby.page.tagline}</p>
             <img className="hp-icon" src={img} alt="" />
           </header>
 

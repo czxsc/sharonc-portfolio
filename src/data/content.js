@@ -1674,7 +1674,7 @@ export const hobbies = [
     tone: 'var(--tone-c2)',
     page: {
       tagline:
-        'No real loyalty to the format — paperback, subtitles, whatever gets it across. Mostly I want to be somewhere else for a few hours.',
+        'No real loyalty to the format, paperback, subtitles, whatever gets it across, I just love a good story.',
       blocks: [
         {
           id: 'read',
@@ -1730,19 +1730,19 @@ export const hobbies = [
               name: 'The Odyssey',
               meta: 'film',
               src: stickerOdyssey,
-              note: 'The myth at full scale. Went in knowing exactly how it ends and still sat forward the whole time.',
+              note: 'Watched with 4DX seats and it felt like I was on the ship with them.',
             },
             {
               name: 'Spy × Family',
               meta: 'anime',
               src: stickerSpyFamily,
-              note: 'The palate cleanser. Nobody in this household is telling the truth.',
+              note: 'My favorite slice-of-life show, so attatched to every character.',
             },
             {
               name: 'Witch Hat Atelier',
               meta: 'anime',
               src: stickerWitchHat,
-              note: 'Magic drawn as ink on paper, which is exactly right.',
+              note: 'Beautiful art and a captivating plot, so excited for season 2!',
             },
           ],
         },
@@ -1783,7 +1783,7 @@ export const hobbies = [
     tone: 'var(--navy)',
     page: {
       tagline:
-        'I love playing a bit of everything, from short indie games to full-on triple-A titles but my favorite are games that make me plan and think',
+        'I love playing a bit of everything, from short indie games to full-on triple-A titles, but my favorite are always games that make me plan and think',
       blocks: [
         {
           id: 'genres',
@@ -1796,31 +1796,31 @@ export const hobbies = [
         {
           id: 'faves',
           kind: 'list',
-          title: 'The permanent three',
+          title: 'Top Favorites of All Time',
           items: [
             {
               name: 'Baldur’s Gate 3',
-              meta: '2023 · CRPG',
-              note: 'Every stupid idea I had was already accounted for. I have never felt so seen by a rules engine.',
+              meta: '2023 · Turn-Based Tactical RPG',
+              note: 'The boundless player freedom and reactive storytelling is truly unparalleled.',
             },
             {
               name: 'Stardew Valley',
               meta: '2016 · farm sim',
-              note: 'There is no version of my life in which I am not partway through a farm.',
+              note: 'An endless amount of things to do and explore, this game is my cozy getaway.',
               shot: {
                 src: shotStardew,
                 alt: 'My Stardew Valley farm, laid out in neat crop blocks with sprinklers and paths between them.',
-                caption: 'the farm, currently',
+                caption: 'My current farm!',
               },
             },
             {
               name: 'Fire Emblem: Three Houses',
-              meta: '2019 · tactics',
-              note: 'Tactics I love, plus a cast I would rearrange a weekend for. Both halves earn it.',
+              meta: '2019 · Tactical RPG',
+              note: 'Absolutely love the balance of strategical gameplay and an engaging story with a cast of characters I\'ve grown attached to.',
               shot: {
                 src: shotFireEmblem,
                 alt: 'The Blue Lions house gathered around their professor in the classroom at Garreg Mach.',
-                caption: 'blue lions, never really a contest',
+                caption: 'Too attached to the Blue Lions playthrough to try the other houses...',
               },
             },
           ],
@@ -1828,27 +1828,27 @@ export const hobbies = [
         {
           id: 'now',
           kind: 'list',
-          title: 'In the save file now',
+          title: 'Currently Playing',
           items: [
             {
               name: 'Minecraft — Cobbleverse',
               meta: 'modded',
-              note: 'Pokémon inside Minecraft. Two favourites, doing chores together.',
+              note: 'This mod adds Pokémon to Minecraft, combining 2 of my childhood favorites.',
             },
             {
               name: 'Minecraft — Sunlit Valley',
               meta: 'modded',
-              note: 'Stardew inside Minecraft. I appear to have exactly one idea, and I stand by it.',
+              note: 'Added new progression and playstyle to Minecraft by combining in Stardew',
             },
             {
               name: 'Unicorn Overlord',
               meta: 'tactics',
-              note: 'Build the squads, commit, and watch the plan hold or fall apart without me.',
+              note: 'Another strategy RPG I\'ve been hooked on, but story a bit more generic',
             },
             {
               name: 'Disco Elysium',
-              meta: 'CRPG',
-              note: 'The hardest boss is your own internal monologue, and it is winning.',
+              meta: 'RPG',
+              note: 'Completely dialogue-based rpg, feels like reading an interactive mystery story.',
             },
           ],
         },
@@ -1857,10 +1857,10 @@ export const hobbies = [
           kind: 'list',
           title: 'Also great',
           items: [
-            { name: 'No Case Left Unsolved', meta: 'deduction' },
-            { name: 'Chants of Sennaar', meta: 'linguistics' },
-            { name: 'Outer Wilds', meta: 'knowledge is the only upgrade' },
-            { name: 'It Takes Two', meta: 'co-op, friendship-tested' },
+            { name: 'No Case Left Unsolved', meta: 'mystery deduction' },
+            { name: 'Chants of Sennaar', meta: 'linguistics puzzle' },
+            { name: 'Outer Wilds', meta: 'metroidbrainia' },
+            { name: 'It Takes Two', meta: 'co-op' },
           ],
         },
         {
