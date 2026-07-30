@@ -1,31 +1,26 @@
 """Draws the coffee-bean cursors into public/.
 
 Run with `python3 scripts/make-cursors.py` (needs Pillow) after changing
-any number here. Four cursors, two axes:
+any number here. Two cursors, identical but for their colours:
 
-  colour  espresso on light ground, cream on dark ground — chosen at
-          runtime, either by theme or by sampling what's under the
-          pointer (see src/hooks/useCursorContrast.js)
-  form    idle is a solid bean leaning at 45deg; hover is the drawn
-          outline bean, sitting up at 60deg and a quarter larger
+  cream bean, espresso rim   idle
+  espresso bean, cream rim   over anything clickable
 
-Colour carries legibility, so form has to carry the interactive state —
-hence a solid/outline switch rather than a colour change. Every bean
-keeps its tip on the (4,4) hotspot, so the click point never moves
-between the four.
+Each bean is two draws: a fattened silhouette in the rim colour, then the
+bean itself with its crease knocked out. The crease and the rim are both
+that lower layer showing through. The rim is what makes either bean
+legible on either ground the way a system arrow's white outline is — the
+earlier latte-art cursor had no such rim and dissolved into dark photos.
 
-The idle bean is two draws: a fattened silhouette in the contrast colour,
-then the bean with its crease knocked out. The rim and the crease both
-come from that lower layer, which is what makes the mark legible on any
-ground the way a system arrow's white outline is — the earlier latte-art
-cursor had no such rim and dissolved into dark photos.
+Because both are legible everywhere, colour is free to carry the state,
+which is why there is no second form. Earlier versions kept an outline
+bean for the hover state and spent colour on the ground instead — sampled
+per image, even — and the cursor ended up restyling itself several times
+crossing a row of thumbnails. The pair below never changes for any reason
+but hovering something you can click.
 
-The hover bean is the hero's role-wheel hub (.hero-wheel-bean: fill none,
-stroke 1.6 on a 17-unit bean, so ~9% of the bean's width) redrawn at
-cursor size, with the crease running tip to tip. No rim on this one: it
-carries no fill for a rim to sit against, and doubling a hairline with a
-second hairline is what made the earlier filled version read as a
-badly-cut-out sticker.
+The two are the same drawing at the same angle, and both keep their tip on
+the (4,4) hotspot, so hovering recolours the bean without moving it.
 """
 import math
 from PIL import Image, ImageDraw
@@ -60,9 +55,12 @@ def geometry(cx, cy, a, bmid, bdelta, theta):
 
 
 def crease_points(place, a, bmid, span):
-    """A gentle S along the long axis, sampled."""
+    """A gentle S along the long axis, sampled. Bows the same way round as
+    the hub's — every bean on the site is the same bean, and the idle and
+    hover cursors swap too often for a mirrored crease to pass as anything
+    but a flicker."""
     return [
-        place(t * span * a, 0.20 * bmid * math.sin(math.pi * t))
+        place(t * span * a, -0.20 * bmid * math.sin(math.pi * t))
         for t in (-1 + 2 * i / 399 for i in range(400))
     ]
 
@@ -87,56 +85,24 @@ def mask(size, cx, cy, a, bmid, bdelta, theta, crease_w, grow=0.0,
     return m.resize((size, size), Image.LANCZOS)
 
 
-def stroke_mask(size, cx, cy, a, bmid, bdelta, theta, stroke_w):
-    """Alpha mask of the drawn bean — a real constant-width stroke around
-    the edge, plus the crease from tip to tip, both round-capped, as the
-    wheel hub's SVG draws it."""
-    S = size * SS
-    m = Image.new('L', (S, S), 0)
-    d = ImageDraw.Draw(m)
-    place, edge = geometry(cx, cy, a, bmid, bdelta, theta)
-    w = max(1, round(stroke_w * SS))
-    d.line(edge + [edge[0]], fill=255, width=w, joint='curve')
-
-    crease = crease_points(place, a, bmid, 0.92)
-    d.line(crease, fill=255, width=w, joint='curve')
-    for px, py in (crease[0], crease[-1]):  # round the caps
-        r = w / 2
-        d.ellipse((px - r, py - r, px + r, py + r), fill=255)
-
-    return m.resize((size, size), Image.LANCZOS)
-
-
-def bean(path, body, rim=None, scale=1.0, deg=45.0, size=SIZE):
-    """`rim=None` draws the outline bean; a colour draws the solid one."""
+def bean(path, body, rim, deg=45.0, size=SIZE):
+    """One solid bean: rim first, then the body with its crease knocked
+    out of it, so the crease is the rim colour showing through."""
     px = size / SIZE  # 2x sheets scale line weights with everything else
-    a, bmid = A * scale * px, BMID * scale * px
+    a, bmid = A * px, BMID * px
     th = math.radians(deg)
     kw = dict(size=size, cx=TIP * px + a * math.cos(th),
               cy=TIP * px + a * math.sin(th), a=a, bmid=bmid,
-              bdelta=0.6 * scale * px, theta=th)
+              bdelta=0.6 * px, theta=th, crease_w=2.0 * px)
     img = Image.new('RGBA', (size, size), body[:3] + (0,))
-    if rim:
-        solid = dict(crease_w=2.0 * scale * px, **kw)
-        img.paste(Image.new('RGBA', (size, size), rim), (0, 0),
-                  mask(grow=1.1 * px, crease=False, **solid))
-        img.paste(Image.new('RGBA', (size, size), body), (0, 0), mask(**solid))
-    else:
-        # ~9% of the bean's width, matching .hero-wheel-bean's 1.6/17
-        img.paste(Image.new('RGBA', (size, size), body), (0, 0),
-                  stroke_mask(stroke_w=0.09 * 2 * bmid, **kw))
+    img.paste(Image.new('RGBA', (size, size), rim), (0, 0),
+              mask(grow=1.1 * px, crease=False, **kw))
+    img.paste(Image.new('RGBA', (size, size), body), (0, 0), mask(**kw))
     img.save(path)
-    print(f'{path}  {size}px  {deg:.0f}deg  {scale:.2f}x'
-          f'  {"solid" if rim else "outline"}')
+    print(f'{path}  {size}px  {deg:.0f}deg')
 
 
-# 1.25x is the largest the hover bean gets while keeping its tip on (4,4)
-# and staying inside 32px — past that the far end clips.
 OUT = 'public'
 for suffix, size in (('-sm', 32), ('', 64)):  # -sm is what the CSS uses
     bean(f'{OUT}/bean-cursor{suffix}.png', ESPRESSO, CREAM, size=size)
     bean(f'{OUT}/bean-cursor-light{suffix}.png', CREAM, ESPRESSO, size=size)
-    bean(f'{OUT}/bean-tap{suffix}.png', ESPRESSO, scale=1.25, deg=60,
-         size=size)
-    bean(f'{OUT}/bean-tap-light{suffix}.png', CREAM, scale=1.25, deg=60,
-         size=size)

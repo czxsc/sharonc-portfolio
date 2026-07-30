@@ -114,27 +114,21 @@
   --nav-h: 68px;
 
   /* — Cursors (see scripts/make-cursors.py) —
-     Four beans: two colours x two forms. Colour is the legibility
-     channel, picked from the ground under the pointer; form is the
-     state channel — the bean sits up over anything clickable. The
-     hotspot is the bean's tip in all four, so it never shifts.
-     -bean/-tap are the espresso pair for light ground, -cream the
-     inverse; --cur-idle/--cur-tap point at whichever pair the page
-     ground calls for, so a theme swap is two lines. */
+     Two beans, one drawing, differing only in colour: cream idle,
+     espresso over anything clickable. Both carry the other colour as a
+     rim, so both stay legible on paper, on photos and on the espresso
+     pool alike — which is what frees colour up to mean state. No theme
+     branch and no per-surface rule: the bean changes when, and only
+     when, there is something to click. */
   --cur-bean: url('/bean-cursor-sm.png') 4 4;
   --cur-bean-cream: url('/bean-cursor-light-sm.png') 4 4;
-  --cur-tap-ink: url('/bean-tap-sm.png') 4 4;
-  --cur-tap-cream: url('/bean-tap-light-sm.png') 4 4;
-  --cur-idle: var(--cur-bean);
-  --cur-tap: var(--cur-tap-ink);
+  --cur-idle: var(--cur-bean-cream);
+  --cur-tap: var(--cur-bean);
 }
 
 /* Dark theme — a warm charcoal, not a naive invert. Accents lift to stay legible. */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* dark ground: the cream pair leads */
-    --cur-idle: var(--cur-bean-cream);
-    --cur-tap: var(--cur-tap-cream);
     --paper: #16130f;
     --paper-2: #1e1a15;
     --card: #201b15;

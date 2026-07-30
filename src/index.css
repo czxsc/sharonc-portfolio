@@ -35,56 +35,19 @@ body {
   /* custom coffee-bean cursor — a small 10% detail. A bean rather than
      the old latte art: at 32px only a silhouette survives, and the
      bean's crease still reads where the rosetta's leaves turned to mush.
-     Both variants carry a contrast rim, so the mark stays findable even
-     on ground the flip below can't classify — dark line art on paper,
-     say, or a photo that's half sky. */
+     The cream bean rides everything: its espresso rim holds it against
+     paper, and its body against photos and the About pool. */
   cursor: var(--cur-idle), auto;
 }
-/* interactive elements: same bean, sitting up. Affordance comes from the
-   change in form rather than handing off to the system arrow. */
+/* interactive elements: the same bean inked espresso. Affordance comes
+   from the recolour rather than handing off to the system arrow, and
+   since the two beans share a drawing and a hotspot, nothing moves. */
 a[href],
 button,
 [role='button'],
 summary,
 label {
   cursor: var(--cur-tap), pointer;
-}
-:root[data-theme='dark'] {
-  --cur-idle: var(--cur-bean-cream);
-  --cur-tap: var(--cur-tap-cream);
-}
-:root[data-theme='light'] {
-  --cur-idle: var(--cur-bean);
-  --cur-tap: var(--cur-tap-ink);
-}
-/* Espresso surfaces flip to the cream pair. These are declared rather
-   than sampled: they're painted by CSS, not images, so the luminance
-   pass has nothing to read. Cursor is inherited, so the whole subtree
-   comes along — except <img> descendants, which sample themselves. */
-.pour-about,
-.pour-static {
-  cursor: var(--cur-bean-cream), auto;
-}
-.pour-about :is(a[href], button, [role='button'], summary, label),
-.pour-static :is(a[href], button, [role='button'], summary, label) {
-  cursor: var(--cur-tap-cream), pointer;
-}
-/* Set by useCursorContrast from the image's own pixels under the
-   pointer. Wins over any inherited cursor, including the rules above.
-   The sampler decides colour only; whether the bean is solid or the
-   drawn outline still comes from context, so a clickable dark image
-   gets the cream outline rather than an espresso one nobody can see. */
-img[data-cursor='light'] {
-  cursor: var(--cur-bean-cream), auto;
-}
-img[data-cursor='dark'] {
-  cursor: var(--cur-bean), auto;
-}
-:is(a[href], button, [role='button'], summary, label) img[data-cursor='light'] {
-  cursor: var(--cur-tap-cream), pointer;
-}
-:is(a[href], button, [role='button'], summary, label) img[data-cursor='dark'] {
-  cursor: var(--cur-tap-ink), pointer;
 }
 img,
 svg {

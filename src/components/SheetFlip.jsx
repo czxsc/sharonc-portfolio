@@ -52,7 +52,7 @@ const Z_BACK = 90; // px — how far the card recedes at the mid-turn. Read
 //                    change one and look at the other.
 const TILT_Z = -1.6; // deg — a hair off-square in the air. Nothing is ever
 //                      machined on this site; see the layout principles.
-const SETTLE = 0.38; // Where the card comes to rest, as a fraction of the
+const SETTLE = 0.46; // Where the card comes to rest, as a fraction of the
 //                      viewport down to the frame's top — and the number
 //                      that sets how long the flight is (see measure()).
 //                      Bigger settles EARLIER in the scroll, with Work
@@ -61,6 +61,17 @@ const SETTLE = 0.38; // Where the card comes to rest, as a fraction of the
 //                      already seated and the section still coming up
 //                      under it, rather than watching it chase the
 //                      layout into place.
+//
+//                      TUNE: this is the only knob that moves the settle
+//                      point, and it moves it 1:1. The card locks to the
+//                      frame at TRAVEL_END, which works out to scroll
+//                      position (frame's document top − settle) — the
+//                      TRAVEL_END term cancels — so raising SETTLE by N
+//                      viewport-fractions settles exactly N·vh px of
+//                      scroll earlier and changes nothing else.
+//                      TRAVEL_END only splits the flight between
+//                      travelling and sitting still; it can't move where
+//                      the sitting starts.
 const SETTLE_PAD = 24; // px of viewport to keep under the settled card
 
 const clamp01 = (t) => (t < 0 ? 0 : t > 1 ? 1 : t);

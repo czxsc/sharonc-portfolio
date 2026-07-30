@@ -1,8 +1,8 @@
 import { hero, meta } from '../data/content.js';
 import SetType from './SetType.jsx';
 import { Coffee, ArrowDown } from './Doodles.jsx';
-import portrait from '../assets/portrait_tailless.webp';
-import catAnim from '../assets/cat_animation.gif';
+import portrait from '../assets/site/portrait.webp';
+import catAnim from '../assets/site/cat_animation.gif';
 import './Hero.css';
 
 /* Slowly spinning role wheel behind the portrait (see references/

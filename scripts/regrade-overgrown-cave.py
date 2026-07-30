@@ -14,16 +14,23 @@ DEG/SAT are the whole control surface. Measured candidates:
     -55 / 1.30  acid, loses the cave
 
 Writes the graded master beside the original (the original is kept as
-the master of record) and the shipped 1100px webp into web/.
+the master of record) and the shipped 1100px webp into the mirrored
+path under assets/projects/little-wonder/.
+
+Run with `python3 scripts/regrade-overgrown-cave.py` (needs Pillow).
 """
 
 from PIL import Image
+import os
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ZONE = 'projects/little-wonder/zones/overgrown'
 
 DEG = -35        # negative = toward yellow-green
 SAT = 1.18       # saturation gain, clipped at 255
-SRC = 'overgrown_cave2048.png'
-GRADED = 'overgrown_cave2048_graded.png'
-WEB = 'web/overgrown_cave2048.webp'
+SRC = os.path.join(ROOT, 'src/assets/_source', ZONE, 'cave.png')
+GRADED = os.path.join(ROOT, 'src/assets/_source', ZONE, 'cave_graded.png')
+WEB = os.path.join(ROOT, 'src/assets', ZONE, 'cave.webp')
 WIDTH = 1100     # squares export at 1100w, quality 82
 QUALITY = 82
 

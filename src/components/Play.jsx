@@ -2,23 +2,23 @@ import { useEffect, useRef, useState } from 'react';
 import { hobbies } from '../data/content.js';
 import HobbyPage from './HobbyPage.jsx';
 import SetType from './SetType.jsx';
-import laptopImg from '../assets/laptop.webp';
-import coffeeImg from '../assets/coffee.webp';
-import controllerImg from '../assets/controller.webp';
-import headphonesImg from '../assets/headphones.webp';
-import sketchbookImg from '../assets/sketchbook.webp';
-import f0 from '../assets/cat_push_bag/f0.webp';
-import f1 from '../assets/cat_push_bag/f1.webp';
-import f2 from '../assets/cat_push_bag/f2.webp';
-import f3 from '../assets/cat_push_bag/f3.webp';
-import f4 from '../assets/cat_push_bag/f4.webp';
-import f5 from '../assets/cat_push_bag/f5.webp';
-import f6 from '../assets/cat_push_bag/f6.webp';
-import f7 from '../assets/cat_push_bag/f7.webp';
+import laptopImg from '../assets/play/laptop.webp';
+import coffeeImg from '../assets/play/coffee.webp';
+import controllerImg from '../assets/play/controller.webp';
+import headphonesImg from '../assets/play/headphones.webp';
+import sketchbookImg from '../assets/play/sketchbook.webp';
+import f0 from '../assets/play/cat_push_bag/f0.webp';
+import f1 from '../assets/play/cat_push_bag/f1.webp';
+import f2 from '../assets/play/cat_push_bag/f2.webp';
+import f3 from '../assets/play/cat_push_bag/f3.webp';
+import f4 from '../assets/play/cat_push_bag/f4.webp';
+import f5 from '../assets/play/cat_push_bag/f5.webp';
+import f6 from '../assets/play/cat_push_bag/f6.webp';
+import f7 from '../assets/play/cat_push_bag/f7.webp';
 import './Play.css';
 
 /* ------------------------------------------------------------------
-   The knock used to be the gif itself (src/assets/cat_push_bag.gif),
+   The knock used to be the gif itself (cat_push_bag.gif, since deleted),
    bookended by stills. That can't hold sync: a gif's clock starts on
    decode, not on the render that set its src, and a browser re-showing
    an already-cached animated image picks up wherever the shared clock

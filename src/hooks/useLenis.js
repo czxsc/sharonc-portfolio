@@ -21,8 +21,15 @@ export function useLenis() {
     const lenis = new Lenis({
       autoRaf: true,
       // take over #hash links so they glide too; the nav offset comes
-      // from the page's scroll-padding-top, which Lenis respects
-      anchors: true,
+      // from the page's scroll-padding-top, which Lenis respects.
+      // Longer than Lenis' 1s default and eased at both ends, so a nav
+      // click reads as travelling to the section rather than landing on
+      // it — the page you scroll past is part of the answer.
+      anchors: {
+        duration: 1.8,
+        easing: (t) =>
+          t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+      },
     });
     instance = lenis;
     return () => {

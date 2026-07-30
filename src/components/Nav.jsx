@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { nav, meta } from '../data/content.js';
 import { useActiveSection } from '../hooks/useActiveSection.js';
-import catMark from '../assets/catmark.png';
+import catMark from '../assets/site/catmark.png';
 import './Nav.css';
 
 const ids = nav.map((n) => n.id);

@@ -2,90 +2,91 @@
    Site content. Drawn from Sharon's own reference mockups; treat as
    real and refine specifics later. Placeholder links marked TODO.
    ------------------------------------------------------------------ */
-import portfolioProjectImg from '../assets/portfolio_project_img.jpg';
-import dishcoveryImg from '../assets/dishcovery_demo.jpg';
-import artificerImg from '../assets/artificer_placeholder.jpg';
-import cuairGcsImg from '../assets/cuair.webp';
-import dpkMissionPlannerImg from '../assets/dpk_mission_planner.png';
-import dpkAccelImg from '../assets/dpk_accel_cropped.webp';
-import dpkGuideImg from '../assets/dpk_guide.webp';
-import dpkRadioImg from '../assets/dpk_radio.webp';
-import dpkServosImg from '../assets/dpk_servos.webp';
-import dpkFlightModesImg from '../assets/dpk_flightmodes.webp';
-import littleWonderImg from '../assets/little_wonder.webp';
-import pokeleetDashboardImg from '../assets/pokeleet_dashboard_static.webp';
-import concertRoseImg from '../assets/rose_stage.jpg';
-import concertTwiceImg from '../assets/twice.jpg';
-import concertSunkisImg from '../assets/sunkis_closeup.jpg';
-import concertSlopeDayImg from '../assets/slope_grouppic.jpg';
-import concertKiofImg from '../assets/kiof_group.jpg';
-import receiptifyImg from '../assets/receiptify.png';
-import pcBuildImg from '../assets/hobby/web/pc.webp';
+import portfolioProjectImg from '../assets/projects/portfolio/cover.jpg';
+import dishcoveryImg from '../assets/projects/dishcovery/demo.jpg';
+import artificerImg from '../assets/projects/artificer/cover.jpg';
+import cuairGcsImg from '../assets/projects/preflight/cover.webp';
+import dpkMissionPlannerImg from '../assets/projects/preflight/mission_planner.png';
+import dpkAccelImg from '../assets/projects/preflight/accel.webp';
+import dpkGuideImg from '../assets/projects/preflight/guide.webp';
+import dpkRadioImg from '../assets/projects/preflight/radio.webp';
+import dpkServosImg from '../assets/projects/preflight/servos.webp';
+import dpkFlightModesImg from '../assets/projects/preflight/flightmodes.webp';
+import littleWonderImg from '../assets/projects/little-wonder/cover.webp';
+import pokeleetDashboardImg from '../assets/projects/pokeleet/cover.webp';
+import concertRoseImg from '../assets/hobby/music/concerts/rose.jpg';
+import concertTwiceImg from '../assets/hobby/music/concerts/twice.jpg';
+import concertSunkisImg from '../assets/hobby/music/concerts/sunkis.jpg';
+import concertSlopeDayImg from '../assets/hobby/music/concerts/slope_day.jpg';
+import concertKiofImg from '../assets/hobby/music/concerts/kiof.jpg';
+import receiptifyImg from '../assets/hobby/music/receiptify.png';
+import pcBuildImg from '../assets/hobby/gaming/pc_build.webp';
 
 /* The hand-drawn assets, shown as themselves on the portfolio case
    page — the nav mark, the hero loop, the cursor, and one of the
    drink paintings. All four are cut out on transparent, so they sit
-   on the paper without a panel. `web/` holds sized webp exports of
-   the two masters (2048px PNGs, ~2MB each) that are otherwise only
-   used at mark and cursor size. */
-import catLogoImg from '../assets/web/cat_logo.webp';
-import catAnimImg from '../assets/cat_animation.gif';
-import latteCursorImg from '../assets/web/latte_art_cursor.webp';
+   on the paper without a panel. `site/` holds sized webp exports of
+   the two masters in `_source/site/` (2048px PNGs, ~2MB each) that are
+   otherwise only used at mark and cursor size. */
+import catLogoImg from '../assets/site/cat_logo.webp';
+import catAnimImg from '../assets/site/cat_animation.gif';
+import latteCursorImg from '../assets/site/latte_art_cursor.webp';
 
 /* Save-file snapshots for the permanent three — a `shot` on a favourite
    is what the hover peek picks up (HobbyPage · FavesList). Titles without
    one behave exactly as before, so the other two can land whenever the
    screenshots do. */
-import shotStardew from '../assets/hobby/web/game_stardew.webp';
-import shotFireEmblem from '../assets/hobby/web/game_fire_emblem.webp';
+import shotStardew from '../assets/hobby/gaming/stardew.webp';
+import shotFireEmblem from '../assets/hobby/gaming/fire_emblem.webp';
 
 /* Book jackets for the Stories shelf — sized-down covers from the Open
    Library cover archive, one per title in `read` below. */
-import coverBabel from '../assets/hobby/web/book_babel.webp';
-import coverKatabasis from '../assets/hobby/web/book_katabasis.webp';
-import coverCirce from '../assets/hobby/web/book_circe.webp';
-import coverDivineRivals from '../assets/hobby/web/book_divine_rivals.webp';
-import coverHailMary from '../assets/hobby/web/book_project_hail_mary.webp';
-import coverThursday from '../assets/hobby/web/book_thursday_murder_club.webp';
-import drinkYuzuAmericano from '../assets/hobby/web/drink_yuzu_americano.webp';
-import drinkCaramelLatte from '../assets/hobby/web/drink_caramel_latte.webp';
-import drinkSesameHojicha from '../assets/hobby/web/drink_sesame_hojicha.webp';
-import drinkJasmineMatcha from '../assets/hobby/web/drink_jasmine_matcha.webp';
+import coverBabel from '../assets/hobby/stories/books/babel.webp';
+import coverKatabasis from '../assets/hobby/stories/books/katabasis.webp';
+import coverCirce from '../assets/hobby/stories/books/circe.webp';
+import coverDivineRivals from '../assets/hobby/stories/books/divine_rivals.webp';
+import coverHailMary from '../assets/hobby/stories/books/project_hail_mary.webp';
+import coverThursday from '../assets/hobby/stories/books/thursday_murder_club.webp';
+import drinkYuzuAmericano from '../assets/hobby/drinks/yuzu_americano.webp';
+import drinkCaramelLatte from '../assets/hobby/drinks/caramel_latte.webp';
+import drinkSesameHojicha from '../assets/hobby/drinks/sesame_hojicha.webp';
+import drinkJasmineMatcha from '../assets/hobby/drinks/jasmine_matcha.webp';
 
 /* Die-cut stickers for the Stories watch row — each one trimmed to its
    subject on transparent, so the white outline is drawn in CSS. */
-import stickerOdyssey from '../assets/hobby/web/show_odyssey.webp';
-import stickerSpyFamily from '../assets/hobby/web/show_spy_family.webp';
-import stickerWitchHat from '../assets/hobby/web/show_witch_hat.webp';
+import stickerOdyssey from '../assets/hobby/stories/shows/odyssey.webp';
+import stickerSpyFamily from '../assets/hobby/stories/shows/spy_family.webp';
+import stickerWitchHat from '../assets/hobby/stories/shows/witch_hat.webp';
 
-/* Little Wonder art direction. `web/` holds the sized webp exports of
-   the source art next to it — the originals run 2–17MB each and are
-   kept only as masters. */
-import lwBoard from '../assets/little_wonder/web/little_wonder_brainstorm_board.webp';
-import lwSketch from '../assets/little_wonder/web/early_landscape_sketch.webp';
-import lwEnvir from '../assets/little_wonder/web/early_envir_concept.webp';
-import lwConcept from '../assets/little_wonder/web/early_concept.webp';
-import lwGrass from '../assets/little_wonder/web/early_grass.webp';
-import lwTileOg from '../assets/little_wonder/web/grassy_tile.webp';
-import lwTileIn from '../assets/little_wonder/web/intermittent_tile.webp';
-import lwTileCr from '../assets/little_wonder/web/crystal_tile.webp';
-import lwTileBi from '../assets/little_wonder/web/biolum_tile.webp';
-import lwOgBanner from '../assets/little_wonder/web/overgrown_stalactites.webp';
-import lwOgCave from '../assets/little_wonder/web/overgrown_cave2048.webp';
-import lwOgGrove from '../assets/little_wonder/web/overgrown_mushrooms.webp';
-import lwOgNexus from '../assets/little_wonder/web/overgrown_nexus.webp';
-import lwInBanner from '../assets/little_wonder/web/intermittent_stalactites.webp';
-import lwInCave from '../assets/little_wonder/web/intermittent_cave.webp';
-import lwInGrove from '../assets/little_wonder/web/intermittent_mushrooms.webp';
-import lwInNexus from '../assets/little_wonder/web/intermittent_nexus.webp';
-import lwCrBanner from '../assets/little_wonder/web/crystal_stalactites.webp';
-import lwCrCave from '../assets/little_wonder/web/crstal_cave2048.webp';
-import lwCrGrove from '../assets/little_wonder/web/crystal_mushrooms.webp';
-import lwCrNexus from '../assets/little_wonder/web/crystal_nexus.webp';
-import lwBiBanner from '../assets/little_wonder/web/biolum_stalactites.webp';
-import lwBiCave from '../assets/little_wonder/web/biolum_cav2048.webp';
-import lwBiGrove from '../assets/little_wonder/web/biolum_mushrooms.webp';
-import lwBiNexus from '../assets/little_wonder/web/biolum_nexus.webp';
+/* Little Wonder art direction. These are the sized webp exports; the
+   masters they come from mirror this layout under
+   `assets/_source/projects/little-wonder/`, run 2–17MB each, and are
+   gitignored. Four zone grades x five subjects, plus the concept sheets. */
+import lwBoard from '../assets/projects/little-wonder/concept/brainstorm_board.webp';
+import lwSketch from '../assets/projects/little-wonder/concept/landscape_sketch.webp';
+import lwEnvir from '../assets/projects/little-wonder/concept/environment.webp';
+import lwConcept from '../assets/projects/little-wonder/concept/concept.webp';
+import lwGrass from '../assets/projects/little-wonder/concept/grass.webp';
+import lwTileOg from '../assets/projects/little-wonder/zones/overgrown/tile.webp';
+import lwTileIn from '../assets/projects/little-wonder/zones/intermittent/tile.webp';
+import lwTileCr from '../assets/projects/little-wonder/zones/crystal/tile.webp';
+import lwTileBi from '../assets/projects/little-wonder/zones/biolum/tile.webp';
+import lwOgBanner from '../assets/projects/little-wonder/zones/overgrown/stalactites.webp';
+import lwOgCave from '../assets/projects/little-wonder/zones/overgrown/cave.webp';
+import lwOgGrove from '../assets/projects/little-wonder/zones/overgrown/mushrooms.webp';
+import lwOgNexus from '../assets/projects/little-wonder/zones/overgrown/nexus.webp';
+import lwInBanner from '../assets/projects/little-wonder/zones/intermittent/stalactites.webp';
+import lwInCave from '../assets/projects/little-wonder/zones/intermittent/cave.webp';
+import lwInGrove from '../assets/projects/little-wonder/zones/intermittent/mushrooms.webp';
+import lwInNexus from '../assets/projects/little-wonder/zones/intermittent/nexus.webp';
+import lwCrBanner from '../assets/projects/little-wonder/zones/crystal/stalactites.webp';
+import lwCrCave from '../assets/projects/little-wonder/zones/crystal/cave.webp';
+import lwCrGrove from '../assets/projects/little-wonder/zones/crystal/mushrooms.webp';
+import lwCrNexus from '../assets/projects/little-wonder/zones/crystal/nexus.webp';
+import lwBiBanner from '../assets/projects/little-wonder/zones/biolum/stalactites.webp';
+import lwBiCave from '../assets/projects/little-wonder/zones/biolum/cave.webp';
+import lwBiGrove from '../assets/projects/little-wonder/zones/biolum/mushrooms.webp';
+import lwBiNexus from '../assets/projects/little-wonder/zones/biolum/nexus.webp';
 
 export const meta = {
   name: 'Sharon Chen',

@@ -28,6 +28,7 @@ references/
 
 # Little Wonder art masters — ~80 MB of source PNGs (single files up to
 # 17 MB). Keep them locally / in cloud storage; only the optimised webp
-# exports in web/ (~790 KB total) are imported by content.js and shipped.
-src/assets/little_wonder/*.png
-src/assets/little_wonder/*.jpeg
+# exports in projects/little-wonder/ (~790 KB total) are imported by
+# content.js and shipped. See scripts/export-little-wonder-web.py.
+src/assets/_source/projects/little-wonder/**/*.png
+src/assets/_source/projects/little-wonder/**/*.jpeg

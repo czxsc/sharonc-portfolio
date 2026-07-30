@@ -8,12 +8,10 @@ import Play from './components/Play.jsx';
 import Contact from './components/Contact.jsx';
 import { useReveal } from './hooks/useReveal.js';
 import { useLenis } from './hooks/useLenis.js';
-import { useCursorContrast } from './hooks/useCursorContrast.js';
 
 export default function App() {
   useReveal();
   useLenis();
-  useCursorContrast();
 
   const reduce = useReducedMotion();
   /* which cover the Work preview is showing — written by Work, read by
