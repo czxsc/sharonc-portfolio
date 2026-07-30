@@ -36,11 +36,24 @@
 
 /* closing: held off just long enough for the return flight to be
    underway, so the page dissolves around a moving image rather than
-   under a still one */
-.pp.is-closing::before,
-.pp.is-closing .pp-scroll {
+   under a still one. A wash is exactly what `--ease-exit` is for —
+   it accelerates away, and nothing here has an edge you can read. */
+.pp.is-closing::before {
   opacity: 0;
   transition: opacity 0.32s var(--ease-exit) 0.13s;
+}
+
+/* The article rides a linear fade, and the choice is deliberate.
+   This sits *under* the per-block exits below and has to stay out of
+   their way: an eased curve either front-loads (swallowing the
+   cascade before it can read) or back-loads (which is the blink the
+   cascade exists to replace). Linear is the only shape that does
+   neither. It also catches what the cascade doesn't name — the case
+   sections further down, and the hero itself on the closes where the
+   return flight bails out to a plain fade. */
+.pp.is-closing .pp-scroll {
+  opacity: 0;
+  transition: opacity 0.36s linear 0.1s;
 }
 
 /* later in the DOM than ::before, so it paints over the scrim */
@@ -71,13 +84,101 @@
   animation: pp-in 0.6s var(--ease) both;
   animation-delay: calc(var(--i, 0) * 70ms + 0.16s);
 }
-.pp-head { --i: 1; }
-.pp-intro { --i: 3; }
-.pp-meta { --i: 4; }
+/* --i is the order the blocks arrive in; --x is the order they leave,
+   which is the reverse of it. Declared together so the two can't
+   drift apart. */
+.pp-topbar { --i: 0; --x: 3; }
+.pp-head { --i: 1; --x: 2; }
+.pp-intro { --i: 3; --x: 1; }
+.pp-meta { --i: 4; --x: 0; }
 @keyframes pp-in {
   from {
     opacity: 0;
     transform: translateY(16px);
+  }
+}
+
+/* ---------- exit ----------
+   The page comes apart the way it went together, backwards: what
+   arrived last leaves first (meta → intro → head → topbar), and the
+   whole cascade is spent by ~345ms — inside the 420ms return flight.
+   That ordering is the point. The picture is the one element
+   continuous with the index, so it should be the last thing still
+   moving; the words clearing ahead of it is what makes the flight
+   read as the close rather than as something happening beside it.
+
+   Before this the whole scroll container faded as one block on
+   `--ease-exit`. That curve is built to accelerate away, which meant
+   the type sat near-opaque through the first half of the close and
+   then went out inside a couple of frames: the words didn't leave,
+   they blinked.
+
+   So opacity and drift are two animations rather than one. The fade
+   leads and is over while the block is still settling downward —
+   which is the thing a single curve can't do, since it has to serve
+   both, and serving both is what forced the choice between a blink
+   and a float. */
+.pp.is-closing .pp-topbar,
+.pp.is-closing .pp-head,
+.pp.is-closing .pp-intro,
+.pp.is-closing .pp-meta {
+  animation:
+    pp-out-fade 0.26s var(--ease) both,
+    pp-out-drift 0.3s var(--ease-exit) both;
+  animation-delay: calc(var(--x, 0) * 42ms);
+}
+@keyframes pp-out-fade {
+  to {
+    opacity: 0;
+  }
+}
+/* Small, and downward — the reverse of the 16px the blocks rose
+   through on the way in. Far enough to have a direction, not far
+   enough to become a slide. */
+@keyframes pp-out-drift {
+  to {
+    transform: translateY(10px);
+  }
+}
+
+/* The title un-sets: each line drops back behind its own mask and
+   loosens as it goes, which is `pp-set` played backwards. Type
+   setting itself is the site's one signature entrance, so a case
+   study that leaves any other way leaves as a different object than
+   the one that arrived. --x inherits from .pp-head, which keeps this
+   on the same beat as the block it belongs to. */
+/* `--ease` rather than `--ease-exit`, against the usual rule that
+   exits accelerate away, because here that rule fights the mask. The
+   line has 130% to travel and the block fades on a front-loaded
+   curve; on an accelerating curve it has moved 6px of 85 by the time
+   the type is at a tenth opacity, so the move plays out entirely
+   after there is anything left to see. Matching the fade's curve
+   instead keeps the two in step — at half opacity the line is half
+   gone — which is the only arrangement where the un-set actually
+   reads. Same reason the entrance works: `pp-in` and `pp-set` are
+   both front-loaded, so the type is visible for the whole set. */
+.pp.is-closing .pp-head .set-line-in {
+  animation: pp-unset 0.26s var(--ease) both;
+  animation-delay: calc(var(--x, 0) * 42ms + var(--i, 0) * 30ms);
+}
+/* Both ends are stated, and they have to be. `.set-line-in` *rests*
+   at translateY(130%) — the set is what brings it up, and inside this
+   portal SetType never gets its `.is-visible` (no observer sees it),
+   so `pp-set` holding its end state with `both` is the only thing
+   putting the line on its baseline. Replace that animation and the
+   underlying value is the pre-set position again: an implicit `from`
+   would read 130%, and the title would drop behind its mask on the
+   first frame of the close instead of over it. */
+@keyframes pp-unset {
+  from {
+    transform: none;
+    letter-spacing: var(--ls);
+  }
+  to {
+    /* past 100%, for the same reason .set-line-in rests there: the
+       extra clears the mask's bottom relief so no sliver is left */
+    transform: translateY(130%);
+    letter-spacing: calc(var(--ls) + 0.035em);
   }
 }
 

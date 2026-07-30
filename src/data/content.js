@@ -47,6 +47,7 @@ import ideaBoardImg from '../assets/projects/portfolio/idea_gathering.webp';
    screenshots do. */
 import shotStardew from '../assets/hobby/gaming/stardew.webp';
 import shotFireEmblem from '../assets/hobby/gaming/fire_emblem.webp';
+import shotBg3 from '../assets/hobby/gaming/bg3.webp';
 
 /* Book jackets for the Stories shelf — sized-down covers from the Open
    Library cover archive, one per title in `read` below. */
@@ -2077,6 +2078,11 @@ export const hobbies = [
               name: 'Baldur’s Gate 3',
               meta: '2023 · Turn-Based Tactical RPG',
               note: 'The boundless player freedom and reactive storytelling is truly unparalleled.',
+              shot: {
+                src: shotBg3,
+                alt: 'My Dark Urge origin character, blood-spattered in ornate armor mid-cutscene.',
+                caption: 'My Dark Urge playthrough.',
+              },
             },
             {
               name: 'Stardew Valley',

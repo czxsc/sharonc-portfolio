@@ -200,8 +200,20 @@ function flyHero(fig, origin, { reverse = false } = {}) {
   const land = () => {
     if (landed) return;
     landed = true;
-    // order matters: unhide first, remove second, one paint for both
-    img.style.visibility = '';
+    /* Outbound, the clone lands *on* the hero and hands the picture
+       back to it: order matters — unhide first, remove second, one
+       paint for both.
+
+       Coming back there is nothing to hand to. The picture has flown
+       to the index frame, and the hero's own box is somewhere else
+       entirely — half a screen left of that frame and half again its
+       size. Unhiding it there paints a full-size copy of the shot
+       across the page for the frame between the flight landing
+       (BACK_MS) and the article's fade reaching zero, which is a flash
+       of the picture in a third position after it has already
+       arrived. So it stays hidden: the overlay is on its way out, and
+       the last movement the reader should see is the landing. */
+    if (!reverse) img.style.visibility = '';
     clone.remove();
   };
   flight.finished.then(land, () => {});
