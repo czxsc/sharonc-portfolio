@@ -1,0 +1,109 @@
+/* ============================================================
+   SheetFlip — the card in the air.
+
+   Geometry is written from JS every frame (see SheetFlip.jsx); this
+   file only sets up the 3D scene and the two faces. Nothing here
+   transitions: the whole thing is scrubbed, so anything with a
+   duration would be fighting the scroll for control of the same
+   property.
+   ============================================================ */
+
+/* The scene AND the placement.
+
+   perspective lives here, as a property, so it applies to the card
+   inside with its origin at the card's own centre — the box is sized
+   to the destination frame in JS. The non-uniform scale that morphs
+   the sheet's shape rides on this element's transform, which is
+   applied after the projection: the turn foreshortens identically at
+   every size, and only the result is scaled to fit. */
+.sheet-flight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 90; /* over the page, under the nav (100) */
+  visibility: hidden;
+  pointer-events: none; /* the list underneath stays hoverable throughout */
+  transform-origin: 0 0; /* JS positions by top-left, having done the maths */
+  perspective: 1500px;
+  will-change: transform;
+}
+
+.sheet-flight-card {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Both faces are opaque and neither ever fades: which one you see is
+   decided by backface-visibility, and it changes at exactly 90° where
+   the card has zero width. That is also where the shape morph is
+   concentrated, so the two faces never have to agree on proportions —
+   see the note in SheetFlip.jsx. */
+.sheet-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  backface-visibility: hidden;
+}
+
+/* natural size + counter-scale, both written by JS */
+.sheet-face-front {
+  transform-origin: 0 0;
+}
+
+.sheet-face-back {
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+/* each face fills its own box; the frame drops its aspect-ratio here
+   because the box is already sized in both axes */
+.sheet-face-front > .sheet,
+.sheet-face-back > .work-frame {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+/* ---------- contact shadow ----------
+   One pre-painted ellipse, moved and faded on the compositor. It sits
+   flat behind the card (a sibling, outside the preserve-3d subtree) so
+   it reads as the shadow the card casts on the page rather than a
+   plane turning with it. */
+.sheet-flight-shade {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 116%;
+  height: 116%;
+  background: radial-gradient(
+    closest-side ellipse at 50% 50%,
+    rgba(12, 8, 5, 0.42),
+    rgba(12, 8, 5, 0.16) 58%,
+    transparent 78%
+  );
+  /* --air: 0 → 1 → 0 across the travel (JS). Purely the lift — both
+     faces already carry their own resting shadow, so this has to
+     reach exactly zero at both ends or the card lands wearing a
+     shadow the real frame doesn't have. */
+  opacity: calc(var(--air, 0) * 0.92);
+  transform: translate(-50%, -50%)
+    translateY(calc(var(--air, 0) * 34px))
+    scale(calc(1 + var(--air, 0) * 0.06));
+}
+
+@media (prefers-color-scheme: dark) {
+  .sheet-flight-shade {
+    background: radial-gradient(
+      closest-side ellipse at 50% 50%,
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.22) 58%,
+      transparent 78%
+    );
+  }
+}
+
+/* Reduced motion: the card never mounts (App doesn't render it), so
+   there is nothing to disable here — both sections simply keep their
+   own window. */

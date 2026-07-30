@@ -473,9 +473,14 @@
 
 .pour-about-grid {
   display: grid;
-  /* ~2:1, not two near-equal columns — the statement needs the measure
-     to hold its three declared line breaks without wrapping */
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.72fr);
+  /* The statement still needs enough measure to hold its three declared
+     line breaks without wrapping — it clears that with room to spare at
+     this ratio (its longest line sets ~570px against ~730px of column).
+     The rail takes the slack, because the wider it runs the smaller the
+     jump when SheetFlip turns it into the project frame: two windows
+     that are nearly the same size read as one object turning over,
+     where a narrow one growing into a wide one reads as two. */
+  grid-template-columns: minmax(0, 1.42fr) minmax(0, 1fr);
   grid-template-areas:
     'rule rule'
     'main rail'
@@ -637,97 +642,13 @@
   color: var(--on-liquid-ink);
 }
 
-/* ---- right rail: experience as a timeline ----
-   The list is chronological and the order carries meaning, so it gets
-   a rule and dots rather than four stacked blocks. */
+/* ---- right rail: the experience window ----
+   The timeline itself lives in SheetWindow.css, because it is shared:
+   this slot and the flight card both render the same window. All this
+   rule owns is where it sits in the composition. */
 .pour-rail {
   grid-area: rail;
   padding-top: clamp(2px, 1vh, 12px);
-}
-.pour-rail-label {
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--on-liquid-faint);
-  padding-bottom: var(--sp-2);
-  margin-bottom: clamp(12px, 2.2vh, 20px);
-  border-bottom: 1px solid var(--on-liquid-line);
-}
-
-.pour-exp {
-  position: relative;
-  list-style: none;
-  padding: 0 0 0 22px;
-}
-/* the spine draws downward with the rail */
-.pour-exp::before {
-  content: '';
-  position: absolute;
-  left: 3px;
-  top: 0.5em;
-  bottom: 0.6em;
-  width: 1px;
-  background: var(--on-liquid-line);
-  transform: scaleY(var(--rv, 1));
-  transform-origin: top;
-}
-
-.pour-exp-item {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  /* rows arrive one after another down the spine */
-  --ev: clamp(0, calc(var(--rv, 1) * 2 - var(--i, 0) * 0.28), 1);
-  opacity: var(--ev);
-  transform: translateY(calc((1 - var(--ev)) * 10px));
-}
-.pour-exp-item + .pour-exp-item {
-  margin-top: clamp(10px, 1.9vh, 20px);
-}
-.pour-exp-dot {
-  position: absolute;
-  left: -22px;
-  top: 0.5em;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  border: 1px solid var(--on-liquid-faint);
-  background: var(--liquid);
-  transition: background var(--dur) var(--ease),
-    border-color var(--dur) var(--ease);
-}
-/* still running — the only two filled dots on the timeline */
-.pour-exp-item.is-now .pour-exp-dot {
-  background: var(--on-liquid-ink);
-  border-color: var(--on-liquid-ink);
-}
-.pour-exp-date {
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  letter-spacing: 0.06em;
-  color: var(--on-liquid-faint);
-  font-variant-numeric: tabular-nums;
-}
-.pour-exp-org {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: clamp(0.98rem, 1.3vw, 1.14rem);
-  line-height: 1.24;
-  letter-spacing: -0.01em;
-  color: var(--on-liquid);
-  text-wrap: balance;
-  transition: color var(--dur) var(--ease);
-}
-.pour-exp-role {
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: var(--on-liquid-soft);
-}
-.pour-exp-item:hover .pour-exp-dot {
-  background: var(--on-liquid);
-  border-color: var(--on-liquid);
 }
 
 /* ---- colophon: the toolkit as a printed strip, not a chip cloud ---- */
@@ -881,8 +802,8 @@
   .pour-note {
     font-size: 0.86rem;
   }
-  .pour-exp-item + .pour-exp-item {
-    margin-top: 14px;
+  .exp-item + .exp-item {
+    margin-top: 13px;
   }
   /* the sheen carries no structure — at phone width it's a wide flat
      band nobody can perceive, so it's pure compositor texture. The

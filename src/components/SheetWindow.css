@@ -1,0 +1,192 @@
+/* ============================================================
+   SheetWindow — the paper side of the sheet.
+
+   The espresso side is the project preview, styled in Work.css.
+   Keep the two in sync structurally: bar (dots + caption) over a
+   body. SheetFlip turns one into the other, and anything that reads
+   as "the same object" has to be true of both.
+   ============================================================ */
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+/* ---------- paper stock ----------
+   Deliberately NOT --card / --ink. This window sits on the espresso
+   pool, which is dark in BOTH themes, so its own colours can't follow
+   the page theme or it would vanish in dark mode. What it does follow
+   is brightness: in dark mode the stock steps down a few levels, so a
+   light panel on a dark page reads as paper rather than as a lamp. */
+.sheet-paper {
+  --w-stock: #ece5da;
+  --w-stock-2: #e1d8ca; /* the chrome bar — one step down from the leaf */
+  --w-ink: #241d15;
+  --w-soft: #5c5147;
+  --w-faint: #8b8074;
+  --w-line: #d2c7b7;
+  --w-accent: #6b5340;
+  background: var(--w-stock);
+  /* a print laid on the pool, not a panel cut into it: a tight contact
+     shadow for the lift off the surface, and one wide soft pass for
+     the distance. Static — the flight's own lift shadow is a separate
+     composited layer (see SheetFlip.css). */
+  box-shadow: 0 2px 3px rgba(10, 7, 4, 0.22),
+    0 26px 44px -30px rgba(10, 7, 4, 0.66);
+}
+
+@media (prefers-color-scheme: dark) {
+  .sheet-paper {
+    --w-stock: #d8cfc0;
+    --w-stock-2: #cdc3b2;
+    --w-line: #c0b5a3;
+  }
+}
+
+.sheet-bar {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: none;
+  padding: 9px 14px;
+  background: var(--w-stock-2);
+  border-bottom: 1px solid var(--w-line);
+}
+.sheet-dots {
+  display: inline-flex;
+  gap: 6px;
+  flex: none;
+}
+/* not the traffic lights — colour on this site is legibility, never
+   decoration (the same reason the preview's dots are plain too) */
+.sheet-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--w-faint) 52%, transparent);
+}
+.sheet-name {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--w-soft);
+}
+.sheet-meta {
+  margin-left: auto;
+  flex: none;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--w-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.sheet-body {
+  flex: 1;
+  min-height: 0;
+  padding: clamp(14px, 1.9vh, 20px) clamp(15px, 1.3vw, 20px);
+}
+
+/* ---------- the timeline ----------
+   Chronological, and the order carries meaning, so it gets a spine
+   and dots rather than four stacked blocks. */
+.exp {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 21px;
+}
+/* the spine draws downward as the section arrives */
+.exp::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0.5em;
+  bottom: 0.6em;
+  width: 1px;
+  background: var(--w-line);
+  transform: scaleY(var(--rv, 1));
+  transform-origin: top;
+}
+
+.exp-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  /* rows arrive one after another down the spine */
+  --ev: clamp(0, calc(var(--rv, 1) * 2 - var(--i, 0) * 0.28), 1);
+  opacity: var(--ev);
+  transform: translateY(calc((1 - var(--ev)) * 10px));
+}
+.exp-item + .exp-item {
+  margin-top: clamp(9px, 1.7vh, 18px);
+}
+.exp-dot {
+  position: absolute;
+  left: -21px;
+  top: 0.52em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--w-faint);
+  background: var(--w-stock);
+  transition: background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+/* still running — the only two filled dots on the timeline */
+.exp-item.is-now .exp-dot {
+  background: var(--w-accent);
+  border-color: var(--w-accent);
+}
+.exp-date {
+  font-family: var(--mono);
+  font-size: 0.61rem;
+  letter-spacing: 0.05em;
+  color: var(--w-faint);
+  font-variant-numeric: tabular-nums;
+}
+.exp-org {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  color: var(--w-ink);
+  text-wrap: balance;
+}
+.exp-role {
+  font-size: 0.79rem;
+  line-height: 1.45;
+  color: var(--w-soft);
+}
+.exp-item:hover .exp-dot {
+  background: var(--w-ink);
+  border-color: var(--w-ink);
+}
+
+/* Below the About's two-column breakpoint the section is fighting for
+   vertical room — it gets exactly one viewport and the toolkit strip
+   below it is the first thing to go. Framing is the cheapest thing to
+   give back there: the bar and the body both tighten, which buys more
+   height than the window's chrome costs. Applies to the flight card
+   too, which is the point — the card's front face has to stay the
+   same object as the one in the composition. */
+@media (max-width: 940px) {
+  .sheet-bar {
+    padding: 7px 12px;
+  }
+  .sheet-body {
+    padding: 12px 14px;
+  }
+}
+@media (max-width: 620px) {
+  .sheet-body {
+    padding: 10px 13px;
+  }
+}

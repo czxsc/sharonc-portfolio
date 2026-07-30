@@ -377,7 +377,7 @@
   background: var(--paper-2);
   border: none;
   border-radius: 999px;
-  cursor: pointer;
+  cursor: var(--cur-tap), pointer;
   transition:
     flex 0.6s cubic-bezier(0.32, 0.08, 0.24, 1),
     border-radius 0.6s cubic-bezier(0.32, 0.08, 0.24, 1);
@@ -938,7 +938,7 @@
   background: none;
   color: inherit;
   text-align: left;
-  cursor: pointer;
+  cursor: var(--cur-tap), pointer;
   text-decoration: underline dotted color-mix(in srgb, var(--ink-faint) 55%, transparent);
   text-decoration-thickness: 1px;
   text-underline-offset: 6px;
@@ -1233,7 +1233,7 @@
   padding: 0;
   background: none;
   border: 0;
-  cursor: pointer;
+  cursor: var(--cur-tap), pointer;
 }
 .hpg-marker-ring {
   width: 11px;

@@ -7,7 +7,8 @@ import {
   useReducedMotion,
 } from 'motion/react';
 import Hero from './Hero.jsx';
-import { about, experience, meta, stack } from '../data/content.js';
+import { ExperienceSheet } from './SheetWindow.jsx';
+import { about, meta, stack } from '../data/content.js';
 import './HeroPourTransition.css';
 
 /* ==================================================================
@@ -234,24 +235,16 @@ function AboutInk({ ruleStyle, greetStyle, setStyle, inkStyle, noteStyle, railSt
         </motion.p>
       </div>
 
-      {/* the list is chronological, so it gets a timeline rather than
-          a stack of rows — the order is information here */}
+      {/* The history, as a window on the pool.
+
+          It's a window because it's the near side of the sheet that
+          SheetFlip turns over into the Work section's project preview
+          — the same object, the other way round. The timeline itself
+          is unchanged in kind: chronological, so it gets a spine and
+          dots rather than a stack of rows, because the order is
+          information here. */}
       <motion.div className="pour-rail" style={railStyle}>
-        <p className="pour-rail-label">Experience</p>
-        <ol className="pour-exp">
-          {experience.map((e, i) => (
-            <li
-              key={e.org}
-              className={`pour-exp-item${e.date.includes('Present') ? ' is-now' : ''}`}
-              style={{ '--i': i }}
-            >
-              <span className="pour-exp-dot" aria-hidden="true" />
-              <span className="pour-exp-date">{e.date}</span>
-              <span className="pour-exp-org">{e.org}</span>
-              <span className="pour-exp-role">{e.role}</span>
-            </li>
-          ))}
-        </ol>
+        <ExperienceSheet />
       </motion.div>
 
       {/* toolkit as a printed colophon strip, not a cloud of chips */}

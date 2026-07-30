@@ -112,11 +112,29 @@
   --radius: 12px;
   --radius-lg: 16px;
   --nav-h: 68px;
+
+  /* — Cursors (see scripts/make-cursors.py) —
+     Four beans: two colours x two forms. Colour is the legibility
+     channel, picked from the ground under the pointer; form is the
+     state channel — the bean sits up over anything clickable. The
+     hotspot is the bean's tip in all four, so it never shifts.
+     -bean/-tap are the espresso pair for light ground, -cream the
+     inverse; --cur-idle/--cur-tap point at whichever pair the page
+     ground calls for, so a theme swap is two lines. */
+  --cur-bean: url('/bean-cursor-sm.png') 4 4;
+  --cur-bean-cream: url('/bean-cursor-light-sm.png') 4 4;
+  --cur-tap-ink: url('/bean-tap-sm.png') 4 4;
+  --cur-tap-cream: url('/bean-tap-light-sm.png') 4 4;
+  --cur-idle: var(--cur-bean);
+  --cur-tap: var(--cur-tap-ink);
 }
 
 /* Dark theme — a warm charcoal, not a naive invert. Accents lift to stay legible. */
 @media (prefers-color-scheme: dark) {
   :root {
+    /* dark ground: the cream pair leads */
+    --cur-idle: var(--cur-bean-cream);
+    --cur-tap: var(--cur-tap-cream);
     --paper: #16130f;
     --paper-2: #1e1a15;
     --card: #201b15;

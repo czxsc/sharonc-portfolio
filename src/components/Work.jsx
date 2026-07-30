@@ -3,6 +3,7 @@ import { projects } from '../data/content.js';
 import { ArrowRight } from './Doodles.jsx';
 import ProjectPage from './ProjectPage.jsx';
 import SetType from './SetType.jsx';
+import { ProjectCover } from './SheetWindow.jsx';
 import './Work.css';
 
 const MARK_H = 18; // px — height of the espresso tick that tracks the list
@@ -34,7 +35,13 @@ const TAGS = (() => {
 
 const matches = (i, tag) => projects[i].category.split(' · ').includes(tag);
 
-export default function Work() {
+/* `previewRef` mirrors `shown` for SheetFlip, whose card has to wear
+   the same cover the frame is showing or the hand-off would change
+   project as well as element. A ref, not state lifted into App: this
+   changes on every hover, and re-rendering the page for it would
+   re-run the About section's scroll transforms.
+   `flight` is false only under reduced motion, where no card exists. */
+export default function Work({ previewRef, flight = false }) {
   const [active, setActive] = useState(0); // the row under the cursor
   const [shown, setShown] = useState(0); // the cover the frame has settled on
   const [openIndex, setOpenIndex] = useState(null); // case study overlay
@@ -151,6 +158,7 @@ export default function Work() {
                  copy lands last                      (900ms / 440ms)
      --------------------------------------------------------------- */
   useLayoutEffect(() => {
+    if (previewRef) previewRef.current = shown;
     const el = itemRefs.current[shown];
     if (!el) return;
     // Recency stacking. Whatever was on screen a moment ago is the
@@ -192,7 +200,7 @@ export default function Work() {
       ],
       { duration: 440, delay: 160, easing: EASE, fill: 'backwards' }
     );
-  }, [shown, openIndex]);
+  }, [shown, openIndex, previewRef]);
 
   const rowState = (i) =>
     litTag ? (matches(i, litTag) ? 'is-lit' : 'is-faded') : '';
@@ -333,8 +341,16 @@ export default function Work() {
 
           {/* preview — a stack of opaque covers; the one on top is the
               one you see, and arrivals fade up over it (see the frame
-              effect above) */}
-          <div className="work-preview reveal" aria-hidden="true">
+              effect above).
+
+              No `.reveal` when SheetFlip is running: the frame's
+              entrance IS the card landing in it, and a reveal here
+              would both double that and translate the box the flight
+              measured its landing from. */}
+          <div
+            className={`work-preview${flight ? '' : ' reveal'}`}
+            aria-hidden="true"
+          >
             <div className="work-frame" ref={frameRef}>
               {projects.map((p, i) => (
                 <div
@@ -343,17 +359,7 @@ export default function Work() {
                   className={`preview-item ${i === shown ? 'is-active' : ''}`}
                   style={{ '--t1': p.tone[0], '--t2': p.tone[1] }}
                 >
-                  <div className="preview-bar">
-                    <span className="preview-dots"><i /><i /><i /></span>
-                    <span className="preview-url">{p.name.toLowerCase().replace(/\s+/g, '')}.app</span>
-                  </div>
-                  <div className="preview-body">
-                    <img className="preview-img" src={p.image} alt="" />
-                    <div className="preview-label">
-                      <span className="preview-blurb">{p.blurb}</span>
-                      <span className="preview-meta">{p.tech.join(' · ')}</span>
-                    </div>
-                  </div>
+                  <ProjectCover project={p} />
                 </div>
               ))}
             </div>

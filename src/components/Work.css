@@ -59,6 +59,14 @@
 }
 .work-frame {
   position: relative;
+  /* Capped and pushed to the right edge of its column rather than
+     filling it. Two reasons, and they agree: the shot reads better
+     with the list given room to breathe beside it, and it closes the
+     size gap SheetFlip has to cross on the turn (see the note on the
+     About grid's columns). Right-aligned so the composition still
+     runs to the margin. */
+  max-width: 680px;
+  margin-left: auto;
   /* sized so the body below the ~34px chrome bar lands at ≈1.86 —
      little_wonder's native ratio, the one shot that can't crop;
      the other screenshots tolerate the slight cover trim */
