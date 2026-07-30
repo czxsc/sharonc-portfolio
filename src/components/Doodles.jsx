@@ -190,6 +190,28 @@ export function HandRule({ className }) {
   );
 }
 
+/* A single coffee bean. Same drawing as the hub of the hero's role
+   wheel — lifted here so the two can't drift apart now that the drink
+   cards rate caffeine in beans. Filled rather than outlined: at 11px
+   a hairline ellipse with a crease inside it turns to mush, and these
+   are counted at a glance. */
+export function Bean({ size = 12, ...p }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>
+      <g transform="rotate(-32 12 12)">
+        <ellipse cx="12" cy="12" rx="6.6" ry="9.6" fill="currentColor" />
+        <path
+          d="M12 3.2C8.5 8.2 15.5 15.8 12 20.8"
+          fill="none"
+          stroke="var(--card, #fbfaf8)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
 export function ArrowRight({ size = 20, ...p }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" {...p}>

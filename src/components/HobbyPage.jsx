@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useOverlayPage } from '../hooks/useOverlayPage.js';
+import { Bean } from './Doodles.jsx';
 import './HobbyPage.css';
 
 /* ------------------------------------------------------------------
@@ -99,6 +100,8 @@ export default function HobbyPage({ hobby, img, origin, onClose }) {
             <GamingBlocks blocks={hobby.page.blocks} />
           ) : hobby.slug === 'stories' ? (
             <StoriesBlocks blocks={hobby.page.blocks} />
+          ) : hobby.slug === 'drinks' ? (
+            <DrinksBlocks blocks={hobby.page.blocks} />
           ) : (
             <div className="hp-blocks">
               {hobby.page.blocks.map((b, i) => (
@@ -320,6 +323,144 @@ function StoriesBlocks({ blocks }) {
             </li>
           ))}
         </ul>
+      </section>
+    </div>
+  );
+}
+
+/* One drink, as a cafe menu card.
+
+   The order down the card is the reference's, and it is not the order
+   of importance — it's the order you'd read a card you picked up off
+   a counter: how it's served, then how strong it is, then what it is,
+   then what's in it, with the painting anchored bottom-right so the
+   type never has to flow around it.
+
+   The rule under the serve mark spans the full card, which is what
+   makes the top two rows read as a masthead rather than as two stray
+   labels floating above a title. */
+function DrinkCard({ item }) {
+  return (
+    <li className="hpd-card">
+      {/* Process mark, top right, with the rule under it. Drawn rather
+          than typed: U+25B3 isn't in Archivo, and a literal △ would
+          fall back to whatever the OS offers, at its own size and
+          baseline on every machine. */}
+      <p className="hpd-serve">
+        <svg className="hpd-serve-mark" viewBox="0 0 12 12" aria-hidden="true">
+          <path
+            d="M6 2.2 10.4 9.8H1.6z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+        </svg>
+        {item.serve}
+      </p>
+
+      {/* name and strength share a line, the beans hanging in the
+          right margin where the reference prints its price */}
+      <div className="hpd-head">
+        <h3 className="hpd-name">{item.name}</h3>
+        <p className="hpd-strength">
+          {item.caffeine > 0 ? (
+            <>
+              <span className="hpd-beans">
+                {Array.from({ length: item.caffeine }, (_, i) => (
+                  <Bean key={i} size={13} />
+                ))}
+              </span>
+              <span className="hpd-sr">Caffeine level {item.caffeine} of 3</span>
+            </>
+          ) : (
+            <span className="hpd-beans hpd-beans-none">
+              <span aria-hidden="true">—</span>
+              <span className="hpd-sr">Caffeine free</span>
+            </span>
+          )}
+        </p>
+      </div>
+
+      {/* what goes in it, in the order it goes in — a drawn bar per
+          line rather than a bullet, set tight so the pour reads as one
+          block and not as a list of separate facts */}
+      <ul className="hpd-build">
+        {item.build.map((n) => (
+          <li key={n}>{n}</li>
+        ))}
+      </ul>
+
+      <div className="hpd-art">
+        {item.src ? (
+          <img src={item.src} alt={`${item.name}, painted`} loading="lazy" />
+        ) : (
+          /* not yet painted — a drawn cup holds the same space so the
+             four cards stay the same shape while the set fills in */
+          <svg className="hpd-art-todo" viewBox="0 0 100 150" aria-hidden="true">
+            <g
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 34h56l-6 96a10 10 0 0 1-10 9H38a10 10 0 0 1-10-9z" />
+              <path d="M18 34h64" />
+              <path d="M27 58h46" strokeDasharray="5 7" />
+            </g>
+          </svg>
+        )}
+      </div>
+
+      {/* the closing line along the bottom edge, where the reference
+          sets its ingredients — ours carries how the drink tastes,
+          since the ingredients have moved up into the list */}
+      <p className="hpd-taste">{item.taste}</p>
+    </li>
+  );
+}
+
+/* Drinks: the menu holds the left, the kitchen keeps a slot on the
+   right. Two columns rather than a full-width grid of four, because
+   the cards are portrait and a 2x2 block beside a tall frame balances
+   where a 4-across row would leave the page bottom-heavy. */
+function DrinksBlocks({ blocks }) {
+  const by = Object.fromEntries(blocks.map((b) => [b.id, b]));
+  const { menu, kitchen } = by;
+
+  return (
+    <div className="hp-drinks">
+      <section className="hpd-menu">
+        <h2 className="hpb-label">
+          <span>{menu.title}</span>
+        </h2>
+        <ul className="hpd-cards">
+          {menu.items.map((it) => (
+            <DrinkCard key={it.name} item={it} />
+          ))}
+        </ul>
+      </section>
+
+      <section className="hpd-soon">
+        <h2 className="hpb-label">
+          <span>{kitchen.title}</span>
+        </h2>
+        <div className="hpd-frame">
+          {/* a drawn asterisk, for the same reason as the triangle */}
+          <svg className="hpd-frame-mark" viewBox="0 0 20 20" aria-hidden="true">
+            <g
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            >
+              <path d="M10 3.4v13.2M4.3 6.7l11.4 6.6M15.7 6.7 4.3 13.3" />
+            </g>
+          </svg>
+          <p className="hpd-frame-note">{kitchen.note}</p>
+          <p className="hpd-frame-tag">In progress</p>
+        </div>
       </section>
     </div>
   );

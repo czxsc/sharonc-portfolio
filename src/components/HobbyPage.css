@@ -1114,10 +1114,13 @@
 }
 
 /* ---------- the annotated build ---------- */
-/* the page opens on it, so it takes the page's own gutters rather than
-   the offset reading column the lists below it sit in */
+/* The page opens on it, so it hangs at the page's own left edge rather
+   than in the offset reading column the lists below it sit in. It ends
+   where those lists end, though — 8vw of indent plus their 1180 — so
+   the label's hairline and the parts link close on the same right edge
+   as everything under them instead of stopping short of it. */
 .hpg-build {
-  max-width: 1180px;
+  max-width: 1300px;
 }
 /* The parts-list link, parked at the far end of the label line.
    .hpb-label's trailing hairline is a ::after, i.e. the last flex item;
@@ -1149,21 +1152,49 @@
   margin-bottom: 1px;
 }
 
+/* Photo left, ledger right, and a wide gutter between them rather than
+   the two pressed together with the leftover width dead on the right.
+   The ledger takes its measure and no more; everything past that goes
+   to the photo's column, so the width left over belongs to the photo's
+   side instead of falling between the two of them. The left track is
+   therefore much wider than the photo it holds, and the photo centres
+   inside it. The ledger keeps its top at the band's top — its first
+   rule and the photo's first inch read as one horizontal — while the
+   photo centres against the band, which is what keeps its short side
+   off the label above and the lists below. */
 .hpg-build-grid {
+  /* named so the photo can centre across it — see .hpg-photo */
+  --hpg-gutter: clamp(24px, 4.5vw, 72px);
   display: grid;
-  /* the photo is portrait; capping it keeps the two halves close in
-     height so the ledger doesn't float in a tall empty column */
-  /* the photo is portrait at 1:1.2, so its width sets the height of the
-     whole opening band — 420px lands the build inside the first screen
-     with the header above it */
-  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
-  gap: clamp(28px, 5vw, 80px);
-  align-items: center;
-  margin-top: var(--sp-4);
+  /* 55% is what holds the narrow band just above the stacking
+     breakpoint together: there, a flat 640 would leave the photo's
+     column almost nothing, so the ledger gives width back instead */
+  grid-template-columns: minmax(0, 1fr) min(640px, 55%);
+  gap: var(--hpg-gutter);
+  align-items: start;
+  margin-top: var(--sp-5);
+  margin-bottom: var(--sp-3);
 }
 
 .hpg-photo {
+  /* portrait at 1:1.2, so width sets the height of the whole opening
+     band — 380 keeps the build clear of the header above it and short
+     enough that the first band below stays in reach */
+  --hpg-photo-w: 380px;
   margin: 0;
+  width: 100%;
+  max-width: var(--hpg-photo-w);
+  justify-self: center;
+  align-self: center;
+  /* Centred against the whole run from the page's left edge to the
+     ledger, not just against its own column — the gutter is part of
+     that run, so half of it has to sit on the photo's left. Under
+     `justify-self: center` it's the margin box that gets centred, so a
+     margin of one full gutter moves the photo by half of one. Dropped
+     once the column is too narrow to hold photo and gutter both, where
+     that margin box would overflow and push the photo back off-centre
+     the other way. */
+  margin-left: max(0px, min(var(--hpg-gutter), 100% - var(--hpg-photo-w)));
 
   /* The pins sit on the photo, and the photo is a bright image in both
      themes — reading --ink here would flip them to light-on-light in
@@ -1270,17 +1301,24 @@
 }
 
 /* ledger — mirrors the markers; rows for parts that aren't in the shot
-   carry a note instead of a highlight */
+   carry a note instead of a highlight.
+   640px is the measure at which the longest value (the memory, then the
+   fans) still sets on one line — a spec list reads as a spec list only
+   while nothing wraps. Its column is capped there, so the cap below is
+   a backstop rather than the thing doing the work. */
 .hpg-ledger {
   margin: 0;
+  max-width: 640px;
 }
 /* the label column has to clear MOTHERBOARD — the longest part type —
    with slack left over, or the value reads as crowded against it */
 .hpg-row {
   display: grid;
-  grid-template-columns: 7rem minmax(0, 1fr);
+  grid-template-columns: 7.5rem minmax(0, 1fr);
   gap: var(--sp-4);
-  padding: 8px 10px 8px 12px;
+  /* nine rows against a 500px photo: at 8px they read as a stack of
+     hairlines, and the column ends less than halfway down it */
+  padding: 14px 10px 14px 12px;
   margin-left: -12px;
   border-top: 1px solid var(--line);
   transition: background var(--dur-quick) var(--ease);
@@ -1332,10 +1370,20 @@
 @media (max-width: 900px) {
   .hpg-build-grid {
     grid-template-columns: 1fr;
-    gap: var(--sp-4);
+    gap: var(--sp-5);
   }
+  /* stacked, the photo has the full column and nothing beside it to
+     centre against, so it goes back to the page's left edge — no
+     gutter to share, hence no margin either */
   .hpg-photo {
-    max-width: 420px;
+    max-width: 400px;
+    justify-self: start;
+    margin-left: 0;
+  }
+  /* same for the ledger — it takes the column it's given rather than
+     holding to its measure with the rest left dead */
+  .hpg-ledger {
+    max-width: none;
   }
 }
 
@@ -1438,6 +1486,276 @@
   .hpb-specs > div {
     grid-template-columns: 108px minmax(0, 1fr);
     gap: var(--sp-3);
+  }
+}
+
+/* ==================================================================
+   Drinks — a menu of cards, and the kitchen slot beside it.
+
+   The card is modelled on a printed cafe menu card (see
+   references drink_card_idea): a serve mark top right, a full-width
+   rule under it, a strength row, then the name, then what's in it,
+   with the painting anchored bottom-right. Everything is set on cream
+   stock with a hairline edge — no shadow, because these read as
+   printed card, not as UI panels floating over the page.
+   ================================================================== */
+.hp-drinks {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+  max-width: 1180px;
+  margin-top: var(--sp-5);
+  margin-left: clamp(0px, 6vw, 96px);
+}
+
+.hpd-cards {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 1.8vw, 26px);
+}
+
+/* ---- the card ----
+   Order down the card is the reference's: serve mark and rule, then
+   name with the strength hanging in the right margin, then the pour,
+   then the cup centred in the lower half, then a closing line along
+   the bottom edge. */
+.hpd-card {
+  position: relative;
+  display: grid;
+  /* declared so all four cards agree on where each band sits whatever
+     the length of a name or the depth of a pour — the art row takes
+     the slack, so the cups stay on a common baseline across the grid */
+  grid-template-rows: auto auto auto 1fr auto;
+  min-height: clamp(292px, 33vw, 372px);
+  padding: clamp(16px, 1.5vw, 22px);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 3px; /* printed stock, not a UI card */
+  overflow: hidden;
+  /* the faintest paper tooth — the same grain the pour uses, at a
+     fraction of the strength, so the stock doesn't read as flat fill */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='5'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23p)' opacity='0.035'/%3E%3C/svg%3E");
+  transition: border-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+.hpd-card:hover {
+  border-color: var(--espresso);
+  transform: translateY(-3px);
+}
+
+/* serve mark, top right, with the rule under it */
+.hpd-serve {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.hpd-serve-mark {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  color: var(--espresso);
+}
+
+/* name and strength on one line */
+.hpd-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: clamp(15px, 1.7vw, 22px);
+}
+/* The reference sets its names in a heavy grotesque, not the site's
+   serif — these are menu cards, a different kind of object from a
+   section title, and the weight is most of what makes them read as
+   printed stock. Same family the rest of the site uses for body, one
+   weight up. */
+.hpd-name {
+  font-family: var(--grot);
+  font-weight: 700;
+  font-size: clamp(0.99rem, 1.24vw, 1.18rem);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.hpd-strength {
+  flex: none;
+  color: var(--espresso);
+}
+.hpd-beans {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.hpd-beans-none {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+
+/* the pour — set tight, as one block. The bar is drawn rather than a
+   typed pipe so it keeps an even weight and sits on the cap height
+   instead of wherever the font puts a | . */
+.hpd-build {
+  list-style: none;
+  padding: 0;
+  margin-top: clamp(9px, 1vw, 13px);
+  display: grid;
+  gap: 0;
+}
+.hpd-build li {
+  position: relative;
+  padding-left: 8px;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  color: var(--ink-soft);
+}
+.hpd-build li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  height: 0.76em;
+  width: 1px;
+  background: var(--ink-faint);
+}
+
+/* the cup sits centred in the lower half, as on the reference — the
+   text hangs to the left of it, the drawing belongs to the whole card */
+.hpd-art {
+  position: relative;
+  align-self: end;
+  justify-self: center;
+  width: clamp(80px, 9vw, 110px);
+  margin-top: var(--sp-3);
+}
+.hpd-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* the watercolour is painted on white; a touch of contrast keeps it
+     from washing out against cream stock */
+  filter: saturate(1.04) contrast(1.03);
+}
+.hpd-art-todo {
+  width: 76%;
+  margin-inline: auto;
+  height: auto;
+  color: var(--line);
+}
+
+/* Closing line, centred under the cup — the reference's last band.
+
+   Mono, caps, tracked out: it's a stamp on the card rather than a
+   sentence, and the fixed advance width is what makes two words and
+   an ampersand sit as a unit. JetBrains Mono is the site's own label
+   face, already loaded — the alternatives that read as "mono" in a
+   type library (Space Mono, Share Tech Mono) are brutalist or sci-fi
+   and would fight a warm cafe card, quite apart from costing a font
+   request for four short lines. Kept at 400: weight is what ruins
+   mono character. */
+.hpd-taste {
+  /* held well clear of the cup: the stamp is a separate band along the
+     bottom edge, not a caption hanging off the painting */
+  margin-top: clamp(20px, 2.4vw, 32px);
+  text-align: center;
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  /* tracking adds a trailing space after the last glyph, so a centred
+     line's visible glyphs sit half a tracking-unit left of true
+     centre — push back by that half */
+  text-indent: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* screen-reader text for the bean count */
+.hpd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- kitchen slot ----
+   An empty frame that says what it's for. A dashed border would read
+   as a broken image, so this is a hairline frame with a corner mark
+   and a status line — the same vocabulary as the rest of the page. */
+.hpd-frame {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--sp-3);
+  min-height: clamp(300px, 30vw, 420px);
+  padding: clamp(20px, 2.2vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: linear-gradient(
+    180deg,
+    var(--paper-2) 0%,
+    color-mix(in srgb, var(--paper-2) 40%, transparent) 100%
+  );
+}
+.hpd-frame-mark {
+  width: 18px;
+  height: 18px;
+  color: var(--espresso);
+}
+.hpd-frame-note {
+  max-width: 30ch;
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.2vw, 1.14rem);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+.hpd-frame-tag {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+@media (max-width: 1040px) {
+  /* the kitchen drops under the menu before the cards get too narrow
+     to hold a name and its bean count on one line */
+  .hp-drinks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hpd-frame {
+    min-height: 220px;
+  }
+}
+@media (max-width: 700px) {
+  .hp-drinks {
+    margin-left: 0;
+  }
+  .hpd-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hpd-card {
+    min-height: 0;
+  }
+  .hpd-art {
+    width: 92px;
   }
 }
 

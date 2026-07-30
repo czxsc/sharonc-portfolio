@@ -595,9 +595,13 @@ function Section({ s }) {
       {/* the four graded tilesets, laid out so the shared grey rock
           reads across the row — same argument as ZoneStudy, one floor
           up. No panel behind them: they are cut-out art with real
-          transparency and they sit on the paper. */}
+          transparency and they sit on the paper.
+
+          `cutouts` is the same row for drawings that DON'T share a
+          ratio (the portfolio's hand-drawn assets): they're matched on
+          height and sat on a common baseline instead. */}
       {s.tiles && (
-        <figure className="pp-tiles">
+        <figure className={`pp-tiles ${s.tiles.cutouts ? 'is-cutouts' : ''}`}>
           <ol>
             {s.tiles.items.map((t) => (
               <li key={t.label}>

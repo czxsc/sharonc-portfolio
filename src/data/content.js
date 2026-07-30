@@ -22,6 +22,16 @@ import concertKiofImg from '../assets/kiof_group.jpg';
 import receiptifyImg from '../assets/receiptify.png';
 import pcBuildImg from '../assets/hobby/web/pc.webp';
 
+/* The hand-drawn assets, shown as themselves on the portfolio case
+   page — the nav mark, the hero loop, the cursor, and one of the
+   drink paintings. All four are cut out on transparent, so they sit
+   on the paper without a panel. `web/` holds sized webp exports of
+   the two masters (2048px PNGs, ~2MB each) that are otherwise only
+   used at mark and cursor size. */
+import catLogoImg from '../assets/web/cat_logo.webp';
+import catAnimImg from '../assets/cat_animation.gif';
+import latteCursorImg from '../assets/web/latte_art_cursor.webp';
+
 /* Save-file snapshots for the permanent three — a `shot` on a favourite
    is what the hover peek picks up (HobbyPage · FavesList). Titles without
    one behave exactly as before, so the other two can land whenever the
@@ -37,6 +47,10 @@ import coverCirce from '../assets/hobby/web/book_circe.webp';
 import coverDivineRivals from '../assets/hobby/web/book_divine_rivals.webp';
 import coverHailMary from '../assets/hobby/web/book_project_hail_mary.webp';
 import coverThursday from '../assets/hobby/web/book_thursday_murder_club.webp';
+import drinkYuzuAmericano from '../assets/hobby/web/drink_yuzu_americano.webp';
+import drinkCaramelLatte from '../assets/hobby/web/drink_caramel_latte.webp';
+import drinkSesameHojicha from '../assets/hobby/web/drink_sesame_hojicha.webp';
+import drinkJasmineMatcha from '../assets/hobby/web/drink_jasmine_matcha.webp';
 
 /* Die-cut stickers for the Stories watch row — each one trimmed to its
    subject on transparent, so the white outline is drawn in CSS. */
@@ -324,49 +338,166 @@ export const projects = [
     href: '#work',
     page: {
       status: 'Live',
-      subtitle: 'The site you’re reading, designed like a printed journal.',
+      subtitle: 'The site you’re reading — built from scratch to feel like mine.',
       intro:
-        'This portfolio began as a Framer prototype and was rebuilt from scratch in code — partly to own every detail, mostly because the details are the point. It’s a React + Vite site with a paper-and-ink design system and hand-tuned motion throughout.',
+        'This portfolio started as a Framer prototype and ended up rebuilt in React, because a builder could get me to a clean site but not to a personal one. It’s a Vite single-page app with a token-driven paper-and-ink design system, hand-drawn art I made myself, and motion tuned by hand rather than picked from a menu.',
       links: [{ label: 'GitHub', href: '#' }],
       meta: [
         { label: 'Category', value: 'Frontend, Design' },
         { label: 'My role', value: 'Design & engineering' },
         { label: 'Timeline', value: '2026' },
-        { label: 'Skills', value: 'React, Vite, Motion, CSS, editorial design' },
+        { label: 'Skills', value: 'React, Vite, CSS architecture, motion design, illustration' },
       ],
       sections: [
         {
-          heading: 'Goal: Feel set, not assembled',
+          heading: 'Brainstorming: Three pages, one voice',
           body: [
-            'Most developer portfolios read as templates with content poured in. The goal here was the opposite: an editorial object with strong typography, asymmetric composition, and personality kept to about ten percent — coffee, one cat, and a tote bag.',
-          ],
-        },
-        {
-          heading: 'Details: The interactions carry it',
-          body: [
-            'Every section got one considered moment instead of scattered effects.',
+            'I started with structure, not styling. I wanted three things from a portfolio: a landing that says who I am in one screen, a work section where each project can be read properly, and a place for the parts of me that aren’t projects. That became the whole site — a hero that pours into an about section, a work index that opens full case studies, and a Play section of hobby mini-pages.',
+            'The harder question was tone. Most engineering portfolios are competent and interchangeable; most design portfolios are personal but don’t look built. I wanted the site to read professional first and unmistakably mine second, so I gave myself a rough ratio — about 85% editorial restraint, 15% personality — and used the two things I actually like, cats and coffee, as the only vocabulary the personality is allowed to speak in. Everything decorative on the site is one of those two, which is what keeps it from sliding into cute.',
           ],
           facts: [
             {
-              title: 'Coffee-pour transition',
-              text: 'The hero pours into the About section on scroll, scrubbed through a liquid fill.',
+              title: 'Coffee set the palette',
+              text: 'Warm off-white paper (#f5f4f1) instead of white, near-black ink, and espresso as the single accent. Sage and navy exist but are rationed. No colour on the site is there for decoration.',
             },
             {
-              title: 'The tote-bag spill',
-              text: 'A drawn cat knocks over a bag and the hobbies scatter out as a flat-lay.',
+              title: 'Typography does the hierarchy',
+              text: 'Newsreader for display, Archivo for body and UI, JetBrains Mono for labels, and Caveat for the few handwritten notes. Hierarchy comes from size and space — never from adding another weight or another colour.',
             },
             {
-              title: 'Iris mini-pages',
-              text: 'Hobby items open full-screen pages through a compositor-friendly circle transition.',
+              title: 'Cats carry the 15%',
+              text: 'A cat in a coffee mug is the nav mark, a cat loops in the hero, a cat knocks over the tote bag in Play, and the cursor is a cup of latte art. One idea, repeated, instead of scattered graphics.',
             },
           ],
         },
         {
-          heading: 'Build notes',
+          heading: 'Choosing the stack: Framer, then not Framer',
           body: [
-            'Animations are CSS-first and kept on transform/opacity for smoothness; Lenis handles scroll feel; reduced-motion collapses everything to instant states. The design system lives in tokens — components never touch raw hex.',
+            'The first version was a Framer prototype, and it was genuinely useful — I got layout, type scale, and section order settled in a couple of evenings without writing anything. But once the composition was right, every next idea ran into the same wall: the interesting parts of the design weren’t things the builder had a control for.',
+            'The moment I decided to rebuild was the hero. I wanted a cup of coffee to tip and pour, and the liquid to rise and become the About section — one continuous gesture scrubbed against scroll. That isn’t a transition preset. Neither is a case-study image that flies out of the work index into the page it opens, or an iris that grows from the exact point you clicked. Rebuilding in React cost me a few weeks and bought me the ability to build any of those.',
           ],
-          media: { caption: 'Selected details — recorded walkthrough coming soon.' },
+          points: [
+            {
+              icon: 'identity',
+              text: 'Templates read as templates. Owning the markup meant the site could be composed rather than configured.',
+            },
+            {
+              icon: 'scope',
+              text: 'Custom motion needs real scroll progress, DOM measurement, and FLIP-style geometry — not a canned transition list.',
+            },
+            {
+              icon: 'performance',
+              text: 'In code I control what animates: transform and opacity only, self-hosted fonts, and webp everywhere.',
+            },
+            {
+              icon: 'platform',
+              text: 'It’s also a portfolio piece in itself — the site is evidence of the frontend work it’s describing.',
+            },
+          ],
+        },
+        {
+          heading: 'Drawing the personality in',
+          body: [
+            'The illustrations are mine, drawn rather than sourced, because bought assets would have made the 15% feel borrowed. The nav mark, the cat that loops in the hero, the cat that tips the tote bag in Play, the latte-art cursor, and the drink paintings on the hobby pages all come out of the same hand.',
+            'One of them turned into a real engineering problem. The tote-bag knock was originally an animated GIF bookended by stills, and it would never stay in sync — a GIF’s clock starts on decode, not on the render that set its src, so a cached image resumes wherever the shared clock happens to be. On a second visit the cat would pick up mid-fall while the hobby items spilled on their own schedule. I unpacked the GIF into individual webp frames and step through them in React with the original frame delays, so the spill fires on an actual frame instead of near one. That fix is a good summary of the whole project: the creative half and the technical half kept turning out to be the same work.',
+          ],
+          tiles: {
+            cutouts: true,
+            items: [
+              { src: catLogoImg, label: 'Nav mark' },
+              { src: catAnimImg, label: 'Hero loop' },
+              { src: latteCursorImg, label: 'Cursor' },
+              { src: drinkYuzuAmericano, label: 'Drink art' },
+            ],
+            caption:
+              'Four of the hand-drawn assets, at the size they were drawn — the mark, the looping hero cat, the latte-art cursor, and one of the four drink paintings from the hobby pages.',
+          },
+        },
+        {
+          heading: 'Architecture: One data file, tokens, and a motion layer',
+          body: [
+            'The site is a React 19 + Vite single-page app with no router, no UI library, and no CSS framework — roughly 13,000 lines across 15 components, most with a stylesheet sitting next to them. Three rules keep that from turning into a pile.',
+            'First, all copy lives in one place: a single content file exports the hero, about, projects, hobbies, and contact data, and components only render it — adding a project is a data edit, not a component edit. Second, every colour, size, and duration is a CSS custom property in tokens.css, and components never write a raw hex value, which is why the whole palette can be retuned in one file. Third, the two full-screen overlays — project case studies and hobby mini-pages — are different pages that behave identically, so the shared plumbing (scroll lock, focus, Esc, browser back, close timing) lives in one useOverlayPage hook and each page owns only its own transition.',
+          ],
+          stack: {
+            title: 'How the code is organized',
+            hint: 'Hover a layer to see what sits in it.',
+            flow: [
+              { title: 'Content in', note: 'one data file — copy, projects, hobbies' },
+              { title: 'Components + tokens', note: 'section per component, no raw hex' },
+              { title: 'Motion on top', note: 'shared hooks and entrance primitives' },
+            ],
+            // diagram-specific hues (not site tokens): the translucent
+            // plates blend when stacked, so the bands need genuinely
+            // different hue families — rust / blue / amber / green
+            groups: [
+              {
+                name: 'Sections',
+                tone: '#b05438',
+                tools: [
+                  { name: 'Nav', note: 'active-section indicator via useActiveSection' },
+                  { name: 'HeroPourTransition', note: 'hero + about, joined by the scroll-scrubbed pour' },
+                  { name: 'Work', note: 'project index, hover previews, tag filtering' },
+                  { name: 'Play', note: 'the tote-bag spill and hobby flat-lay' },
+                  { name: 'Contact', note: 'the closing block' },
+                ],
+              },
+              {
+                name: 'Overlay pages',
+                tone: '#3e6b9e',
+                tools: [
+                  { name: 'ProjectPage', note: 'case study — the hero image flies out of the index' },
+                  { name: 'HobbyPage', note: 'mini-page — iris grows from the click point' },
+                  { name: 'useOverlayPage', note: 'scroll lock, focus, Esc, browser back, close timing' },
+                ],
+              },
+              {
+                name: 'Motion primitives',
+                tone: '#c99a3d',
+                tools: [
+                  { name: 'SetType', note: 'per-line masked entrance for every title' },
+                  { name: 'useReveal', note: 'scroll entrances that follow direction and speed' },
+                  { name: 'useLenis', note: 'interpolated scroll, so scrubbed animation glides' },
+                  { name: 'Doodles', note: 'the hand-drawn inline SVG set' },
+                ],
+              },
+              {
+                name: 'Content & tokens',
+                tone: '#55855a',
+                tools: [
+                  { name: 'content.js', note: 'all copy and project data, one file' },
+                  { name: 'tokens.css', note: 'colour, type scale, spacing, easing' },
+                  { name: 'fonts.css', note: 'self-hosted woff2, latin subset' },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          heading: 'Technical decisions',
+          body: [
+            'The animation work is where most of the engineering went, and nearly all of it came down to keeping the browser doing cheap things.',
+          ],
+          facts: [
+            {
+              title: 'CSS first, library second',
+              text: 'Entrances, hovers, and the iris are plain CSS transitions on transform and opacity. Motion is only pulled in for the two scroll-scrubbed sequences, where progress has to be read continuously instead of fired once.',
+            },
+            {
+              title: 'Geometry, not crossfades',
+              text: 'The case-study hero doesn’t fade between two images — it interpolates the clip box and the painted picture separately, sampled at sixteen points, so one photograph re-crops instead of two swapping.',
+            },
+            {
+              title: 'Reduced motion is a real path',
+              text: 'Sixteen files branch on prefers-reduced-motion. Lenis never starts, scrubbed sequences render their settled state, and the flights collapse to instant — the layout is the same either way.',
+            },
+          ],
+        },
+        {
+          heading: 'Where it stands',
+          body: [
+            'The site is live and still moving — the hobby pages and a few case studies are the parts I keep returning to. What I’d tell myself at the start is that prototyping in Framer first was right: it settled the composition cheaply, and I only paid for the rebuild once I knew exactly which details were worth writing code for.',
+          ],
         },
       ],
     },
@@ -1672,8 +1803,13 @@ export const projects = [
          — x/y are % positions on the photo; a part with neither gets no
            marker (it isn't visible in the shot) and shows `note` instead.
          — link renders at the far end of the section label.
-   TODO(sharon): drinks / art below are still sample copy — swap in the
-   real ones, and add gallery image imports. */
+   Drinks has a bespoke composition (DrinksBlocks) too, with its own:
+       { kind: 'menu', title,
+         items: [{ name, serve, caffeine, build, taste, src? }] }
+         — cafe menu cards; caffeine is a bean count, build the pour
+       { kind: 'soon', title, note } — an empty frame holding a slot open
+   TODO(sharon): art below is still sample copy — swap in the real one,
+   and add gallery image imports. */
 export const hobbies = [
   {
     icon: 'laptop',
@@ -1767,19 +1903,73 @@ export const hobbies = [
     page: {
       tagline:
         'Pour-overs on slow mornings, matcha when it’s warm, and the occasional experiment that shouldn’t leave the kitchen.',
+      /* Drinks gets a bespoke composition (DrinksBlocks): a menu of
+         cards down the left, the kitchen beside it. Blocks are picked
+         by `id`. */
       blocks: [
         {
-          kind: 'list',
-          title: 'House menu',
+          id: 'menu',
+          kind: 'menu',
+          title: 'On regular rotation',
+          /* One card each, modelled on a cafe menu card:
+               serve    — the process mark at the top right
+               caffeine — beans, counted; 0 is valid and renders as a
+                          dash rather than an empty row
+               build    — what goes in it, in the order it goes in;
+                          the bar-marked list down the left
+               taste    — the closing line along the bottom edge, where
+                          the reference sets its ingredients in Chinese.
+                          Set in caps by the CSS, so write it in normal
+                          case here; keep it to two words and an
+                          ampersand — it is a stamp, not a sentence
+               src      — the hand-painted cup. Cards without one fall
+                          back to a drawn placeholder cup, so the menu
+                          stays even while the set is being painted. */
           items: [
-            { name: 'V60 pour-over', meta: 'the daily', note: 'Light roast, 1:16, no shortcuts.' },
-            { name: 'Iced matcha latte', meta: 'summer', note: 'Whisked properly or not at all.' },
-            { name: 'Honey cardamom latte', meta: 'the experiment', note: 'Version four finally works.' },
+            {
+              name: 'Yuzu Americano',
+              serve: 'Iced',
+              caffeine: 3,
+              build: ['Yuzu Juice', 'Espresso'],
+              taste: 'Fresh & Citrusy',
+              src: drinkYuzuAmericano,
+            },
+            {
+              name: 'Caramel Latte',
+              serve: 'Iced',
+              caffeine: 3,
+              build: ['Espresso', 'Caramel Syrup', 'Oat Milk'],
+              taste: 'Sweet & Creamy',
+              src: drinkCaramelLatte,
+            },
+            {
+              name: 'Sesame Hojicha',
+              serve: 'Iced',
+              caffeine: 1,
+              build: ['Hojicha Powder', 'Sesame Powder', 'Milk', 'Sweet Cream Top'],
+              taste: 'Toasty & Nutty',
+              src: drinkSesameHojicha,
+            },
+            {
+              name: 'Jasmine Matcha',
+              serve: 'Iced',
+              caffeine: 2,
+              build: [
+                'Brewed Jasmine Tea',
+                'Matcha Powder',
+                'Jasmine Syrup',
+                'Oat Milk',
+              ],
+              taste: 'Grassy & Floral',
+              src: drinkJasmineMatcha,
+            },
           ],
         },
         {
-          kind: 'text',
-          body: ['Making the drink is half ritual, half excuse to slow down before the day starts. The latte-art cursor on this site is not a coincidence.'],
+          id: 'kitchen',
+          kind: 'soon',
+          title: 'From the kitchen',
+          note: 'Cooking goes here — the same cards, for things that need a plate.',
         },
       ],
     },
@@ -1938,10 +2128,10 @@ export const hobbies = [
           // signage where I could, but double check "TWICE" and "KIOF".
           items: [
             { caption: 'THE ROSE — Rosetopia', src: concertRoseImg },
-            { caption: 'TWICE', src: concertTwiceImg },
-            { caption: 'SUNKIS', src: concertSunkisImg },
-            { caption: 'Slope Day', src: concertSlopeDayImg },
-            { caption: 'KIOF', src: concertKiofImg },
+            { caption: 'TWICE - This is For', src: concertTwiceImg },
+            { caption: 'SUNKIS @ Cornell', src: concertSunkisImg },
+            { caption: 'Slope Day x Chainsmokers', src: concertSlopeDayImg },
+            { caption: 'Kiss Of Life', src: concertKiofImg },
           ],
         },
         {

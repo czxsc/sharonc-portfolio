@@ -78,15 +78,15 @@
    wrong one: running down the list faster than the wipe can finish
    leaves several panels mid-flight travelling different ways, and
    the frame reads as twitching. Anything whose *direction* depends
-   on the last input has that failure mode built in.
+   on the last input has that failure mode built in. A plain
+   crossfade was the second answer and it flashed — see the frame
+   effect in Work.jsx for why, and for what replaced it.
 
-   So nothing here is directional, and the only geometry is a single
-   slow settle inward — always inward, at 900ms, so interrupting it
-   just means it carries on from wherever it had got to. The change
-   itself is carried by opacity: the project's tone comes up first
-   and the screenshot resolves out of it, like a print developing.
-   Run the list at any speed and the worst you get is a soft bloom
-   of colour. */
+   What's left here is only the resting state, and the resting state
+   of every cover is the same: whole, opaque, fully developed. None
+   of these panels is ever hidden by CSS. Which one you see is a
+   question of stacking order, and the arrival is animated in JS —
+   nothing in this file can be caught mid-flight. */
 .preview-item {
   position: absolute;
   inset: 0;
@@ -95,24 +95,10 @@
   background:
     radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.16), transparent 55%),
     linear-gradient(145deg, var(--t1), var(--t2));
-  opacity: 0;
-  transform: scale(1.025);
-  transition:
-    opacity 0.22s var(--ease),
-    transform 0.9s var(--ease);
-  will-change: opacity, transform;
 }
-.preview-item.is-active {
-  opacity: 1;
-  transform: scale(1);
-  z-index: 2;
-}
-/* under an open case study: change project, don't animate doing it.
-   The closing flight measures this frame and lands the picture in
-   it, so it has to be still — see the `is-held` note in Work.jsx */
-.work-frame.is-held :is(.preview-item, .preview-img, .preview-label) {
-  transition: none;
-}
+/* `.is-active` carries no style — it marks the cover on top, for the
+   case study's opening flight to measure (getFrameRect in Work.jsx).
+   The z-index that actually puts it there is set per-cover in JS. */
 /* faux app chrome */
 .preview-bar {
   display: flex;
@@ -160,14 +146,6 @@
   /* anchor the top of the screenshot so its nav bar survives the crop —
      cover trims from the bottom instead */
   object-position: top center;
-  /* never fully out: at 0.4 the tone tints the outgoing shot rather
-     than replacing it, so a fast run down the list blooms instead of
-     flashing between six flat colours */
-  opacity: 0.4;
-  transition: opacity 0.5s var(--ease);
-}
-.preview-item.is-active .preview-img {
-  opacity: 1;
 }
 /* scrim so the label stays readable over any screenshot — fades to the
    same color as the window bar above (project tone + the bar's 30%
@@ -191,17 +169,6 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  /* small enough that overlapping copies never read as the frame
-     itself moving — this is where the liveliness goes now */
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity 0.3s var(--ease) 0.06s,
-    transform 0.45s var(--ease) 0.06s;
-}
-.preview-item.is-active .preview-label {
-  opacity: 1;
-  transform: none;
 }
 /* no project name here — the active list row already carries it */
 .preview-blurb {
@@ -395,12 +362,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .preview-item,
-  .preview-item.is-active {
-    transition: opacity 0.2s linear;
-    transform: none;
-    clip-path: none;
-  }
+  /* the covers need nothing here — they carry no CSS motion, and
+     Work.jsx skips their arrival animation outright */
+
   /* rows arrive already set; the tick still marks the row, it just
      doesn't travel (durations are zeroed globally) */
   .work-list .work-item {

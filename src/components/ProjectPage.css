@@ -503,9 +503,36 @@
   letter-spacing: 0.06em;
   color: var(--ink-faint);
 }
+/* `cutouts`: the same row for drawings of unrelated proportions — a
+   wide nav mark next to a tall glass of iced coffee. Matching them on
+   width would make the tall one tower; they're matched on height and
+   sat on a shared baseline instead, so the row reads as objects laid
+   out on a table rather than four boxes. */
+.pp-tiles.is-cutouts li {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.pp-tiles.is-cutouts img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 168px;
+  object-fit: contain;
+  object-position: bottom center;
+  margin-inline: auto;
+}
+/* the drawing is centred in its column, so the label follows it —
+   left-aligning under a narrow cut-out reads as a stray caption */
+.pp-tiles.is-cutouts span {
+  text-align: center;
+}
 @media (max-width: 760px) {
   .pp-tiles ol {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pp-tiles.is-cutouts img {
+    height: 132px;
   }
 }
 

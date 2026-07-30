@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { projects } from '../data/content.js';
 import { ArrowRight } from './Doodles.jsx';
 import ProjectPage from './ProjectPage.jsx';
@@ -6,6 +6,19 @@ import SetType from './SetType.jsx';
 import './Work.css';
 
 const MARK_H = 18; // px — height of the espresso tick that tracks the list
+
+/* How long the pointer has to rest on a row before the picture commits
+   to it. Below the ~150ms where a delay starts to register, and long
+   enough that rows merely crossed on the way somewhere else never reach
+   the frame at all — running the cursor down the list is one journey,
+   not six. The row and the tick don't wait for this; they're cheap and
+   they're meant to track the cursor. */
+const DWELL_MS = 110;
+
+/* Premium easing (see the motion notes on .preview-item): symmetric,
+   no overshoot, nothing that reads as a bounce. */
+const EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
+const EASE_SETTLE = 'cubic-bezier(0.16, 1, 0.3, 1)'; // long tail on the scale
 
 /* disciplines worth a filter button — tags shared by 2+ projects
    (singletons like Autonomous Systems would just re-sort one row) */
@@ -22,7 +35,8 @@ const TAGS = (() => {
 const matches = (i, tag) => projects[i].category.split(' · ').includes(tag);
 
 export default function Work() {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(0); // the row under the cursor
+  const [shown, setShown] = useState(0); // the cover the frame has settled on
   const [openIndex, setOpenIndex] = useState(null); // case study overlay
   const [order, setOrder] = useState(projects.map((_, i) => i));
   const [hoverTag, setHoverTag] = useState(null); // previewed via hover/focus
@@ -31,10 +45,30 @@ export default function Work() {
   const rowRefs = useRef([]);
   const markRef = useRef(null);
   const frameRef = useRef(null);
+  const itemRefs = useRef([]); // the stacked covers
   const flipFrom = useRef(null); // row tops captured just before a sort
+  const dwellRef = useRef(null);
+  const zRef = useRef(1); // stacking counter — see the frame effect below
+  const lastShown = useRef(0);
 
   // hover previews over an existing pin; second click clears both
   const litTag = hoverTag ?? pinTag;
+
+  /* Pointing at a row: the row lights now, the picture waits to see
+     whether you meant it. */
+  const previewRow = (i) => {
+    setActive(i);
+    clearTimeout(dwellRef.current);
+    dwellRef.current = setTimeout(() => setShown(i), DWELL_MS);
+  };
+  /* A press, a tap, a filter click — the choice is already deliberate,
+     so there's nothing left for the dwell to establish. */
+  const showNow = (i) => {
+    clearTimeout(dwellRef.current);
+    setActive(i);
+    setShown(i);
+  };
+  useEffect(() => () => clearTimeout(dwellRef.current), []);
 
   const pickTag = (tag) => {
     flipFrom.current = new Map(
@@ -53,7 +87,7 @@ export default function Work() {
     ];
     setPinTag(tag);
     setOrder(next);
-    setActive(next[0]); // preview follows the row that just surfaced
+    showNow(next[0]); // preview follows the row that just surfaced
   };
 
   // FLIP: slide rows from their pre-sort spots into the new order
@@ -88,6 +122,77 @@ export default function Work() {
     const y = row.offsetTop + row.offsetHeight / 2 - MARK_H / 2;
     mark.style.transform = `translateY(${y}px)`;
   }, [active, order]);
+
+  /* ---- the frame changing project -------------------------------
+     A crossfade is the obvious answer and it's the one that flashed:
+     two stacked panels dissolving through each other are both partly
+     transparent at the halfway mark, so the frame's dark ground shows
+     between them — a dip, on every single change.
+
+     So nothing here dissolves *out*. Every cover is opaque all the
+     time and the only question is which is on top: the incoming one
+     fades up over the one it replaces, which stays whole underneath
+     until it's completely covered. There is no midpoint where you can
+     see through to the ground, and therefore no flash.
+
+     That leaves interruption, which on a hover-driven list is the
+     normal case and not the edge case. These are Web Animations, not
+     CSS transitions, and they are deliberately never cancelled: a
+     cover deposed halfway through its own arrival keeps right on
+     going to opaque underneath its replacement. Nothing snaps back,
+     nothing reverses, nothing has a direction to be caught travelling
+     the wrong way in. Run the list at any speed and the worst you get
+     is a soft stack of blooms.
+
+     Three layers, in the order they read:
+       primary   the cover arrives                    (480ms)
+       secondary the shot develops out of its tone    (720ms)
+       ambient   the frame settles inward, and the
+                 copy lands last                      (900ms / 440ms)
+     --------------------------------------------------------------- */
+  useLayoutEffect(() => {
+    const el = itemRefs.current[shown];
+    if (!el) return;
+    // Recency stacking. Whatever was on screen a moment ago is the
+    // thing directly beneath the incoming cover — which is the whole
+    // premise above, and it can't be left to DOM order.
+    el.style.zIndex = ++zRef.current;
+
+    const from = lastShown.current;
+    lastShown.current = shown;
+    if (from === shown) return; // first paint, or a re-render that changed nothing
+    // Under an open case study the frame changes project without
+    // animating: nobody can see it happen, and the closing flight has
+    // to land on a box that has stopped moving.
+    if (openIndex !== null) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const img = el.querySelector('.preview-img');
+    const label = el.querySelector('.preview-label');
+
+    el.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: 480,
+      easing: EASE,
+    });
+    // always inward, never from a direction the last input chose
+    el.animate([{ transform: 'scale(1.02)' }, { transform: 'scale(1)' }], {
+      duration: 900,
+      easing: EASE_SETTLE,
+    });
+    // the tone establishes first and the screenshot resolves out of
+    // it — a print developing rather than a slide changing
+    img?.animate(
+      [{ opacity: 0.42 }, { opacity: 0.42, offset: 0.24 }, { opacity: 1 }],
+      { duration: 720, easing: EASE }
+    );
+    label?.animate(
+      [
+        { opacity: 0, transform: 'translateY(10px)' },
+        { opacity: 1, transform: 'none' },
+      ],
+      { duration: 440, delay: 160, easing: EASE, fill: 'backwards' }
+    );
+  }, [shown, openIndex]);
 
   const rowState = (i) =>
     litTag ? (matches(i, litTag) ? 'is-lit' : 'is-faded') : '';
@@ -130,7 +235,7 @@ export default function Work() {
      picture settles into a frame already showing that project rather
      than dissolving into a different one. */
   const openProject = (i) => {
-    setActive(i);
+    showNow(i); // the flight grows out of this frame — no pending dwell
     setOpenIndex(i);
   };
 
@@ -143,7 +248,7 @@ export default function Work() {
   // tabbed-to row still opens on the first press.
   const pressRow = (i) => {
     if (active === i) openProject(i);
-    else setActive(i);
+    else showNow(i); // the tap itself is the dwell
   };
 
   const closeProject = () => {
@@ -207,8 +312,8 @@ export default function Work() {
                     type="button"
                     ref={(el) => (btnRefs.current[i] = el)}
                     className={`work-item ${i === active ? 'is-active' : ''} ${rowState(i)}`}
-                    onMouseEnter={() => setActive(i)}
-                    onFocus={() => setActive(i)}
+                    onMouseEnter={() => previewRow(i)}
+                    onFocus={() => previewRow(i)}
                     onClick={() => pressRow(i)}
                     aria-label={
                       i === active
@@ -226,23 +331,16 @@ export default function Work() {
             })}
           </ol>
 
-          {/* preview — stacked covers, the active one developing up
-              through the ones behind it (see Work.css) */}
+          {/* preview — a stack of opaque covers; the one on top is the
+              one you see, and arrivals fade up over it (see the frame
+              effect above) */}
           <div className="work-preview reveal" aria-hidden="true">
-            {/* `is-held`: while the overlay is up, the frame changes
-                project without animating. Nobody can see a crossfade
-                that happens under a full-screen page — but the
-                closing flight has to land on this exact box, and a
-                frame still easing into place is a box that has moved
-                by the time the picture gets there. */}
-            <div
-              className={`work-frame ${openIndex !== null ? 'is-held' : ''}`}
-              ref={frameRef}
-            >
+            <div className="work-frame" ref={frameRef}>
               {projects.map((p, i) => (
                 <div
                   key={p.name}
-                  className={`preview-item ${i === active ? 'is-active' : ''}`}
+                  ref={(el) => (itemRefs.current[i] = el)}
+                  className={`preview-item ${i === shown ? 'is-active' : ''}`}
                   style={{ '--t1': p.tone[0], '--t2': p.tone[1] }}
                 >
                   <div className="preview-bar">
