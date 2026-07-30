@@ -1,0 +1,200 @@
+/* ============================================================
+   DesignBoard — reference wall beside the style guide it produced.
+   ============================================================ */
+
+/* Two panels of equal height, which takes work from both ends: the
+   card's height comes from its content and the board's comes from its
+   own width over its own ratio, so neither one can simply match the
+   other. The grid row stretches both to the taller of the two, the card
+   takes the extra as bottom room, and the board is `contain`ed inside
+   its panel so it mounts rather than crops. The column ratio is set so
+   the two land within a few pixels of each other at full width, which
+   is where the case study is read; below that the layout stacks before
+   the difference has a chance to open up.
+
+   The caption belongs to the pair, so it runs under both. */
+.db {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 0;
+}
+.db-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.db-label {
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* `flex-grow` with a natural basis: the board reports its own height to
+   the grid, then fills whatever the row settles on. `contain` is what
+   makes the surplus read as a mount — the reference wall carries the
+   decided-themes checklist out at its right edge, and `cover` would
+   trim exactly that. */
+.db-ref {
+  display: block;
+  flex: 1 0 auto;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  /* the same surface as the card beside it, so the mount reads as the
+     panel the board sits in rather than as a band around it */
+  background: var(--card);
+}
+
+/* `1 0 auto` on both panels, not `1`: a zero basis would keep the card's
+   own content height out of the grid's row sizing, and the row is what
+   the two panels are being matched against. */
+.db-card {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: 18px 20px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+.db-block-label {
+  display: block;
+  padding-bottom: 9px;
+  margin-bottom: 13px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* same caption treatment as every other figure on the case page */
+.db figcaption {
+  grid-column: 1 / -1;
+  max-width: 76ch;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+/* ---------- palette ----------
+   Segment widths are `share` (see content.js), not equal fifths. */
+/* Paper is most of the bar and sits three levels off the card it's
+   painted on, so without an outline the strip has no left end and no
+   top. It has to be a real border rather than an inset shadow: the
+   segments are child elements and would paint straight over a shadow,
+   while `overflow: hidden` clips them to the padding box and leaves the
+   border standing. */
+.db-bar {
+  display: flex;
+  height: 26px;
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.db-bar span {
+  flex: 1 1 0;
+  min-width: 6px;
+  background: var(--c);
+}
+/* joints, for the two accents that are within a few levels of each
+   other; invisible where a light segment meets a dark one */
+.db-bar span + span {
+  box-shadow: inset 1px 0 0 color-mix(in srgb, var(--paper) 26%, transparent);
+}
+
+.db-legend {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.db-legend li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+.db-chip {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--c);
+  /* same reason as the bar's border — the paper chip is otherwise a
+     blank square. Nothing paints over this one, so a shadow is fine. */
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 22%, transparent);
+}
+.db-legend-name {
+  flex: 1;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.db-legend code {
+  font-family: inherit;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+/* ---------- type specimens ----------
+   Each name is set in the family it names, at the weight the site sets
+   it at, with its job and the range from the type scale opposite. One
+   grid for all four rows, so the three columns line up. */
+.db-type {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  column-gap: var(--sp-3);
+  row-gap: 10px;
+  margin: 0;
+}
+.db-type dt {
+  font-size: 1.02rem;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.db-type dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  line-height: 1.2;
+}
+.db-role {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.db-size {
+  text-align: right;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+/* One column: the board, the card, then the caption. Stacked well
+   before the two panels are narrow, because matching their heights only
+   works over a narrow band of widths and the mount would otherwise grow
+   into a visible letterbox. */
+@media (max-width: 1000px) {
+  .db {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+  .db-ref {
+    flex: none;
+  }
+}

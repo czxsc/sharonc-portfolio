@@ -185,7 +185,8 @@
   white-space: nowrap;
   pointer-events: none;
   font-family: var(--hand);
-  font-size: 1.2rem;
+  font-size: 1.28rem;
+  text-transform: lowercase;
   color: var(--ink-soft);
   opacity: 0;
   transition:

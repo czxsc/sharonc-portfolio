@@ -76,11 +76,27 @@
   src: url('/fonts/jetbrainsmono-500.woff2') format('woff2');
 }
 
-/* Caveat — hand accent, the ~10% only */
+/* Hi Melody — hand accent, the ~10% only.
+   A Korean handwriting face: the latin glyphs inherit CJK metrics, so the
+   advance widths disagree with each other and words sit unevenly. That
+   mis-fit is the point — Caveat was too evenly spaced to read as a hand. */
+@font-face {
+  font-family: 'Hi Melody';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/himelody-400.woff2') format('woff2');
+}
+
+/* Caveat — kept ONLY as a glyph fallback behind Hi Melody, which has no
+   en-dash or em-dash. Per-glyph fallback means just those codepoints render
+   here; everything else is Hi Melody. Drop this once the dashes are gone
+   from the captions in content.js. */
 @font-face {
   font-family: 'Caveat';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
   src: url('/fonts/caveat-500.woff2') format('woff2');
+  unicode-range: U+2013-2014;
 }

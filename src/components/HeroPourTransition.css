@@ -261,8 +261,8 @@
     rgb(var(--liquid-deep) / 0) 86%
   );
   animation-name: pour-convect-c;
-  animation-duration: 11s;
-  animation-delay: -5s;
+  animation-duration: 7.7s;
+  animation-delay: -3.5s;
 }
 
 /* a second shadow high on the right, so the dark isn't all pooled at
@@ -279,8 +279,8 @@
     rgb(var(--liquid-deep) / 0) 86%
   );
   animation-name: pour-convect-e;
-  animation-duration: 15s;
-  animation-delay: -9s;
+  animation-duration: 10.5s;
+  animation-delay: -6.3s;
 }
 
 /* the main body of crema, sweeping down out of the top-left */
@@ -296,8 +296,8 @@
     rgb(var(--liquid-lobe) / 0) 86%
   );
   animation-name: pour-convect-a;
-  animation-duration: 9s;
-  animation-delay: -3s;
+  animation-duration: 6.3s;
+  animation-delay: -2.1s;
 }
 
 /* the second mass pushes back from the bottom-right in a redder
@@ -315,8 +315,8 @@
     rgb(var(--liquid-warm) / 0) 86%
   );
   animation-name: pour-convect-b;
-  animation-duration: 13s;
-  animation-delay: -8s;
+  animation-duration: 9.1s;
+  animation-delay: -5.6s;
 }
 
 /* light lying across the surface. Wide and shallow rather than round,
@@ -333,8 +333,8 @@
     rgb(var(--liquid-glint) / 0) 80%
   );
   animation-name: pour-convect-d;
-  animation-duration: 17s;
-  animation-delay: -6s;
+  animation-duration: 11.9s;
+  animation-delay: -4.2s;
 }
 
 /* Film grain over the whole field. Lives inside .pour-flow so it
@@ -364,11 +364,13 @@
    Amplitudes and durations are set from a measurement, not by feel.
    The reference field shifts ~5.6% of its luminance range every half
    second; the first version of this ran on 31–53s periods and managed
-   0.63 levels per half second, which is under the threshold at which
-   a large smooth gradient reads as moving at all — hence "I can't see
-   any movement". These durations put it at ~1.8 levels, about two
-   thirds of the reference's rate, which is as far as it can go before
-   it stops feeling calm. */
+   0.63 levels per half second, under the threshold at which a large
+   smooth gradient reads as moving at all — hence "I can't see any
+   movement". A later pass at 9–17s periods (~1.8 levels/half second)
+   was still too subtle for anyone not lingering on the page. Current
+   durations are 0.7x that — ~2.6 levels/half second — the fastest this
+   can run before the drift stops feeling like liquid and starts
+   feeling like a spinner. */
 @keyframes pour-convect-a {
   0%,
   100% {

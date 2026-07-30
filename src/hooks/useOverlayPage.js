@@ -48,7 +48,10 @@ export function useOverlayPage({ slug, closeMs, onClose, focusRef }) {
     const html = document.documentElement;
     const held = html.style.overflow;
     html.style.overflow = '';
-    window.scrollTo(0, scrollRef.current);
+    // explicit 'instant' — the page sets scroll-behavior: smooth
+    // globally, which would otherwise turn this jump into a few
+    // hundred ms of browser-driven scrolling racing the close
+    window.scrollTo({ top: scrollRef.current, left: 0, behavior: 'instant' });
     html.style.overflow = held;
   };
 

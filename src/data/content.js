@@ -14,11 +14,16 @@ import dpkServosImg from '../assets/projects/preflight/servos.webp';
 import dpkFlightModesImg from '../assets/projects/preflight/flightmodes.webp';
 import littleWonderImg from '../assets/projects/little-wonder/cover.webp';
 import pokeleetDashboardImg from '../assets/projects/pokeleet/cover.webp';
+import pokeleetCollectionImg from '../assets/projects/pokeleet/collection.webp';
+import pokeleetGachaImg from '../assets/projects/pokeleet/gacha.webp';
+import pokeleetDetailImg from '../assets/projects/pokeleet/detail.webp';
+import pokeleetRecallImg from '../assets/projects/pokeleet/recall.webp';
 import concertRoseImg from '../assets/hobby/music/concerts/rose.jpg';
 import concertTwiceImg from '../assets/hobby/music/concerts/twice.jpg';
 import concertSunkisImg from '../assets/hobby/music/concerts/sunkis.jpg';
 import concertSlopeDayImg from '../assets/hobby/music/concerts/slope_day.jpg';
 import concertKiofImg from '../assets/hobby/music/concerts/kiof.jpg';
+import concertBibiImg from '../assets/hobby/music/concerts/bibi_selfie.jpg';
 import receiptifyImg from '../assets/hobby/music/receiptify.png';
 import pcBuildImg from '../assets/hobby/gaming/pc_build.webp';
 
@@ -31,6 +36,10 @@ import pcBuildImg from '../assets/hobby/gaming/pc_build.webp';
 import catLogoImg from '../assets/site/cat_logo.webp';
 import catAnimImg from '../assets/site/cat_animation.gif';
 import latteCursorImg from '../assets/site/latte_art_cursor.webp';
+
+/* The reference wall the site's direction was picked off, sized down
+   for the portfolio case page. Master in `_source/projects/portfolio/`. */
+import ideaBoardImg from '../assets/projects/portfolio/idea_gathering.webp';
 
 /* Save-file snapshots for the permanent three — a `shot` on a favourite
    is what the hover peek picks up (HobbyPage · FavesList). Titles without
@@ -351,25 +360,51 @@ export const projects = [
       ],
       sections: [
         {
-          heading: 'Brainstorming: Three pages, one voice',
+          heading: 'Initial design: Three pages, one voice',
           body: [
-            'I started with structure, not styling. I wanted three things from a portfolio: a landing that says who I am in one screen, a work section where each project can be read properly, and a place for the parts of me that aren’t projects. That became the whole site — a hero that pours into an about section, a work index that opens full case studies, and a Play section of hobby mini-pages.',
-            'The harder question was tone. Most engineering portfolios are competent and interchangeable; most design portfolios are personal but don’t look built. I wanted the site to read professional first and unmistakably mine second, so I gave myself a rough ratio — about 85% editorial restraint, 15% personality — and used the two things I actually like, cats and coffee, as the only vocabulary the personality is allowed to speak in. Everything decorative on the site is one of those two, which is what keeps it from sliding into cute.',
+            'I started with structure. A portfolio needed three things: a landing that says who I am in one screen, a work section where each project can be read in full, and somewhere for the parts of me that are not projects. That became the site: a hero that pours into an about section, a work index that opens case studies, and a Play section of hobby pages.',
+            'Tone took longer. I pulled in sites I liked and sorted them into four directions: illustrative, doodles, minimal, and scrapbook. Minimal won, with small hand drawings for warmth and a warm cream ground instead of white. I set a rough ratio of 85% restraint to 15% personality, and kept the personality to two things I actually like, coffee and cats. Everything decorative on the site is one of those two, which is what stops it turning cute.',
           ],
-          facts: [
-            {
-              title: 'Coffee set the palette',
-              text: 'Warm off-white paper (#f5f4f1) instead of white, near-black ink, and espresso as the single accent. Sage and navy exist but are rationed. No colour on the site is there for decoration.',
+          designBoard: {
+            reference: {
+              src: ideaBoardImg,
+              label: 'Reference board',
+              alt:
+                'A canvas of portfolio and studio sites grouped into illustrative, doodle, minimal, retro and scrapbook directions, with a checklist of decided themes at the right',
             },
-            {
-              title: 'Typography does the hierarchy',
-              text: 'Newsreader for display, Archivo for body and UI, JetBrains Mono for labels, and Caveat for the few handwritten notes. Hierarchy comes from size and space — never from adding another weight or another colour.',
+            /* The palette is quoted from tokens.css rather than read from
+               it: the card documents what was decided at the start, and a
+               swatch that silently re-tinted with a later token change
+               would stop being a record of that. `share` is how much of
+               the site each colour actually covers, and it sets the width
+               of that colour's segment in the bar — the ground is most of
+               what you see and the accents are a few percent, which an
+               even five-up strip would misreport.
+
+               The type specimens are live: `family` is set in `font`, so
+               the card shows the faces rather than naming them. `size` is
+               the range the site sets that family at (from the type scale
+               in tokens.css); `set` only exists to bring a specimen with
+               an odd x-height up to the others optically. */
+            card: {
+              label: 'Style guide v1',
+              palette: [
+                { hex: '#F5F4F1', name: 'Paper', share: 58 },
+                { hex: '#1B1B1B', name: 'Ink', share: 24 },
+                { hex: '#5A4636', name: 'Espresso', share: 10 },
+                { hex: '#3F4A3E', name: 'Sage', share: 4 },
+                { hex: '#2C3A4A', name: 'Navy', share: 4 },
+              ],
+              type: [
+                { family: 'Newsreader', role: 'Display', size: '22–112px', font: 'var(--serif)', weight: 600 },
+                { family: 'Archivo', role: 'Body & UI', size: '14–17px', font: 'var(--grot)' },
+                { family: 'JetBrains Mono', role: 'Labels', size: '11px', font: 'var(--mono)' },
+                { family: 'Hi Melody', role: 'Notes', size: '19–22px', font: 'var(--hand)', set: '1.36rem', lower: true },
+              ],
             },
-            {
-              title: 'Cats carry the 15%',
-              text: 'A cat in a coffee mug is the nav mark, a cat loops in the hero, a cat knocks over the tote bag in Play, and the cursor is a cup of latte art. One idea, repeated, instead of scattered graphics.',
-            },
-          ],
+            caption:
+              'What I collected before deciding anything, and the guidelines it came down to. Those five colours and four families are still the tokens the site runs on.',
+          },
         },
         {
           heading: 'Choosing the stack: Framer, then not Framer',
@@ -1736,43 +1771,83 @@ export const projects = [
     name: 'PokeLeet',
     slug: 'pokeleet',
     category: 'Frontend · Game Design',
-    year: '2024',
+    year: '2026',
     blurb: 'Gamified, pokemon-themed Leetcode tracker.',
-    tech: ['JavaScript', 'CSS'],
+    tech: ['React', 'Vite', 'CSS'],
     image: pokeleetDashboardImg,
     tone: ['var(--tone-f1)', 'var(--tone-f2)'],
     href: '#work',
     page: {
-      status: 'Completed',
+      status: 'Developing',
       subtitle: 'A Pokémon-themed tracker that turns Leetcode into a collect-a-thon.',
       intro:
-        'PokeLeet is a small experiment in motivation design: every solved Leetcode problem earns progress toward catching a Pokémon, with harder problems yielding rarer catches. Built to make a grind feel like a game — mostly for me, then for friends.',
+        'PokéLeet is an experiment in motivation design: solving a problem pays out in shards, shards summon Pokémon, and the collection is the thing you are actually working toward. It runs on my own Neetcode 150 folder, so the progress it shows is progress I really made. The frontend loop is playable end to end — the parts underneath it are still being built.',
       links: [{ label: 'GitHub', href: '#' }],
       meta: [
         { label: 'Category', value: 'Frontend, Game Design' },
         { label: 'My role', value: 'Design & engineering' },
-        { label: 'Timeline', value: '2024' },
-        { label: 'Skills', value: 'JavaScript, CSS, gamification' },
+        { label: 'Timeline', value: '2026 — in progress' },
+        { label: 'Skills', value: 'React, Vite, game economy design, pixel-art UI' },
       ],
       sections: [
         {
-          heading: 'Idea: Borrow a better reward loop',
+          heading: 'Motivation: The payoff is months away',
           body: [
-            'Interview prep has a brutal feedback curve — effort now, payoff months away. Collection games solved that problem decades ago: visible progress, variable rewards, and a shelf to fill.',
+            'Interview prep has a brutal feedback curve. The work is daily and the reward — an offer, eventually, maybe — sits months out with nothing in between. A checklist of solved problems is an honest record of that and a terrible motivator: it only ever counts up, and the number stops meaning anything around thirty.',
+            'Collection games solved this decades ago. They front-load the feeling of progress: something visible arrives every session, the good outcomes are rare enough to matter, and there is a shelf that keeps filling. I wanted that shape wrapped around the grind I was already doing, so I built the tracker I would actually open.',
           ],
         },
         {
-          heading: 'How it works',
+          heading: 'The loop: Solve, summon, build a team',
           body: [
-            'Problems map to encounter tiers by difficulty and topic; streaks improve catch rates. The collection screen is the real interface — the todo list is just how you hunt.',
+            'A solved problem pays shards by difficulty — 150 easy, 300 medium, 600 hard. Shards go into the gacha, which draws at 60/25/10/5 across common, rare, epic and legendary, with pity counters so a dry streak is bounded rather than infinite. Duplicates are not dead weight: three copies evolve a Pokémon, and a copy of something that cannot evolve becomes five levels instead.',
+            'What you collect feeds back into the tracker. Six of them make a team, the team has a fighting power, and that power is level × rarity summed and then scaled by how much you have actually solved. Sending the team into the Meadow earns coins, coins buy candy and evolution stones in the shop, and those raise power again. Two currencies keep the two halves honest — shards only come from studying, coins only from the game.',
+            'Solving is not the only way in. A daily Active Recall quiz pulls ten questions from a bank of Python syntax, Big-O drills, and pseudocode recall of problems already solved, paying 25 shards a correct answer. It exists because rereading a solution felt like studying without being studying; being asked what Kadane’s keeps, cold, does not.',
           ],
-          media: { caption: 'Collection screen — capture coming soon.' },
+          imagesFirst: true,
+          gallery: [
+            { src: pokeleetGachaImg, fit: true, caption: 'The Gacha Lab — draw costs, pity counters, published pull rates, and a pinned target.' },
+            { src: pokeleetCollectionImg, fit: true, caption: 'Collection and active team — rarity-tinted cards, level bars, and the fighting power they add up to.' },
+          ],
+          facts: [
+            {
+              title: 'The tracker reads real files',
+              text: 'The dashboard globs my Neetcode 150 folder at build time and matches each solution file to a problem, so a problem ticks off because the code for it exists — not because I clicked a box.',
+            },
+            {
+              title: 'Rarity has to track difficulty',
+              text: 'The moment a reward feels arbitrary the loop stops working. Hard problems pay four times an easy one, and the roster is graded so the Pokémon people actually want sit in the tiers that are hard to reach.',
+            },
+            {
+              title: 'The game can never study for you',
+              text: 'Idle combat pays coins, which only buy levels. Every shard — the only currency that summons anything new — comes from a problem or a recall quiz.',
+            },
+          ],
         },
         {
-          heading: 'What I learned',
+          heading: 'Sprites: Keeping 897 Pokémon on style',
           body: [
-            'Gamification works when the game is honest: as soon as rewards felt arbitrary, motivation dropped. Tying rarity to genuine difficulty kept the loop meaningful — a lesson that generalizes well beyond side projects.',
+            'The whole thing is pixel art, which meant the one visual decision I could not make by drawing was the most important one: every Pokémon on screen comes from pokemondb.net/sprites, and their sprite sets are not consistent across generations. Official animated sprites stop after Gen 5. Everything later exists only as stills, in a smoother, rounder house style that sits badly next to pixels.',
+            'So the sprite URL is a small resolver rather than a template. It asks for the best available in a fixed order, and each Pokémon renders at the highest rung it can reach: the Gen 5 Black/White · Black 2 White 2 animated GIF first, because a sprite that breathes is worth more than one that matches; then the Gen 8 Sword/Shield still, which is at least sprite-shaped; then, if the request 404s, the HOME render as a last resort. Anything that fails all three falls back to a type-coloured disc with the Pokémon’s initial — never a broken image. Shinies follow the same ladder on a parallel path, and Mega and Gigantamax forms take their own routes, since those only ever existed as ORAS dex art and Sword/Shield stills.',
+            'Two details make the mix hold together. The resolver walks down the chain on the image’s own error event, so a missing sprite costs one failed request and no layout shift. And image-rendering: pixelated is applied only to the Gen 1–5 animated sprites — the ones drawn on a real pixel grid, where the browser’s smoothing is what would ruin them. The later stills are left to scale normally, because sharpening art that was never pixel art just makes it look broken.',
           ],
+          media: {
+            src: pokeleetDetailImg,
+            fit: true,
+            caption: 'A detail card: the Gen 1 animated sprite at size, with evolution state and form stones underneath.',
+          },
+        },
+        {
+          heading: 'Where it stands',
+          body: [
+            'The frontend is the part that works. It is a React + Vite app of about four thousand lines, with all game state in one store and a 897-entry roster hand-tagged with types, rarity, generation, evolution target, and which Mega or Gigantamax forms exist. The economy, gacha, quests, recall, team, shop, and Meadow all run; the save lives in the browser.',
+            'What is missing is everything behind it. There is no account and no server, so a save is one browser deep, and the Leetcode connection is still a folder on my disk rather than a real sync. Both are the next things I want to build — and the reason this page is short: right now the interesting claims are about the design of the loop, not the engineering under it.',
+          ],
+          media: {
+            src: pokeleetRecallImg,
+            fit: true,
+            caption: 'Active Recall — ten mixed questions a day, 25 shards a correct answer.',
+          },
         },
       ],
     },
@@ -2133,6 +2208,7 @@ export const hobbies = [
             { caption: 'SUNKIS @ Cornell', src: concertSunkisImg },
             { caption: 'Slope Day x Chainsmokers', src: concertSlopeDayImg },
             { caption: 'Kiss Of Life', src: concertKiofImg },
+            { caption: 'Bibi Concert', src: concertBibiImg },
           ],
         },
         {

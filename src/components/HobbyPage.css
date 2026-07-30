@@ -349,7 +349,8 @@
   margin-top: 10px;
   text-align: center;
   font-family: var(--hand);
-  font-size: 1.15rem;
+  font-size: 1.22rem;
+  text-transform: lowercase;
   color: var(--ink-soft);
 }
 
@@ -402,7 +403,8 @@
   padding: 28px 18px 14px;
   background: linear-gradient(to top, rgb(0 0 0 / 0.6), transparent 75%);
   font-family: var(--hand);
-  font-size: 1.3rem;
+  font-size: 1.38rem;
+  text-transform: lowercase;
   color: #fff;
   text-align: left;
   opacity: 0;
@@ -521,7 +523,8 @@
   text-align: center;
   rotate: -1deg;
   font-family: var(--hand);
-  font-size: 1.1rem;
+  font-size: 1.18rem;
+  text-transform: lowercase;
   color: var(--ink-soft);
 }
 
@@ -1218,7 +1221,8 @@
   padding-left: clamp(0px, 6vw, 90px);
   rotate: -1deg;
   font-family: var(--hand);
-  font-size: 1.15rem;
+  font-size: 1.22rem;
+  text-transform: lowercase;
   color: var(--ink-soft);
 }
 
@@ -1425,7 +1429,8 @@
   margin-top: 12px;
   rotate: -1deg;
   font-family: var(--hand);
-  font-size: 1.1rem;
+  font-size: 1.18rem;
+  text-transform: lowercase;
   color: var(--ink-soft);
 }
 

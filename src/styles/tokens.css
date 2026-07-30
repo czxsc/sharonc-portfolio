@@ -67,7 +67,10 @@
   --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
   --grot: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-  --hand: 'Caveat', 'Segoe Script', cursive;
+  /* Hi Melody is set lowercase everywhere it appears — its capitals are
+     short (0.53em vs Caveat's 0.80) and read as an odd second voice.
+     Caveat trails it purely to cover the dashes it lacks; see fonts.css. */
+  --hand: 'Hi Melody', 'Caveat', 'Segoe Script', cursive;
 
   /* — Type scale (fluid) — */
   --fs-display: clamp(3rem, 8vw, 7rem);      /* hero name */

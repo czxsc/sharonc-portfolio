@@ -6,6 +6,7 @@ import StackDiagram from './StackDiagram.jsx';
 import FlowDiagram from './FlowDiagram.jsx';
 import ArchMap from './ArchMap.jsx';
 import ZoneStudy from './ZoneStudy.jsx';
+import DesignBoard from './DesignBoard.jsx';
 import SetType from './SetType.jsx';
 import './ProjectPage.css';
 
@@ -521,8 +522,8 @@ export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
 }
 
 /* one case-study section: heading, body copy, then whichever optional
-   blocks the data provides (points / subs / facts / stack / flow /
-   archMap / zones / tiles / compare / media / gallery).
+   blocks the data provides (designBoard / points / subs / facts /
+   stack / flow / archMap / zones / tiles / compare / media / gallery).
 
    `imagesFirst` lifts media + gallery to just under the body. The early
    sections read "here is what we made -> here is the work -> here is
@@ -548,6 +549,7 @@ function Section({ s }) {
         <p key={i}>{p}</p>
       ))}
       {s.imagesFirst && pictures}
+      {s.designBoard && <DesignBoard board={s.designBoard} />}
       {s.points && (
         <div className="pp-points">
           {s.points.map((pt) => (
