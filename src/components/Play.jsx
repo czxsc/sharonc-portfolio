@@ -46,21 +46,84 @@ const imgMap = {
   sketchbook: sketchbookImg,
 };
 
-/* Scatter layout (scrapbook flat-lay, see references/whats_in_bag_ref.jpg):
-   x/y — final position, % of the scene box
-   r/s — resting rotation (deg) and item width (px)
-   fx/fy — entry offset in px back toward the tipped bag's mouth
-           (desktop scale; CSS multiplies by --k on small screens)
-   One slot per hobby, in hobbies order. Two ride high, three stagger
-   below — the gap that leaves at mid-right is deliberate, not a hole
-   where a seventh thing used to be. */
-const SCATTER = [
-  { x: 47, y: 10, r: -7, s: 150, fx: -105, fy: 300 },
-  { x: 47, y: 56, r: -5, s: 116, fx: -105, fy: 58 },
-  { x: 70, y: 12, r: 10, s: 132, fx: -380, fy: 300 },
-  { x: 84, y: 42, r: -9, s: 122, fx: -552, fy: 135 },
-  { x: 63, y: 62, r: 6, s: 120, fx: -294, fy: 20 },
+/* ------------------------------------------------------------------
+   Shelf layout.
+
+   What spills out of the bag comes to rest ON something: one hairline
+   runs from under the tote to the edge of the section, every object
+   sits its own bottom edge on it, and each object's name hangs off the
+   underside of the line directly below it. Objects alone on paper read
+   as clip art — the line and the labels are what make it a shelf.
+
+   Every number below is a percentage of the scene's own width, and
+   .bag-scene is a size container, so `1cqw` turns each one into
+   length. That is the whole reason the old --k fudge factor is gone:
+   the composition is defined once and scales exactly, and the entry
+   offsets keep pointing at the bag's mouth at any width.
+
+     x   the object's left edge — and its label's, and the left end of
+         the stretch of shelf it owns. One number, because the column
+         IS the object's footprint: the espresso tick that lights on
+         hover then measures out exactly the thing you are pointing at.
+     s   object width (the files are trimmed to their own edges by
+         scripts/trim-play-cutouts.py, so this IS the visible size)
+     r   resting tilt, deg; pivoted on the contact point, not the
+         centre, so the tilt reads as "set down at an angle" rather
+         than "sinking through the shelf"
+     fy  where the object waits before the spill: up at the bag's
+         mouth. fx is derived from the mouth's x, below.
+     row which shelf it lands on (mobile splits into two; desktop is
+         one, so every desktop row is 0)
+
+   `mob` overrides the lot below 760px, where five objects can't share
+   a phone's width — see the reorganised two-shelf layout there.
+   ------------------------------------------------------------------ */
+
+/* The bag's mouth, in scene-width percent. Both numbers are read off
+   the last frame of the knock — the tote's opening sits at ~0.76 of
+   the drawing's width — so they track --cat-w in the stylesheet. */
+const MOUTH_X = 24;
+const MOUTH_X_MOB = 39.5;
+
+const LAYOUT = [
+  // Stories — first out, and the one that lands nearest the tote
+  { x: 32, s: 10.5, r: -2.4, fy: -7, mob: { x: 50, s: 22, r: -2.4, fy: -11, row: 1 } },
+  // Drink making — the smallest thing on the shelf by some way. Its
+  // label is the longest, which is why it gets the widest gap after it
+  { x: 46.5, s: 5, r: 1.8, fy: -7, mob: { x: 74, s: 10, r: 1.8, fy: -11, row: 1 } },
+  { x: 60, s: 8, r: -1.8, fy: -7, mob: { x: 2, s: 21, r: -1.8, fy: -45, row: 0 } },
+  { x: 72.5, s: 6.6, r: 2.6, fy: -7, mob: { x: 33, s: 17, r: 2.6, fy: -45, row: 0 } },
+  // Art — the sketchbook ends the shelf, the largest thing on it. It
+  // is also the object that used to vanish into the paper, which the
+  // contact shadow fixes
+  { x: 85, s: 10.2, r: -1.4, fy: -7, mob: { x: 62, s: 24, r: -1.4, fy: -45, row: 0 } },
 ];
+
+// how many shelves the mobile layout needs — drives the extra rule
+const MOB_ROWS = 1 + Math.max(...LAYOUT.map((c) => c.mob.row));
+
+/* One object's custom properties, both layouts at once.
+
+   Note the -d suffix on the desktop set: these arrive as inline style,
+   which outranks every stylesheet rule, so a media query can't be the
+   thing that overrides them. Both layouts are handed over under names
+   nothing reads directly, and Play.css picks which one --x, --s and
+   the rest resolve to. */
+const slotVars = (c, i) => ({
+  '--x-d': c.x,
+  '--s-d': c.s,
+  '--r-d': `${c.r}deg`,
+  '--fx-d': MOUTH_X - (c.x + c.s / 2), // travel back to the mouth
+  '--fy-d': c.fy,
+  '--row-d': 0,
+  '--x-m': c.mob.x,
+  '--s-m': c.mob.s,
+  '--r-m': `${c.mob.r}deg`,
+  '--fx-m': MOUTH_X_MOB - (c.mob.x + c.mob.s / 2),
+  '--fy-m': c.mob.fy,
+  '--row-m': c.mob.row,
+  '--i': i,
+});
 
 export default function Play() {
   const sceneRef = useRef(null);
@@ -74,11 +137,14 @@ export default function Play() {
   const resetTimerRef = useRef(null);
   const framePool = useRef(null); // decoded frames, kept alive (see below)
   const btnRefs = useRef([]); // to return focus after a mini-page closes
+  const objRefs = useRef([]); // the object itself — where the iris starts
   const [active, setActive] = useState(null); // { hobby, index, origin }
 
-  // iris origin = the item's center, in viewport coords
+  /* iris origin = the object's centre, in viewport coords. The button
+     is the whole column (object + caption) so that the caption is part
+     of the target; its centre would put the iris down in the text. */
   const openHobby = (hobby, index) => {
-    const rect = btnRefs.current[index].getBoundingClientRect();
+    const rect = objRefs.current[index].getBoundingClientRect();
     setActive({
       hobby,
       index,
@@ -203,40 +269,43 @@ export default function Play() {
             height="702"
             alt="A drawn black cat knocking over a tote bag"
           />
+
+          {/* the shelf everything lands on. Drawn rather than simply
+              present: it arrives with the spill, left to right. */}
+          <span className="bag-shelf" aria-hidden="true" />
+          {MOB_ROWS > 1 && (
+            <span className="bag-shelf bag-shelf-upper" aria-hidden="true" />
+          )}
+
           <ul className="bag-items">
-            {hobbies.map((h, i) => {
-              const c = SCATTER[i % SCATTER.length];
-              return (
-                <li
-                  key={h.title}
-                  className={`bag-item ${active?.index === i ? 'is-opened' : ''}`}
-                  style={{
-                    '--x': `${c.x}%`,
-                    '--y': `${c.y}%`,
-                    '--r': `${c.r}deg`,
-                    '--s': `${c.s}px`,
-                    '--fx': `${c.fx}px`,
-                    '--fy': `${c.fy}px`,
-                    '--i': i,
-                    '--tone': h.tone,
-                  }}
+            {hobbies.map((h, i) => (
+              <li
+                key={h.title}
+                className={`bag-item ${active?.index === i ? 'is-opened' : ''}`}
+                style={{ ...slotVars(LAYOUT[i % LAYOUT.length], i), '--tone': h.tone }}
+              >
+                <button
+                  ref={(el) => (btnRefs.current[i] = el)}
+                  className="bag-item-btn"
+                  onClick={() => openHobby(h, i)}
+                  tabIndex={spilled ? 0 : -1}
                 >
-                  <button
-                    ref={(el) => (btnRefs.current[i] = el)}
-                    className="bag-item-btn"
-                    onClick={() => openHobby(h, i)}
-                    aria-label={`${h.title} — ${h.note}`}
-                    tabIndex={spilled ? 0 : -1}
+                  <span
+                    className="bag-obj"
+                    ref={(el) => (objRefs.current[i] = el)}
                   >
-                    <span className="bag-dot" aria-hidden="true" />
-                    <img src={imgMap[h.icon]} alt="" />
-                    <span className="bag-label" aria-hidden="true">
-                      {h.title}
+                    <span className="bag-obj-in">
+                      <span className="bag-dot" aria-hidden="true" />
+                      <img src={imgMap[h.icon]} alt="" />
                     </span>
-                  </button>
-                </li>
-              );
-            })}
+                  </span>
+                  <span className="bag-cap">
+                    <span className="bag-cap-rule" aria-hidden="true" />
+                    <span className="bag-title">{h.title}</span>
+                  </span>
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

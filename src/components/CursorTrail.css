@@ -1,0 +1,181 @@
+/* ============================================================
+   CursorTrail — four versions of the cursor down the page, each
+   shown on the two grounds it had to survive. Lives inside a
+   ProjectPage section, and carries the same card as CodeMap so the
+   case study's diagrams read as one family.
+   ============================================================ */
+
+.ct {
+  --ct-tile: 176px;
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+  background: var(--card);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+}
+
+/* ---------- head ---------- */
+.ct-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.ct-head h3 {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.ct-hint {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+/* ---------- the grid ----------
+   One template shared by the column heads and every row, so the
+   swatches line up into columns you can read straight down. */
+.ct-cols,
+.ct-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--sp-4);
+  align-items: center;
+}
+.ct-cols {
+  padding-top: var(--sp-4);
+}
+.ct-col-label,
+.ct-ground-label {
+  display: block;
+  width: var(--ct-tile);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+/* the per-row copy of the label only appears once the grid stacks */
+.ct-ground-label {
+  display: none;
+  margin-bottom: 8px;
+}
+
+.ct-rows {
+  list-style: none;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+}
+/* the hairline is the row's floor, running the full width so the
+   versions read as a sequence rather than four cards */
+.ct-row {
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ---------- rail ---------- */
+.ct-name {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--serif);
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ct-num {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+.ct-tag {
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--espresso);
+}
+.ct-note {
+  max-width: 54ch;
+  margin-top: 7px;
+  font-size: var(--fs-small);
+  line-height: 1.62;
+  color: var(--ink-soft);
+}
+
+/* ---------- swatches ---------- */
+.ct-grounds {
+  display: flex;
+  gap: var(--sp-2);
+}
+.ct-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  width: var(--ct-tile);
+  height: 84px;
+  border-radius: var(--radius);
+  background-size: cover;
+  /* fixed rather than tokened: these two grounds are the record, and a
+     theme swap must not repaint the thing being demonstrated */
+  box-shadow: inset 0 0 0 1px rgba(27, 27, 27, 0.11);
+}
+/* the marks are the shipped files at the size they shipped at, so
+   nothing here may scale them; `contain` only keeps the one drawing
+   that isn't square (the latte art) on its own ratio, hung from the
+   top-left the way its hotspot hangs it. */
+.ct-mark {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  object-position: left top;
+}
+
+/* ---------- narrow ----------
+   The swatches drop under the copy and stretch, and each row grows its
+   own labels back, since the shared column heads no longer sit above
+   anything. */
+@media (max-width: 860px) {
+  .ct-cols {
+    display: none;
+  }
+  .ct-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-3);
+  }
+  .ct-ground {
+    flex: 1;
+  }
+  .ct-ground-label,
+  .ct-swatch {
+    display: block;
+    width: auto;
+  }
+  .ct-swatch {
+    display: flex;
+  }
+  .ct-note {
+    max-width: none;
+  }
+}
+
+.ct figcaption {
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line-soft);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  color: var(--ink-faint);
+}

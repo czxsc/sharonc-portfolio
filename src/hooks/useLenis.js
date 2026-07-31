@@ -22,13 +22,16 @@ export function useLenis() {
       autoRaf: true,
       // take over #hash links so they glide too; the nav offset comes
       // from the page's scroll-padding-top, which Lenis respects.
-      // Longer than Lenis' 1s default and eased at both ends, so a nav
-      // click reads as travelling to the section rather than landing on
-      // it — the page you scroll past is part of the answer.
+      // Eased at both ends so a nav click still reads as travelling
+      // rather than teleporting, but the ease-out is short — the long
+      // tail is what made the trip feel like waiting.
       anchors: {
-        duration: 1.8,
+        duration: 0.9,
+        // quadratic ease-in for the first 40%, cubic ease-out after;
+        // coefficients are the pair that keeps value and slope
+        // continuous at the join, so there is no kick mid-flight
         easing: (t) =>
-          t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+          t < 0.4 ? 3.125 * t * t : 1 - 2.3148 * Math.pow(1 - t, 3),
       },
     });
     instance = lenis;

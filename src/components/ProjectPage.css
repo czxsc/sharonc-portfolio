@@ -465,6 +465,38 @@
 .pp-section > p + p {
   margin-top: var(--sp-3);
 }
+/* weighed-options aside inside the body flow: a hairline rule per option,
+   label set in the mono label style, one line of reasoning under it. Kept
+   flat (no panel) so it reads as indented prose, not another tile row. */
+.pp-weigh {
+  margin: var(--sp-3) 0 var(--sp-3) 2px;
+  display: grid;
+  gap: var(--sp-3);
+}
+.pp-weigh-item {
+  padding-left: var(--sp-3);
+  border-left: 1px solid var(--line);
+}
+.pp-weigh dt {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.pp-weigh dt span {
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+.pp-weigh dd {
+  margin-top: 8px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
 .pp-section .pp-media {
   margin-top: var(--sp-4);
 }
@@ -681,20 +713,73 @@
 /* stacked subsections (_source/projects/preflight/ref/solution_ref.jpg's research
    block): bold lead-in + paragraph, full width — a quieter rhythm
    than the three-column facts grid */
+/* ---------- principles ----------
+   Numbered rows ruled like the meta table: the title holds a left rail
+   of its own and the argument sits opposite it, a one-line claim with
+   the supporting detail under it as short bullets. The split is what
+   keeps three or four of these scannable — the rail alone reads as the
+   list of decisions, and only a reader who wants the reasoning crosses
+   into the right column. */
 .pp-subs {
+  list-style: none;
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.pp-sub {
   display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
   gap: var(--sp-4);
-  margin-top: var(--sp-4);
-  max-width: 72ch;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--line);
+}
+.pp-sub-idx {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  opacity: 0.55;
 }
 .pp-sub h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  margin-bottom: 6px;
+  line-height: 1.3;
+  text-wrap: balance;
 }
-.pp-sub p {
+.pp-sub-body {
+  max-width: 62ch;
+}
+.pp-sub-deck {
   line-height: 1.65;
+  color: var(--ink);
+}
+.pp-sub-list {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+}
+.pp-sub-list li {
+  position: relative;
+  padding-left: 20px;
+  font-size: var(--fs-small);
+  line-height: 1.6;
   color: var(--ink-soft);
+}
+/* a hairline tick rather than a bullet glyph, so the list reads as
+   ruled editorial detail instead of a spec sheet */
+.pp-sub-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 9px;
+  height: 1px;
+  background: var(--espresso);
+  opacity: 0.55;
 }
 
 /* three findings, ruled like the meta rows */
@@ -839,6 +924,20 @@
   }
   .pp-facts {
     grid-template-columns: 1fr;
+  }
+  /* the rail has nowhere to sit, so the title goes back above its
+     argument and the index runs inline with it */
+  .pp-sub {
+    grid-template-columns: 1fr;
+    gap: var(--sp-3);
+  }
+  .pp-sub-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .pp-sub-idx {
+    margin-bottom: 0;
   }
   .pp-points,
   .pp-gallery,

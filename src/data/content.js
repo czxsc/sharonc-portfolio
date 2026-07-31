@@ -27,19 +27,25 @@ import concertBibiImg from '../assets/hobby/music/concerts/bibi_selfie.jpg';
 import receiptifyImg from '../assets/hobby/music/receiptify.png';
 import pcBuildImg from '../assets/hobby/gaming/pc_build.webp';
 
-/* The hand-drawn assets, shown as themselves on the portfolio case
-   page — the nav mark, the hero loop, the cursor, and one of the
-   drink paintings. All four are cut out on transparent, so they sit
-   on the paper without a panel. `site/` holds sized webp exports of
-   the two masters in `_source/site/` (2048px PNGs, ~2MB each) that are
-   otherwise only used at mark and cursor size. */
-import catLogoImg from '../assets/site/cat_logo.webp';
-import catAnimImg from '../assets/site/cat_animation.gif';
-import latteCursorImg from '../assets/site/latte_art_cursor.webp';
-
 /* The reference wall the site's direction was picked off, sized down
    for the portfolio case page. Master in `_source/projects/portfolio/`. */
 import ideaBoardImg from '../assets/projects/portfolio/idea_gathering.webp';
+
+/* Every version of the cursor at the 32px it shipped at (CursorTrail).
+   Copies rather than pointers into `public/`: the live cursor is still
+   being worked on and this row is a record of what each pass looked
+   like, so it must not move when that one does. Provenance, including
+   the three marks that had to be drawn rather than recovered, is in
+   scripts/make-cursor-history.py. */
+import cursorLatte from '../assets/projects/portfolio/cursors/01-latte.png';
+import cursorLatteCream from '../assets/projects/portfolio/cursors/01-latte-cream.png';
+import cursorSolid from '../assets/projects/portfolio/cursors/02-bean.png';
+import cursorRimInk from '../assets/projects/portfolio/cursors/03-bean.png';
+import cursorRimCream from '../assets/projects/portfolio/cursors/03-bean-cream.png';
+import cursorOutlineInk from '../assets/projects/portfolio/cursors/03-outline.png';
+import cursorOutlineCream from '../assets/projects/portfolio/cursors/03-outline-cream.png';
+import cursorNowInk from '../assets/projects/portfolio/cursors/04-bean.png';
+import cursorNowCream from '../assets/projects/portfolio/cursors/04-bean-cream.png';
 
 /* Save-file snapshots for the permanent three — a `shot` on a favourite
    is what the hover peek picks up (HobbyPage · FavesList). Titles without
@@ -349,22 +355,39 @@ export const projects = [
     href: '#work',
     page: {
       status: 'Live',
-      subtitle: 'The site you’re reading — built from scratch to feel like mine.',
+      subtitle: 'My portfolio website to display both my work and personality.',
       intro:
-        'This portfolio started as a Framer prototype and ended up rebuilt in React, because a builder could get me to a clean site but not to a personal one. It’s a Vite single-page app with a token-driven paper-and-ink design system, hand-drawn art I made myself, and motion tuned by hand rather than picked from a menu.',
-      links: [{ label: 'GitHub', href: '#' }],
+        'A custom portfolio built in React and Vite, covering the whole surface, from visual direction and hand-drawn illustration through to the motion work and the component architecture. It has to read as clean and professional to someone scanning for two minutes, and still be unmistakably personal.',
+      links: [{ label: 'GitHub', href: 'https://github.com/czxsc/sharonc-portfolio' }],
       meta: [
         { label: 'Category', value: 'Frontend, Design' },
         { label: 'My role', value: 'Design & engineering' },
         { label: 'Timeline', value: '2026' },
-        { label: 'Skills', value: 'React, Vite, CSS architecture, motion design, illustration' },
+        { label: 'Skills', value: 'React, Vite, UI/UX design, motion design, illustration' },
       ],
       sections: [
         {
-          heading: 'Initial design: Three pages, one voice',
+          heading: 'Design Process',
           body: [
-            'I started with structure. A portfolio needed three things: a landing that says who I am in one screen, a work section where each project can be read in full, and somewhere for the parts of me that are not projects. That became the site: a hero that pours into an about section, a work index that opens case studies, and a Play section of hobby pages.',
-            'Tone took longer. I pulled in sites I liked and sorted them into four directions: illustrative, doodles, minimal, and scrapbook. Minimal won, with small hand drawings for warmth and a warm cream ground instead of white. I set a rough ratio of 85% restraint to 15% personality, and kept the personality to two things I actually like, coffee and cats. Everything decorative on the site is one of those two, which is what stops it turning cute.',
+            'To build a portfolio that effectively showcases my work, I began by defining my objective. I wanted to create a clean, easily readable interface that still preserved my personal touch and artistic personality. I initially explored a wide spectrum of visual directions, mapping out ideas on a scale from cluttered and expressive to minimal and professional. These concepts ranged from scrapbook-style layouts layered with post-its and polaroids, to retro game-inspired UIs, to clean minimalist grids paired with subtle hand-drawn doodles.',
+            'Evaluating these paths against my primary goal revealed a fundamental tension between expressiveness and clarity.',
+            {
+              list: [
+                {
+                  label: 'High expressiveness',
+                  note: 'Scrapbook, retro',
+                  text:
+                    'Layering, bold accent colours and creative layouts carried strong character, at the risk of overwhelming visitors and hiding the technical content.',
+                },
+                {
+                  label: 'Minimalistic',
+                  note: 'Modern, Simple',
+                  text:
+                    'Exceptionally professional, accessible and quick to scan, but a little too generic and detached from my creative identity.',
+                },
+              ],
+            },
+            'Ultimately, I chose the hybrid approach of Minimalism with Custom Hand-Drawn Accents, built on a palette of light cream and warm neutrals rather than stark black and white. This allowed me to leverage generous whitespace and a clean structure to keep my technical projects front and center, while using soft colors and custom illustrations to give the site a welcoming, unique identity without distracting from the content.',
           ],
           designBoard: {
             reference: {
@@ -373,6 +396,16 @@ export const projects = [
               alt:
                 'A canvas of portfolio and studio sites grouped into illustrative, doodle, minimal, retro and scrapbook directions, with a checklist of decided themes at the right',
             },
+            caption:
+              'Initial Brainstorming: A collection of visual references I liked, organized to clearly pin down the possible directions.',
+          },
+        },
+        {
+          heading: 'Style Guide',
+          body: [
+            'Everything the direction implied was written down before the first section was built. One token file holds the colour, type scale, spacing and easing, and no component is allowed a raw hex value, which is what lets the whole site be retuned from a single place. As a final layer of personality, I anchored the brand identity in a cohesive theme inspired by cats and coffee.',
+          ],
+          designBoard: {
             /* The palette is quoted from tokens.css rather than read from
                it: the card documents what was decided at the start, and a
                swatch that silently re-tinted with a later token change
@@ -400,140 +433,274 @@ export const projects = [
                 { family: 'Newsreader', role: 'Display', size: '22–112px', font: 'var(--serif)', weight: 600 },
                 { family: 'Archivo', role: 'Body & UI', size: '14–17px', font: 'var(--grot)' },
                 { family: 'JetBrains Mono', role: 'Labels', size: '11px', font: 'var(--mono)' },
-                { family: 'Hi Melody', role: 'Notes', size: '19–22px', font: 'var(--hand)', set: '1.36rem', lower: true },
+              ],
+              rules: [
+                { name: 'Radius', value: '12 / 16px' },
+                { name: 'Spacing', value: '8px base' },
+                { name: 'Duration', value: '0.18 / 0.42 / 0.72s' },
+                { name: 'Easing', value: 'settle · set · draw' },
               ],
             },
             caption:
-              'What I collected before deciding anything, and the guidelines it came down to. Those five colours and four families are still the tokens the site runs on.',
+              'Finalized design standards for the visual system of this site.',
           },
         },
         {
-          heading: 'Choosing the stack: Framer, then not Framer',
+          heading: 'Building the Experience',
           body: [
-            'The first version was a Framer prototype, and it was genuinely useful — I got layout, type scale, and section order settled in a couple of evenings without writing anything. But once the composition was right, every next idea ran into the same wall: the interesting parts of the design weren’t things the builder had a control for.',
-            'The moment I decided to rebuild was the hero. I wanted a cup of coffee to tip and pour, and the liquid to rise and become the About section — one continuous gesture scrubbed against scroll. That isn’t a transition preset. Neither is a case-study image that flies out of the work index into the page it opens, or an iris that grows from the exact point you clicked. Rebuilding in React cost me a few weeks and bought me the ability to build any of those.',
+            'I initially prototyped and built the site using Framer, as its visual interface made it straightforward to quickly draft layouts and iterate on design changes in real time. However, as the concept evolved, I quickly hit the platform\'s constraints. I wanted more customized elements and interactions which proved difficult with Framer\'s more templates component system. Rather than compromising on my design vision or paying for restrictive platform features, I decided to rebuild the site from scratch in React.',
+            'Building from scratch meant owning the structure too. To keep state complexity from bloating a single page app, the frontend is organized around three principles.',
           ],
-          points: [
+          subs: [
             {
-              icon: 'identity',
-              text: 'Templates read as templates. Owning the markup meant the site could be composed rather than configured.',
+              title: 'Data-driven content abstraction',
+              deck: 'All copy, metadata and page structure is decoupled from the rendering layer and kept in a single data manifest.',
+              bullets: [
+                'content.js holds every project, case study section and hobby page as plain data, and components only render what they are handed.',
+                'Updating or adding a project is a schema edit rather than a component rewrite.',
+              ],
             },
             {
-              icon: 'scope',
-              text: 'Custom motion needs real scroll progress, DOM measurement, and FLIP-style geometry — not a canned transition list.',
+              title: 'Centralized design system tokens',
+              deck: 'Visual variables live in one CSS custom property layer instead of in the components that use them.',
+              bullets: [
+                'tokens.css carries the colour palettes for both themes, the fluid type scale, the spacing grid and the motion easing curves.',
+                'Hardcoded hex values and inline magic numbers are off limits, so a global aesthetic change is a single file edit.',
+              ],
             },
             {
-              icon: 'performance',
-              text: 'In code I control what animates: transform and opacity only, self-hosted fonts, and webp everywhere.',
+              title: 'Reusable state and motion hooks',
+              deck: 'Shared mechanics are abstracted into custom hooks, so each component only owns what is unique to it.',
+              bullets: [
+                'useOverlayPage isolates the overlay plumbing, scroll lock, focus, Escape and browser back, leaving ProjectPage and HobbyPage to manage only their own transitions.',
+                'useLenis and useReveal standardize smooth scroll and entrance triggers across every section.',
+              ],
             },
-            {
-              icon: 'platform',
-              text: 'It’s also a portfolio piece in itself — the site is evidence of the frontend work it’s describing.',
-            },
           ],
-        },
-        {
-          heading: 'Drawing the personality in',
-          body: [
-            'The illustrations are mine, drawn rather than sourced, because bought assets would have made the 15% feel borrowed. The nav mark, the cat that loops in the hero, the cat that tips the tote bag in Play, the latte-art cursor, and the drink paintings on the hobby pages all come out of the same hand.',
-            'One of them turned into a real engineering problem. The tote-bag knock was originally an animated GIF bookended by stills, and it would never stay in sync — a GIF’s clock starts on decode, not on the render that set its src, so a cached image resumes wherever the shared clock happens to be. On a second visit the cat would pick up mid-fall while the hobby items spilled on their own schedule. I unpacked the GIF into individual webp frames and step through them in React with the original frame delays, so the spill fires on an actual frame instead of near one. That fix is a good summary of the whole project: the creative half and the technical half kept turning out to be the same work.',
-          ],
-          tiles: {
-            cutouts: true,
-            items: [
-              { src: catLogoImg, label: 'Nav mark' },
-              { src: catAnimImg, label: 'Hero loop' },
-              { src: latteCursorImg, label: 'Cursor' },
-              { src: drinkYuzuAmericano, label: 'Drink art' },
-            ],
-            caption:
-              'Four of the hand-drawn assets, at the size they were drawn — the mark, the looping hero cat, the latte-art cursor, and one of the four drink paintings from the hobby pages.',
-          },
-        },
-        {
-          heading: 'Architecture: One data file, tokens, and a motion layer',
-          body: [
-            'The site is a React 19 + Vite single-page app with no router, no UI library, and no CSS framework — roughly 13,000 lines across 15 components, most with a stylesheet sitting next to them. Three rules keep that from turning into a pile.',
-            'First, all copy lives in one place: a single content file exports the hero, about, projects, hobbies, and contact data, and components only render it — adding a project is a data edit, not a component edit. Second, every colour, size, and duration is a CSS custom property in tokens.css, and components never write a raw hex value, which is why the whole palette can be retuned in one file. Third, the two full-screen overlays — project case studies and hobby mini-pages — are different pages that behave identically, so the shared plumbing (scroll lock, focus, Esc, browser back, close timing) lives in one useOverlayPage hook and each page owns only its own transition.',
-          ],
-          stack: {
+          /* renders the architecture elevation (CodeMap.jsx): tiers
+             stack downward and the ones below the surface span the
+             full width, because that is what shared looks like. The
+             four tiers are the three principles above plus the floor
+             they stand on, in that order, so the diagram reads as the
+             evidence for the paragraphs rather than a second list.
+             The last tier is marked `base`, which draws it as ground. */
+          codeMap: {
             title: 'How the code is organized',
-            hint: 'Hover a layer to see what sits in it.',
-            flow: [
-              { title: 'Content in', note: 'one data file — copy, projects, hobbies' },
-              { title: 'Components + tokens', note: 'section per component, no raw hex' },
-              { title: 'Motion on top', note: 'shared hooks and entrance primitives' },
+            hint: 'Hover any file or package to see what it owns.',
+            stats: [
+              { value: '20', label: 'components' },
+              { value: '4', label: 'shared hooks' },
+              { value: '15k', label: 'lines' },
             ],
-            // diagram-specific hues (not site tokens): the translucent
-            // plates blend when stacked, so the bands need genuinely
-            // different hue families — rust / blue / amber / green
-            groups: [
+            tiers: [
               {
-                name: 'Sections',
-                tone: '#b05438',
-                tools: [
-                  { name: 'Nav', note: 'active-section indicator via useActiveSection' },
-                  { name: 'HeroPourTransition', note: 'hero + about, joined by the scroll-scrubbed pour' },
-                  { name: 'Work', note: 'project index, hover previews, tag filtering' },
-                  { name: 'Play', note: 'the tote-bag spill and hobby flat-lay' },
-                  { name: 'Contact', note: 'the closing block' },
+                id: '01',
+                name: 'Surface',
+                note: 'One component per section, each with its stylesheet beside it. Renders data, owns no copy.',
+                groups: [
+                  {
+                    name: 'Sections',
+                    items: [
+                      { name: 'Nav', note: 'active-section indicator, driven by useActiveSection' },
+                      { name: 'HeroPourTransition', note: 'hero and about, joined by the scroll-scrubbed pour' },
+                      { name: 'Work', note: 'project index, hover previews, tag filtering' },
+                      { name: 'Play', note: 'the tote-bag spill and the hobby flat-lay' },
+                      { name: 'Contact', note: 'the closing block' },
+                    ],
+                  },
+                  {
+                    name: 'Overlay pages',
+                    items: [
+                      { name: 'ProjectPage', note: 'case study, hero image flies out of the index' },
+                      { name: 'HobbyPage', note: 'mini-page, iris grows from the click point' },
+                      { name: 'SheetFlip', note: 'one virtual card, turning from the About window into the Work preview' },
+                    ],
+                  },
                 ],
               },
               {
-                name: 'Overlay pages',
-                tone: '#3e6b9e',
-                tools: [
-                  { name: 'ProjectPage', note: 'case study — the hero image flies out of the index' },
-                  { name: 'HobbyPage', note: 'mini-page — iris grows from the click point' },
-                  { name: 'useOverlayPage', note: 'scroll lock, focus, Esc, browser back, close timing' },
+                id: '02',
+                name: 'Shared behaviour',
+                note: 'The mechanics every section would otherwise reimplement, written once.',
+                groups: [
+                  {
+                    name: 'Hooks',
+                    items: [
+                      { name: 'useOverlayPage', note: 'the overlay plumbing, scroll lock, focus, Escape, browser back, close timing' },
+                      { name: 'useReveal', note: 'scroll entrances that follow direction and speed' },
+                      { name: 'useLenis', note: 'interpolated scroll, so scrubbed animation glides' },
+                      { name: 'useActiveSection', note: 'an IntersectionObserver reporting which section is in view' },
+                    ],
+                  },
+                  {
+                    name: 'Primitives',
+                    items: [
+                      { name: 'SetType', note: 'per-line masked entrance for every title' },
+                      { name: 'SectionSeam', note: 'the rule between sections, scrubbed open against scroll' },
+                      { name: 'Doodles', note: 'the hand-drawn inline SVG set' },
+                    ],
+                  },
                 ],
               },
               {
-                name: 'Motion primitives',
-                tone: '#c99a3d',
-                tools: [
-                  { name: 'SetType', note: 'per-line masked entrance for every title' },
-                  { name: 'useReveal', note: 'scroll entrances that follow direction and speed' },
-                  { name: 'useLenis', note: 'interpolated scroll, so scrubbed animation glides' },
-                  { name: 'Doodles', note: 'the hand-drawn inline SVG set' },
+                id: '03',
+                name: 'Source of truth',
+                note: 'Copy and design values, edited here rather than in the components that read them.',
+                groups: [
+                  {
+                    items: [
+                      { name: 'content.js', note: 'every project, section and hobby page as plain data, one file' },
+                      { name: 'tokens.css', note: 'both palettes, the fluid type scale, spacing grid and easing curves' },
+                      { name: 'fonts.css', note: 'self-hosted woff2, latin subset' },
+                    ],
+                  },
                 ],
               },
               {
-                name: 'Content & tokens',
-                tone: '#55855a',
-                tools: [
-                  { name: 'content.js', note: 'all copy and project data, one file' },
-                  { name: 'tokens.css', note: 'colour, type scale, spacing, easing' },
-                  { name: 'fonts.css', note: 'self-hosted woff2, latin subset' },
+                id: '04',
+                name: 'Toolchain',
+                base: true,
+                note: 'Two runtime dependencies past React. Everything else is written here.',
+                groups: [
+                  {
+                    items: [
+                      { name: 'react', note: 'the view layer, hooks and portals, no router and no UI kit on top of it' },
+                      { name: 'vite', note: 'dev server and production build, assets fingerprinted on the way out' },
+                      { name: 'motion', note: 'scroll progress and reduced-motion for the pour and the seam, the rest of the motion is CSS' },
+                      { name: 'lenis', note: 'interpolated scrolling, which is what lets an animation be scrubbed smoothly' },
+                    ],
+                  },
                 ],
               },
             ],
           },
         },
         {
-          heading: 'Technical decisions',
+          heading: 'UX Decisions',
           body: [
-            'The animation work is where most of the engineering went, and nearly all of it came down to keeping the browser doing cheap things.',
+            'The site is written for two readers at once, someone giving it ninety seconds and someone who has decided to stay. My approach to the user experience was guided by a single core philosophy, optimize for efficiency first, then reward curiosity with engagement.',
           ],
-          facts: [
+          /* Four principles, each a one line claim with its supporting
+             detail broken out. `deck` is the claim, `bullets` the
+             detail. */
+          subs: [
             {
-              title: 'CSS first, library second',
-              text: 'Entrances, hovers, and the iris are plain CSS transitions on transform and opacity. Motion is only pulled in for the two scroll-scrubbed sequences, where progress has to be read continuously instead of fired once.',
+              title: 'The homepage should be enough',
+              deck: 'A single pass over the landing page carries the full picture.',
+              bullets: [
+                'Each project reveals its stack on hover, and can be sorted by domain so reviewers can instantly isolate the work most relevant for what they\'re looking for.',
+                'High-level project summaries and a brief snapshot of personal interests live right on the main page for quick scanning.',
+                'Dedicated subpages offer deeper technical breakdowns for those who want to dive into implementation details.',
+              ],
             },
             {
-              title: 'Geometry, not crossfades',
-              text: 'The case-study hero doesn’t fade between two images — it interpolates the clip box and the painted picture separately, sampled at sixteen points, so one photograph re-crops instead of two swapping.',
+              title: 'Motion should do a job',
+              deck: 'I used intentional animations to encourage exploration without creating visual noise.',
+              bullets: [
+                'Creative scroll-driven effects, like the coffee pour and flipping window, bring a pleasant surprise to visitors as they navigate down the page.',
+                'Subtle ambient motion, such as a moving background gradient in About and the animated swishing tail on landing, keeps resting states dynamic without distracting the reader.',
+                'Nearly all of the engineering behind it came down to keeping the browser doing cheap work.',
+              ],
             },
             {
-              title: 'Reduced motion is a real path',
-              text: 'Sixteen files branch on prefers-reduced-motion. Lenis never starts, scrubbed sequences render their settled state, and the flights collapse to instant — the layout is the same either way.',
+              title: 'Personality lives in small details',
+              deck: 'Small details sit in secondary visual layers, where they wouldn\'t interfere with readability.',
+              bullets: [
+                'A custom coffee bean cursor designed with adaptive contrast to ensure high visibility across both light and dark UI elements.',
+                'Custom hand-drawn cat animations and illustrations, placed outside primary reading zones, giving the site a warm, memorable personality without competing with core project content.',
+              ],
+            },
+            {
+              title: 'The site should work for everyone',
+              deck: 'Accessibility and responsiveness were part of the build rather than a pass at the end.',
+              bullets: [
+                'Every section is built from real headings and landmarks in order, so a screen reader hears the same structure the layout shows.',
+                'Text is held at high contrast everywhere, including over the moving espresso pool and the darker illustrated panels.',
+                'Narrow screens get reorganized layouts instead of one stacked column.',
+              ],
             },
           ],
         },
         {
-          heading: 'Where it stands',
+          heading: 'Iterations',
           body: [
-            'The site is live and still moving — the hobby pages and a few case studies are the parts I keep returning to. What I’d tell myself at the start is that prototyping in Framer first was right: it settled the composition cheaply, and I only paid for the rebuild once I knew exactly which details were worth writing code for.',
+            'Most sections went through two or three versions, and the pattern held. Early drafts said too little to stop anyone scrolling, so each pass added the one thing that made a section worth reading and cut whatever was decorating around it.',
+          ],
+          /* Screenshots to drop in (captions are the keys, so keep them
+             unique). Each entry renders a labelled placeholder until it
+             gets a `src`, so the section is readable in the meantime. */
+          gallery: [
+            {
+              caption:
+                'Framer draft to the current hero. The static introduction became the pour that carries you into About.',
+            },
+            {
+              caption:
+                'About, before and after. One block of text became a shorter statement set on the espresso pool.',
+            },
+            {
+              caption:
+                'The work index, before and after. Titles and images alone became stack on hover, a one line description and filtering by field.',
+            },
+          ],
+          /* The cursor is the one iteration with no screenshots to wait
+             on, since every version of it is a file we still have. Shown
+             as a matrix rather than a row (see CursorTrail): the marks
+             are 21px of bean, and what changed between passes only reads
+             against the two grounds they had to survive. */
+          cursorTrail: {
+            title: 'The cursor, four passes',
+            hint: 'Left is cursor at rest, Right is cursor over clickable elements',
+            grounds: [
+              { id: 'light', label: 'On paper', color: '#f5f4f1' },
+              { id: 'dark', label: 'On dark', color: '#15110e' },
+            ],
+            stages: [
+              {
+                id: '01',
+                name: 'Latte art',
+                marks: {
+                  light: { rest: { src: cursorLatte }, link: { src: cursorLatteCream } },
+                  dark: { rest: { src: cursorLatte }, link: { src: cursorLatteCream } },
+                },
+                note: 'Loved original latte art cursor idea, but too much detail for 32px, and hard to see on some backgrounds.',
+              },
+              {
+                id: '02',
+                name: 'Solid bean',
+                marks: {
+                  light: { rest: { src: cursorSolid }, link: { src: cursorSolid } },
+                  dark: { rest: { src: cursorSolid }, link: { src: cursorSolid } },
+                },
+                note: 'Much simpler shape and recognizable even at small sizes. However, not distinguishable when something is interactable, and blends into dark backgrounds.',
+              },
+              {
+                id: '03',
+                name: 'Bean and outline',
+                marks: {
+                  light: { rest: { src: cursorRimInk }, link: { src: cursorOutlineInk } },
+                  dark: { rest: { src: cursorRimCream }, link: { src: cursorOutlineCream } },
+                },
+                note: 'Color flipped depending on background for contrast, but four different cursor designs gave mixed signals on what was actually interactable.',
+              },
+              {
+                id: '04',
+                name: 'Cream and espresso',
+                current: true,
+                marks: {
+                  light: { rest: { src: cursorNowCream }, link: { src: cursorNowInk } },
+                  dark: { rest: { src: cursorNowCream }, link: { src: cursorNowInk } },
+                },
+                note: 'Each ink rimmed in the other, so colour is free to mean state.',
+              },
+            ],
+          },
+        },
+        {
+          heading: 'Reflection',
+          body: [
+            'The hardest part was keeping expressive motion cheap. Early versions leaned on large animated assets, and the cost showed up as dropped frames rather than an obvious bug, so it took me a while to trace the performance problems back to my own image weight. One was the cat that knocks over the tote bag in Play, originally an animated GIF. A GIF clock starts on decode rather than on the render that set its source, so on a second visit a cached image resumed mid fall while the hobby items spilled on their own schedule. Unpacking it into webp frames and stepping through them in React with the original delays fixed the sync and cut the weight at once.',
+            'That fix is a fair summary of the project, since the creative half and the technical half kept turning out to be the same work. The constraint I would keep is the one that made both tractable, prototyping the composition cheaply in Framer and only paying for the rebuild once the details worth writing code for were clear. The site is live and still moving, with the hobby pages and a few case studies the parts I keep returning to.',
           ],
         },
       ],
@@ -2080,8 +2247,8 @@ export const hobbies = [
               note: 'The boundless player freedom and reactive storytelling is truly unparalleled.',
               shot: {
                 src: shotBg3,
-                alt: 'My Dark Urge origin character, blood-spattered in ornate armor mid-cutscene.',
-                caption: 'My Dark Urge playthrough.',
+                alt: 'My character mid-cutscene.',
+                caption: 'Act II of my first playthrough',
               },
             },
             {

@@ -1,0 +1,248 @@
+/* ============================================================
+   CodeMap — an architecture elevation on paper. Tiers stack
+   downward, the surface tier splits into parallel families, and
+   the shared tiers below run the full width because that is what
+   "shared" looks like. Lives inside a ProjectPage section.
+   ============================================================ */
+
+.cm {
+  margin-top: var(--sp-4);
+  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+  background: var(--card);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+}
+
+/* ---------- head: title left, counted facts right ---------- */
+.cm-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-3);
+}
+.cm-head h3 {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.cm-stats {
+  display: flex;
+  gap: var(--sp-4);
+  margin: 0;
+}
+.cm-stats div {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+.cm-stats dt {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.cm-stats dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---------- tiers ----------
+   The hairline above each tier is the drawing's floor line: it runs
+   the whole width so the tiers read as strata, not as cards. */
+.cm-tier {
+  display: grid;
+  grid-template-columns: 186px minmax(0, 1fr);
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--line);
+}
+
+/* The floor. The last tier holds packages rather than files we wrote,
+   so it is drawn as ground instead of another stratum: bled out to the
+   card's edges and tinted, which says "not ours" without a legend.
+   The tint is mixed from --ink rather than set to --paper-2 because the
+   dark palette puts paper-2 and card within two points of each other,
+   and the band would vanish. */
+.cm-tier.is-base {
+  margin: 0 calc(var(--sp-4) * -1) var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.cm-rail {
+  position: relative;
+  padding-left: 20px;
+}
+/* The spine: one continuous rule with a tick per tier. Each rail
+   draws its own segment and overshoots into the tier padding above
+   and below, so the segments meet across the floor lines. The two
+   ends stop at their own dot rather than running off the drawing. */
+.cm-rail::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: -22px;
+  bottom: -22px;
+  border-left: 1px solid var(--line);
+}
+.cm-tier:first-child .cm-rail::before {
+  top: 10px;
+}
+.cm-tier:last-child .cm-rail::before {
+  bottom: calc(100% - 10px);
+}
+.cm-rail::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--ink-faint);
+}
+.cm-num {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+}
+.cm-rail h4 {
+  margin-top: 2px;
+  font-family: var(--serif);
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cm-rail p {
+  margin-top: 5px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+/* ---------- groups ---------- */
+.cm-groups {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
+}
+.cm-groups.is-split {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+/* a named family gets a frame; the shared tiers stay unframed so they
+   read as ground rather than as another box */
+.cm-group.is-boxed {
+  padding: 12px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+.cm-group-name {
+  margin-bottom: 10px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.cm-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.cm-item {
+  display: block;
+  padding: 6px 11px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.2;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  transition:
+    color var(--dur-quick) var(--ease),
+    border-color var(--dur-quick) var(--ease),
+    opacity var(--dur-quick) var(--ease),
+    transform var(--dur-quick) var(--ease);
+}
+/* reading one file recedes the rest, so the row you are in stays clear */
+.cm.has-hot .cm-item {
+  opacity: 0.45;
+}
+.cm.has-hot .cm-item.is-hot,
+.cm .cm-item:hover {
+  opacity: 1;
+  color: var(--ink);
+  border-color: var(--espresso);
+  transform: translateY(-1px);
+}
+
+/* ---------- caption rail ---------- */
+.cm-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 44px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+}
+.cm-caption strong {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--espresso);
+}
+.cm-caption span {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.cm-caption .cm-hint {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .cm-tier {
+    grid-template-columns: 1fr;
+    gap: var(--sp-3);
+  }
+  .cm-groups.is-split {
+    grid-template-columns: 1fr;
+  }
+  .cm-rail p {
+    max-width: 58ch;
+  }
+}
+@media (max-width: 620px) {
+  .cm-stats {
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-item {
+    transition: color var(--dur-quick) var(--ease),
+      border-color var(--dur-quick) var(--ease);
+  }
+  .cm.has-hot .cm-item.is-hot,
+  .cm .cm-item:hover {
+    transform: none;
+  }
+}

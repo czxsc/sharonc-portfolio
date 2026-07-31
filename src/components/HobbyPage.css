@@ -345,12 +345,15 @@
   text-transform: uppercase;
   color: var(--ink-faint);
 }
+/* Picture captions across the hobby pages are set in the display serif's
+   italic — the caption voice comes from the italic and the smaller size,
+   not from a fourth family. */
 .hp-frame figcaption {
   margin-top: 10px;
   text-align: center;
-  font-family: var(--hand);
-  font-size: 1.22rem;
-  text-transform: lowercase;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.02rem;
   color: var(--ink-soft);
 }
 
@@ -402,9 +405,9 @@
   inset: auto 0 0 0;
   padding: 28px 18px 14px;
   background: linear-gradient(to top, rgb(0 0 0 / 0.6), transparent 75%);
-  font-family: var(--hand);
-  font-size: 1.38rem;
-  text-transform: lowercase;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.12rem;
   color: #fff;
   text-align: left;
   opacity: 0;
@@ -522,9 +525,9 @@
   margin-top: 12px;
   text-align: center;
   rotate: -1deg;
-  font-family: var(--hand);
-  font-size: 1.18rem;
-  text-transform: lowercase;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
   color: var(--ink-soft);
 }
 
@@ -1220,9 +1223,9 @@
   margin-top: var(--sp-3);
   padding-left: clamp(0px, 6vw, 90px);
   rotate: -1deg;
-  font-family: var(--hand);
-  font-size: 1.22rem;
-  text-transform: lowercase;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.02rem;
   color: var(--ink-soft);
 }
 
@@ -1428,9 +1431,9 @@
 .hp-accent figcaption {
   margin-top: 12px;
   rotate: -1deg;
-  font-family: var(--hand);
-  font-size: 1.18rem;
-  text-transform: lowercase;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
   color: var(--ink-soft);
 }
 

@@ -64,6 +64,66 @@
   border-radius: var(--radius-lg);
   background: var(--card);
 }
+/* ---------- card on its own ----------
+   Without the reference wall beside it the card has the full measure,
+   and a single column of three short blocks would run tall and narrow
+   with a page of white to its right. Turned on its side it reads as one
+   guide sheet, palette then type then the numbers, left to right.
+
+   A grid rather than a flex row, and `minmax(0, …)` on every track, so a
+   column can never be widened past its share by its own content — the
+   tracks are set by the card, and everything inside wraps to fit. The
+   weighting is not thirds: the palette carries a five-segment bar over a
+   legend, the type block holds a family name, a role and a size on one
+   line, and the numbers are the shortest of the three.
+
+   Columns are divided by a hairline instead of a gap, and the block
+   labels rule off at the same height across all three, so the card reads
+   as one sheet with a header band rather than three stacked cards. */
+.db.is-solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+.db.is-solo .db-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr) minmax(0, 0.8fr);
+  gap: 0;
+  padding: 22px 24px 24px;
+}
+.db.is-solo .db-block {
+  min-width: 0;
+  padding-inline: var(--sp-4);
+}
+.db.is-solo .db-block:first-child {
+  padding-inline-start: 0;
+}
+.db.is-solo .db-block:last-child {
+  padding-inline-end: 0;
+}
+.db.is-solo .db-block + .db-block {
+  border-left: 1px solid var(--line-soft);
+}
+
+/* Same width the paired board stacks at. Below it the three columns are
+   tight enough that the type specimens start wrapping their own names,
+   and a wrapped family name reads as a second row. The divider turns
+   with the layout, hairline above each block instead of beside it, so
+   the sheet stays one sheet. */
+@media (max-width: 1000px) {
+  .db.is-solo .db-card {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px 22px 22px;
+  }
+  .db.is-solo .db-block {
+    padding-inline: 0;
+  }
+  .db.is-solo .db-block + .db-block {
+    padding-top: var(--sp-4);
+    margin-top: var(--sp-4);
+    border-left: 0;
+    border-top: 1px solid var(--line-soft);
+  }
+}
+
 .db-block-label {
   display: block;
   padding-bottom: 9px;
@@ -162,6 +222,8 @@
   margin: 0;
 }
 .db-type dt {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 1.02rem;
   font-weight: 500;
   line-height: 1.15;
@@ -183,6 +245,37 @@
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
   color: var(--ink-soft);
+}
+
+/* ---------- the remaining rules ----------
+   Name over value, both left-aligned to the same edge, in the same mono
+   as the legend. The name is the faint label and the value is the piece
+   being documented, so the value carries the weight — the reverse of a
+   right-aligned two-column list, where the long duration string is the
+   first thing to break when the column narrows. Nothing here depends on
+   the column's width, so the block survives any resize intact. */
+.db-rules {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  font-family: var(--mono);
+  line-height: 1.35;
+}
+.db-rules dt {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.db-rules dd {
+  margin: 3px 0 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  /* the values are slash- and dot-separated runs with no guaranteed
+     break point at card width */
+  overflow-wrap: anywhere;
 }
 
 /* One column: the board, the card, then the caption. Stacked well

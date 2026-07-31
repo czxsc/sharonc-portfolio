@@ -3,10 +3,12 @@ import { createPortal } from 'react-dom';
 import { projects } from '../data/content.js';
 import { useOverlayPage } from '../hooks/useOverlayPage.js';
 import StackDiagram from './StackDiagram.jsx';
+import CodeMap from './CodeMap.jsx';
 import FlowDiagram from './FlowDiagram.jsx';
 import ArchMap from './ArchMap.jsx';
 import ZoneStudy from './ZoneStudy.jsx';
 import DesignBoard from './DesignBoard.jsx';
+import CursorTrail from './CursorTrail.jsx';
 import SetType from './SetType.jsx';
 import './ProjectPage.css';
 
@@ -280,6 +282,28 @@ const POINT_ICONS = {
       <path d="M19.5 19c-.6-3-2.6-4.7-4.9-4.7" />
     </>
   ),
+  balance: (
+    <>
+      <path d="M12 4.5v15" />
+      <path d="M5 8h14" />
+      <path d="M2.5 15 5.5 8l3 7a3 3 0 0 1-6 0z" />
+      <path d="M15.5 15l3-7 3 7a3 3 0 0 1-6 0z" />
+    </>
+  ),
+  swatch: (
+    <>
+      <path d="M4 5.5h7v13H4z" />
+      <path d="M11 8.5h4.5v10H11z" />
+      <path d="M15.5 11H20v7.5h-4.5z" />
+    </>
+  ),
+  pen: (
+    <>
+      <path d="M4 20c1-4 2-6.5 4.5-9" />
+      <path d="M8.5 11 15 4.5a2.1 2.1 0 0 1 3 3L11.5 14z" />
+      <path d="M8.5 11 11.5 14" />
+    </>
+  ),
 };
 
 export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
@@ -535,7 +559,8 @@ export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
 
 /* one case-study section: heading, body copy, then whichever optional
    blocks the data provides (designBoard / points / subs / facts /
-   stack / flow / archMap / zones / tiles / compare / media / gallery).
+   stack / flow / archMap / cursorTrail / zones / tiles / compare /
+   media / gallery).
 
    `imagesFirst` lifts media + gallery to just under the body. The early
    sections read "here is what we made -> here is the work -> here is
@@ -557,40 +582,56 @@ function Section({ s }) {
   return (
     <section className="pp-section">
       <h2>{s.heading}</h2>
-      {s.body.map((p, i) => (
-        <p key={i}>{p}</p>
-      ))}
+      {/* a body entry is normally a paragraph; an object with `list` is a
+          short weighed-options aside that has to sit between two
+          paragraphs rather than after all of them */}
+      {s.body.map((p, i) =>
+        typeof p === 'string' ? (
+          <p key={i}>{p}</p>
+        ) : (
+          <dl className="pp-weigh" key={i}>
+            {p.list.map((it) => (
+              <div className="pp-weigh-item" key={it.label}>
+                <dt>
+                  {it.label}
+                  {it.note && <span>{it.note}</span>}
+                </dt>
+                <dd>{it.text}</dd>
+              </div>
+            ))}
+          </dl>
+        ),
+      )}
       {s.imagesFirst && pictures}
       {s.designBoard && <DesignBoard board={s.designBoard} />}
-      {s.points && (
-        <div className="pp-points">
-          {s.points.map((pt) => (
-            <div className="pp-point" key={pt.text}>
-              <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                {POINT_ICONS[pt.icon]}
-              </svg>
-              <p>{pt.text}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      {s.points && <Points points={s.points} />}
+      {/* numbered principles: the claim sits in the left rail so the
+          rail alone reads as the list of decisions, and the reasoning
+          under it is broken into bullets rather than one block. A lone
+          `text` (the older shape) still renders as the claim. */}
       {s.subs && (
-        <div className="pp-subs">
-          {s.subs.map((sub) => (
-            <div className="pp-sub" key={sub.title}>
-              <h3>{sub.title}</h3>
-              <p>{sub.text}</p>
-            </div>
+        <ol className="pp-subs">
+          {s.subs.map((sub, i) => (
+            <li className="pp-sub" key={sub.title}>
+              <div className="pp-sub-head">
+                <span className="pp-sub-idx" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3>{sub.title}</h3>
+              </div>
+              <div className="pp-sub-body">
+                <p className="pp-sub-deck">{sub.deck || sub.text}</p>
+                {sub.bullets && (
+                  <ul className="pp-sub-list">
+                    {sub.bullets.map((b) => (
+                      <li key={b}>{b}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
       {s.facts && (
         <div className="pp-facts">
@@ -603,8 +644,10 @@ function Section({ s }) {
         </div>
       )}
       {s.stack && <StackDiagram stack={s.stack} />}
+      {s.codeMap && <CodeMap map={s.codeMap} />}
       {s.flow && <FlowDiagram flow={s.flow} />}
       {s.archMap && <ArchMap map={s.archMap} />}
+      {s.cursorTrail && <CursorTrail trail={s.cursorTrail} />}
       {s.zones && <ZoneStudy zones={s.zones} />}
       {/* the four graded tilesets, laid out so the shared grey rock
           reads across the row — same argument as ZoneStudy, one floor
@@ -650,6 +693,31 @@ function Section({ s }) {
       )}
       {!s.imagesFirst && pictures}
     </section>
+  );
+}
+
+/* the icon tile set: a section's own summary points, or the supporting
+   detail of a single principle inside .pp-subs */
+function Points({ points }) {
+  return (
+    <div className="pp-points">
+      {points.map((pt) => (
+        <div className="pp-point" key={pt.text}>
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {POINT_ICONS[pt.icon]}
+          </svg>
+          <p>{pt.text}</p>
+        </div>
+      ))}
+    </div>
   );
 }
 
