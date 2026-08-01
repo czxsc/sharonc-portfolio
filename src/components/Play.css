@@ -124,6 +124,8 @@
   --fx: var(--fx-d);
   --fy: var(--fy-d);
   --row: var(--row-d);
+  --dy: var(--dy-d);
+  --dot: var(--dot-d);
 
   position: absolute;
   left: calc(var(--x) * 1cqw);
@@ -202,11 +204,22 @@
   transform: rotate(var(--r));
   transition: transform 0.45s var(--ease);
 }
+/* --dy sinks the drawing inside its own column by whatever hangs below
+   the object proper — the sketchbook's bookmark, and nothing else so
+   far. The column still ends at the shelf, so the book's covers come
+   down onto the line (with the contact shadow, which belongs to the
+   column, waiting there for them) and the ribbon drapes over the front
+   edge. Left alone, the ribbon's tip was the only thing touching the
+   shelf and the book read as hovering above a line it never met. It is
+   the image that moves and not the column, so the caption below, the
+   stretch of shelf this object owns and the flight out of the bag all
+   stay where they were. */
 .bag-obj img {
   position: relative;
   z-index: 1;
   width: 100%;
   height: auto;
+  translate: 0 calc(var(--dy) * 1cqw);
   /* a little separation from the paper at rest — the objects are
      cut-outs, and without it the pale ones (controller, sketchbook)
      sit in the page rather than on it */
@@ -260,16 +273,24 @@
 }
 
 /* the hover wash — a muted tint of the hobby's tone behind the object;
-   on click the HobbyPage iris grows from this exact circle */
+   on click the HobbyPage iris grows from this exact circle.
+
+   Its diameter is handed down per object (see the note on DOT_BLEND in
+   Play.jsx): sized off the drawn object rather than off the column's
+   width, so a tall narrow cup and a wide flat laptop get discs of
+   comparable size instead of one disappearing behind its object while
+   the other rings it. Centred on the drawn object too — half of --dy,
+   because sinking the image by --dy moves the middle of what you can
+   see by half that. */
 .bag-dot {
   position: absolute;
   z-index: 0;
   left: 50%;
   top: 50%;
-  width: 112%;
+  width: calc(var(--dot) * 1cqw);
   aspect-ratio: 1;
   border-radius: 50%;
-  translate: -50% -50%;
+  translate: -50% calc(-50% + var(--dy) * 0.5cqw);
   scale: 0.55;
   opacity: 0;
   background: color-mix(in srgb, var(--tone) 16%, var(--paper));
@@ -379,6 +400,8 @@
     --fx: var(--fx-m);
     --fy: var(--fy-m);
     --row: var(--row-m);
+    --dy: var(--dy-m);
+    --dot: var(--dot-m);
   }
   /* the tote is up on the second shelf now, so that is the one that
      starts at it; the lower shelf catches what fell further and runs

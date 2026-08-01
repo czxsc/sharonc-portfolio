@@ -17,8 +17,10 @@ import './CursorTrail.css';
    record still says what it said if the palette moves later or the
    page is read in dark theme.
 
-   Data shape (content.js → section.cursorTrail):
-   { title, hint,
+   Data shape (content.js → section.cursorTrail). `text` is the lead
+   paragraph, rendered by the section above this figure rather than
+   inside it, so it sits in the body flow like the compare pairs' own:
+   { text, title, hint,
      grounds: [{ id, label, color }],
      stages: [{ id, name, current?, note,
                 marks: { <groundId>: { rest, link } } }],   // { src }
@@ -35,7 +37,9 @@ export default function CursorTrail({ trail }) {
   return (
     <figure className="ct">
       <div className="ct-head">
-        <h3>{trail.title}</h3>
+        {/* omitted when the pass above already carries the title
+            (see PassCopy in ProjectPage), so the hint sits alone */}
+        {trail.title && <h3>{trail.title}</h3>}
         {trail.hint && <p className="ct-hint">{trail.hint}</p>}
       </div>
 

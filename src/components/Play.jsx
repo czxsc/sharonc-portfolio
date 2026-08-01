@@ -67,6 +67,14 @@ const imgMap = {
          hover then measures out exactly the thing you are pointing at.
      s   object width (the files are trimmed to their own edges by
          scripts/trim-play-cutouts.py, so this IS the visible size)
+     ar  the file's own height ÷ width — the two numbers that follow
+         are what turn a column width into the drawn object's real
+         footprint, which is what the hover wash and the contact point
+         have to be measured against
+     hg  the share of that height taken by something thin dangling
+         below the object proper (only the sketchbook has one: its
+         bookmark ribbon). Left out, it would be the ribbon's tip
+         standing on the shelf with the book floating above it
      r   resting tilt, deg; pivoted on the contact point, not the
          centre, so the tilt reads as "set down at an angle" rather
          than "sinking through the shelf"
@@ -86,21 +94,55 @@ const MOUTH_X = 24;
 const MOUTH_X_MOB = 39.5;
 
 const LAYOUT = [
-  // Stories — first out, and the one that lands nearest the tote
-  { x: 32, s: 10.5, r: -2.4, fy: -7, mob: { x: 50, s: 22, r: -2.4, fy: -11, row: 1 } },
+  // Stories — first out, and the one that lands nearest the tote. Flat
+  // on its face and the widest silhouette of the five, so it carries
+  // more weight than its number suggests and is set a size below it
+  { x: 32, s: 9.3, ar: 0.835, r: -2.4, fy: -7, mob: { x: 50, s: 19.5, r: -2.4, fy: -11, row: 1 } },
   // Drink making — the smallest thing on the shelf by some way. Its
   // label is the longest, which is why it gets the widest gap after it
-  { x: 46.5, s: 5, r: 1.8, fy: -7, mob: { x: 74, s: 10, r: 1.8, fy: -11, row: 1 } },
-  { x: 60, s: 8, r: -1.8, fy: -7, mob: { x: 2, s: 21, r: -1.8, fy: -45, row: 0 } },
-  { x: 72.5, s: 6.6, r: 2.6, fy: -7, mob: { x: 33, s: 17, r: 2.6, fy: -45, row: 0 } },
+  { x: 46.5, s: 5, ar: 1.277, r: 1.8, fy: -7, mob: { x: 74, s: 10, r: 1.8, fy: -11, row: 1 } },
+  { x: 60, s: 8, ar: 0.912, r: -1.8, fy: -7, mob: { x: 2, s: 21, r: -1.8, fy: -45, row: 0 } },
+  { x: 72.5, s: 6.6, ar: 1.157, r: 2.6, fy: -7, mob: { x: 33, s: 17, r: 2.6, fy: -45, row: 0 } },
   // Art — the sketchbook ends the shelf, the largest thing on it. It
   // is also the object that used to vanish into the paper, which the
   // contact shadow fixes
-  { x: 85, s: 10.2, r: -1.4, fy: -7, mob: { x: 62, s: 24, r: -1.4, fy: -45, row: 0 } },
+  { x: 85, s: 10.2, ar: 0.889, hg: 0.23, r: -1.4, fy: -7, mob: { x: 62, s: 24, r: -1.4, fy: -45, row: 0 } },
 ];
 
 // how many shelves the mobile layout needs — drives the extra rule
 const MOB_ROWS = 1 + Math.max(...LAYOUT.map((c) => c.mob.row));
+
+/* ------------------------------------------------------------------
+   The hover wash.
+
+   It used to be a circle 112% of the column's width, which meant its
+   size tracked one edge of a cut-out rather than the cut-out: the
+   coffee cup (tall, narrow) got a disc smaller than itself while the
+   sticker-covered laptop (wide, flat) got one half again bigger than
+   the object inside it, and side by side they read as different
+   effects rather than the same one.
+
+   So it is measured off the drawn object instead — the geometric mean
+   of its width and its body height, which is a fair single number for
+   "how big is this thing" whichever way it is proportioned — and then
+   pulled halfway toward the average of the five. Halfway, because
+   neither extreme is right: sized purely per object the discs vary as
+   much as the objects do, and one shared size would swallow the coffee
+   cup whole. The result is a family that reads as one effect while
+   still admitting the sketchbook is bigger than the espresso glass.
+   ------------------------------------------------------------------ */
+const DOT_BLEND = 0.5; // 0 = each object's own size, 1 = one size for all
+const DOT_K = 1.34; // how far the disc stands off the object it sits behind
+
+const bodyH = (c, s) => s * c.ar * (1 - (c.hg ?? 0)); // minus what dangles
+const massOf = (c, s) => Math.sqrt(s * bodyH(c, s));
+const dotSizes = (widthOf) => {
+  const m = LAYOUT.map((c) => massOf(c, widthOf(c)));
+  const mean = m.reduce((a, b) => a + b, 0) / m.length;
+  return m.map((v) => DOT_K * (v + (mean - v) * DOT_BLEND));
+};
+const DOTS_D = dotSizes((c) => c.s);
+const DOTS_M = dotSizes((c) => c.mob.s);
 
 /* One object's custom properties, both layouts at once.
 
@@ -109,21 +151,31 @@ const MOB_ROWS = 1 + Math.max(...LAYOUT.map((c) => c.mob.row));
    thing that overrides them. Both layouts are handed over under names
    nothing reads directly, and Play.css picks which one --x, --s and
    the rest resolve to. */
-const slotVars = (c, i) => ({
-  '--x-d': c.x,
-  '--s-d': c.s,
-  '--r-d': `${c.r}deg`,
-  '--fx-d': MOUTH_X - (c.x + c.s / 2), // travel back to the mouth
-  '--fy-d': c.fy,
-  '--row-d': 0,
-  '--x-m': c.mob.x,
-  '--s-m': c.mob.s,
-  '--r-m': `${c.mob.r}deg`,
-  '--fx-m': MOUTH_X_MOB - (c.mob.x + c.mob.s / 2),
-  '--fy-m': c.mob.fy,
-  '--row-m': c.mob.row,
-  '--i': i,
-});
+const slotVars = (i) => {
+  const c = LAYOUT[i % LAYOUT.length];
+  const j = i % LAYOUT.length;
+  return {
+    '--x-d': c.x,
+    '--s-d': c.s,
+    '--r-d': `${c.r}deg`,
+    '--fx-d': MOUTH_X - (c.x + c.s / 2), // travel back to the mouth
+    '--fy-d': c.fy,
+    '--row-d': 0,
+    // sunk by whatever hangs below the object, so it is the object that
+    // stands on the shelf and the ribbon that drapes over the edge
+    '--dy-d': c.s * c.ar * (c.hg ?? 0),
+    '--dot-d': DOTS_D[j],
+    '--x-m': c.mob.x,
+    '--s-m': c.mob.s,
+    '--r-m': `${c.mob.r}deg`,
+    '--fx-m': MOUTH_X_MOB - (c.mob.x + c.mob.s / 2),
+    '--fy-m': c.mob.fy,
+    '--row-m': c.mob.row,
+    '--dy-m': c.mob.s * c.ar * (c.hg ?? 0),
+    '--dot-m': DOTS_M[j],
+    '--i': i,
+  };
+};
 
 export default function Play() {
   const sceneRef = useRef(null);
@@ -137,12 +189,16 @@ export default function Play() {
   const resetTimerRef = useRef(null);
   const framePool = useRef(null); // decoded frames, kept alive (see below)
   const btnRefs = useRef([]); // to return focus after a mini-page closes
-  const objRefs = useRef([]); // the object itself — where the iris starts
+  const objRefs = useRef([]); // the hover wash — where the iris starts
   const [active, setActive] = useState(null); // { hobby, index, origin }
 
-  /* iris origin = the object's centre, in viewport coords. The button
-     is the whole column (object + caption) so that the caption is part
-     of the target; its centre would put the iris down in the text. */
+  /* iris origin = the centre of the hover wash, in viewport coords —
+     the circle the iris is supposed to grow out of, so the two agree by
+     construction rather than by two sets of numbers happening to
+     match. (The button is the whole column, object + caption, so that
+     the caption is part of the target; its centre would put the iris
+     down in the text. The wash's own scale is about its centre, so an
+     un-hovered one measures the same point as a hovered one.) */
   const openHobby = (hobby, index) => {
     const rect = objRefs.current[index].getBoundingClientRect();
     setActive({
@@ -282,7 +338,7 @@ export default function Play() {
               <li
                 key={h.title}
                 className={`bag-item ${active?.index === i ? 'is-opened' : ''}`}
-                style={{ ...slotVars(LAYOUT[i % LAYOUT.length], i), '--tone': h.tone }}
+                style={{ ...slotVars(i), '--tone': h.tone }}
               >
                 <button
                   ref={(el) => (btnRefs.current[i] = el)}
@@ -290,12 +346,13 @@ export default function Play() {
                   onClick={() => openHobby(h, i)}
                   tabIndex={spilled ? 0 : -1}
                 >
-                  <span
-                    className="bag-obj"
-                    ref={(el) => (objRefs.current[i] = el)}
-                  >
+                  <span className="bag-obj">
                     <span className="bag-obj-in">
-                      <span className="bag-dot" aria-hidden="true" />
+                      <span
+                        className="bag-dot"
+                        aria-hidden="true"
+                        ref={(el) => (objRefs.current[i] = el)}
+                      />
                       <img src={imgMap[h.icon]} alt="" />
                     </span>
                   </span>

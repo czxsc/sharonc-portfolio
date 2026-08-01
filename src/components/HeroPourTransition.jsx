@@ -70,8 +70,9 @@ const STREAM_GAP = 4; // px — stream centreline this far left of the tilted cu
 const SPOUT_DROP = 8; // px — stream starts this far below the computed lip
 //                       height, tucking it under the tilted rim
 const FRAME_RIGHT_PAD = 56; // px — frame extends this far past the portrait
-const HERO_STACK_MAX = 941; // px — below this the hero reflows (cup moves to the
-//                             top right); the frame stays full-width there
+const HERO_STACK_MAX = 941; // px — below this the hero reflows (the margin
+//                             column drops below the landing, taking the cup
+//                             with it); the frame stays full-width there
 
 /* Cup-lip geometry: the rim corner of the Coffee doodle (viewBox 24×24,
    rim at 4,9), rotated by the full pour tilt about the CSS

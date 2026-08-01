@@ -250,9 +250,14 @@
 @media (max-width: 940px) {
   .hero-grid {
     grid-template-columns: 1fr 0.85fr;
+    /* margin sits UNDER the landing here, not over it. It carries the
+       coffee cup, and the cup is where the pour starts — above the
+       name it drops a stream down the full height of the hero, straight
+       through the type. Below it, the cup pours into the pool rising to
+       meet it, which is the gesture the section is actually about. */
     grid-template-areas:
-      'margin margin'
-      'main   side';
+      'main   side'
+      'margin margin';
     gap: clamp(18px, 3vw, 36px);
   }
   .hero-margin {
@@ -261,8 +266,8 @@
     justify-content: space-between;
     align-items: flex-start;
     border-right: 0;
-    border-bottom: 1px solid var(--line);
-    padding: 0 0 var(--sp-4);
+    border-top: 1px solid var(--line);
+    padding: var(--sp-4) 0 0;
     gap: var(--sp-4);
   }
   .hero-note { margin-top: 0; }

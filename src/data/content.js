@@ -55,6 +55,19 @@ import cursorNowCream from '../assets/projects/portfolio/cursors/04-bean-cream.p
 import aboutBeforeImg from '../assets/projects/portfolio/iterations/about_before.webp';
 import aboutAfterImg from '../assets/projects/portfolio/iterations/about_after.webp';
 
+/* Work, the same way — one viewport, one scroll landing, one clip box,
+   so the pair registers and only the section moves.
+
+   The before side is reconstructed rather than checked out: no single
+   commit holds that state (the faux window bar was there from the
+   first list version, and the blurb, the stack and the real
+   screenshots all arrived together in 5f7c6f2). It is HEAD with the
+   four things this pass added taken back out — the discipline labels,
+   the filters, the window chrome and the description/stack overlay —
+   which is the comparison the caption actually makes. */
+import workBeforeImg from '../assets/projects/portfolio/iterations/work_before.webp';
+import workAfterImg from '../assets/projects/portfolio/iterations/work_after.webp';
+
 /* Save-file snapshots for the permanent three — a `shot` on a favourite
    is what the hover peek picks up (HobbyPage · FavesList). Titles without
    one behave exactly as before, so the other two can land whenever the
@@ -75,6 +88,7 @@ import drinkYuzuAmericano from '../assets/hobby/drinks/yuzu_americano.webp';
 import drinkCaramelLatte from '../assets/hobby/drinks/caramel_latte.webp';
 import drinkSesameHojicha from '../assets/hobby/drinks/sesame_hojicha.webp';
 import drinkJasmineMatcha from '../assets/hobby/drinks/jasmine_matcha.webp';
+import kitchenFood from '../assets/hobby/drinks/food.webp';
 
 /* Die-cut stickers for the Stories watch row — each one trimmed to its
    subject on transparent, so the white outline is drawn in CSS. */
@@ -367,7 +381,7 @@ export const projects = [
       status: 'Live',
       subtitle: 'My portfolio website to display both my work and personality.',
       intro:
-        'A custom portfolio built in React and Vite, covering the whole surface, from visual direction and hand-drawn illustration through to the motion work and the component architecture. It has to read as clean and professional to someone scanning for two minutes, and still be unmistakably personal.',
+        'A custom portfolio built in React and Vite, covering the whole surface, from visual direction and hand-drawn illustration through to the motion work and the component architecture. It has to read as clean and professional but still feel unmistakably mine.',
       links: [{ label: 'GitHub', href: 'https://github.com/czxsc/sharonc-portfolio' }],
       meta: [
         { label: 'Category', value: 'Frontend, Design' },
@@ -634,30 +648,38 @@ export const projects = [
         {
           heading: 'Iterations',
           body: [
-            'Most sections went through two or three versions, and the pattern held. Early drafts said too little to stop anyone scrolling, so each pass added the one thing that made a section worth reading and cut whatever was decorating around it.',
+            'Every section of the site went through several passes. Many of the redesign decisions were not only for the sake of aesthetics, but also for improving clarity, scannability, and visitor engagement.',
           ],
-          /* Screenshots to drop in (captions are the keys, so keep them
-             unique). Each entry renders a labelled placeholder until it
-             gets a `src`, so the section is readable in the meantime. */
-          gallery: [
-            {
-              caption:
-                'Framer draft to the current hero. The static introduction became the pour that carries you into About.',
-            },
-            {
-              caption:
-                'The work index, before and after. Titles and images alone became stack on hover, a one line description and filtering by field.',
-            },
-          ],
-          /* `natural`: these are full-width captures of one section, so
+          /* Each pair reads under its own titled problem/solution pair
+             rather than a caption (see PassCopy in ProjectPage). The
+             labels are rendered as run-in tags, so the prose here
+             carries no "The Problem" lead-in of its own.
+
+             `natural`: these are full-width captures of one section, so
              the default 8:5 crop would cut the layout being compared. */
           compare: [
             {
               natural: true,
+              label: 'About section',
+              title: 'From static block to interactive transition',
+              problem:
+                'The initial draft relied on dense, multi-paragraph text blocks set against a flat dark panel. It felt like an unengaging wall of text, lacked visual elements, and felt skippable.',
+              solution:
+                'I trimmed the copy down to a clear, high-impact statement and restructured the layout into floating window cards. This change made the content significantly easier to scan while integrating seamlessly with the scroll-driven liquid fill transition from the Hero section. To keep resting states dynamic, I added a subtle background gradient animation that gently shifts like a pool of espresso, ensuring the viewport never feels completely static while someone is reading.',
               before: { src: aboutBeforeImg, label: 'Before · Flat panel' },
               after: { src: aboutAfterImg, label: 'After · Espresso pool' },
-              caption:
-                'About, either side of the rebuild. Two paragraphs of biography became one statement poured onto the espresso pool, with experience moved into a paper window beside it.',
+            },
+            {
+              natural: true,
+              framed: true,
+              label: 'Work section',
+              title: 'Enhancing context and discoverability',
+              problem:
+                'The original project index simply paired project titles with a single image. Because project names alone rarely communicate what a project actually does, visitors had to click into case studies just to understand basic context or tech stacks, and search through to find the relevant projects they were looking for.',
+              solution:
+                'I expanded the project list to display domain tags and tech stacks on hover, giving visitors instant technical context. Additionally, I added a filtering system by field, ML versus full stack, allowing readers to quickly sort through projects relevant to their specific domain without leaving the main index.',
+              before: { src: workBeforeImg, label: 'Before · Titles and a photo' },
+              after: { src: workAfterImg, label: 'After · Field, stack and sorting' },
             },
           ],
           /* The cursor is the one iteration with no screenshots to wait
@@ -666,7 +688,12 @@ export const projects = [
              are 21px of bean, and what changed between passes only reads
              against the two grounds they had to survive. */
           cursorTrail: {
-            title: 'The cursor, four passes',
+            label: 'Custom cursor',
+            title: 'Balancing detail, contrast, and state',
+            problem:
+              'A custom cursor needs to function reliably at small sizes and across both light cream and dark espresso backgrounds without losing detail or confusing interactable states.',
+            solution:
+              'After four iterations, I arrived at a dual-ink design where each color is rimmed in the other. This ensures high contrast and crisp visibility across every background color on the site, reserving cursor changes purely for user interaction and hover feedback.',
             hint: 'Left is cursor at rest, Right is cursor over clickable elements',
             grounds: [
               { id: 'light', label: 'On paper', color: '#f5f4f1' },
@@ -714,10 +741,23 @@ export const projects = [
           },
         },
         {
-          heading: 'Reflection',
+          heading: 'Reflections & Key Takeaways',
           body: [
-            'The hardest part was keeping expressive motion cheap. Early versions leaned on large animated assets, and the cost showed up as dropped frames rather than an obvious bug, so it took me a while to trace the performance problems back to my own image weight. One was the cat that knocks over the tote bag in Play, originally an animated GIF. A GIF clock starts on decode rather than on the render that set its source, so on a second visit a cached image resumed mid fall while the hobby items spilled on their own schedule. Unpacking it into webp frames and stepping through them in React with the original delays fixed the sync and cut the weight at once.',
-            'That fix is a fair summary of the project, since the creative half and the technical half kept turning out to be the same work. The constraint I would keep is the one that made both tractable, prototyping the composition cheaply in Framer and only paying for the rebuild once the details worth writing code for were clear. The site is live and still moving, with the hobby pages and a few case studies the parts I keep returning to.',
+            'The clearest throughline was that the creative and technical work kept turning out to be the same problem, prototyping cheaply in Framer and only rebuilding in code once a detail earned it. The site is still moving, with the hobby pages and a few case studies the parts I keep returning to.',
+          ],
+          facts: [
+            {
+              title: 'Motion & Performance',
+              text: 'A GIF clocks from decode, not render, so a cached cat animation in Play kept resuming out of sync. Stepping through webp frames in React fixed the timing and the frame drops together.',
+            },
+            {
+              title: 'Accessibility & Reflow',
+              text: 'A custom cursor and hand-drawn accents raised the bar on contrast and keyboard support. Small screens got reorganized layouts instead of a plain stack.',
+            },
+            {
+              title: 'Systems Thinking',
+              text: 'Hand-rolling the site instead of reaching for a builder meant real design tokens, decoupled content, and shared transition hooks in place of one-off styling.',
+            },
           ],
         },
       ],
@@ -775,16 +815,16 @@ export const projects = [
         {
           heading: 'Research: Redesigning for the team',
           body: [
-            'Rather than directly moving Mission Planner\'s interface over, I redesigned the setup experience to best fit our team\'s needs. Integrating hardware setup into our GCS solved the platform-switching and Mac compatibility problems, while the interface itself was simplified to focus on the five setup tasks we actually perform, replacing cluttered menus and external documentation with a guided, intuitive experience.',
+            'Rather than directly moving Mission Planner\'s interface over, I redesigned the setup experience to best fit our team\'s needs. Integrating hardware setup into our GCS solved the platform-switching and Mac compatibility problems, while the interface itself was simplified to focus on the setup tasks we actually perform, replacing cluttered menus and external documentation with a guided, intuitive experience.',
           ],
           facts: [
             {
               title: 'Simplified to the essential workflows',
-              text: 'Accelerometer calibration, large-vehicle compass calibration, radio calibration, servo outputs, and flight modes — the setup steps every flight needs, and nothing else.',
+              text: 'Limited to the setup tasks our team uses: Accelerometer, large-vehicle compass, radio, servo outputs, and flight modes.',
             },
             {
               title: 'A window, not a sidebar',
-              text: 'Hardware setup happens before flight, so it lives in its own separate draggable modal instead of permanently crowding flight-critical telemetry on the main display.',
+              text: 'Hardware setup happens before flight, so its in a separate draggable modal instead of crowding flight-critical telemetry on the main display.',
             },
             {
               title: 'Guidance built in',
@@ -2157,13 +2197,13 @@ export const hobbies = [
   },
   {
     icon: 'coffee',
-    slug: 'drinks',
-    title: 'Drink making',
-    note: 'Pour-overs, matchas, and the odd experiment.',
+    slug: 'eats',
+    title: 'Eats',
+    note: 'Experimenting with iced lattes, teas, and home-cooked meals',
     tone: 'var(--espresso)',
     page: {
       tagline:
-        'Pour-overs on slow mornings, matcha when it’s warm, and the occasional experiment that shouldn’t leave the kitchen.',
+        'Pour-overs on slow mornings, matcha when it’s warm, and whatever’s actually cooking in the kitchen.',
       /* Drinks gets a bespoke composition (DrinksBlocks): a menu of
          cards down the left, the kitchen beside it. Blocks are picked
          by `id`. */
@@ -2228,9 +2268,10 @@ export const hobbies = [
         },
         {
           id: 'kitchen',
-          kind: 'soon',
+          kind: 'photo',
           title: 'From the kitchen',
-          note: 'Cooking goes here — the same cards, for things that need a plate.',
+          src: kitchenFood,
+          caption: 'Soups, egg tarts, and whatever else got made that week.',
         },
       ],
     },

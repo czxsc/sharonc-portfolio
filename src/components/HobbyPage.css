@@ -1742,6 +1742,35 @@
   color: var(--ink-faint);
 }
 
+/* ---- kitchen slot, filled ----
+   Same footprint as the empty frame, but the cutout photo sits
+   directly on the page's own paper rather than a bordered panel — a
+   plate of food doesn't need a UI frame around it the way an absent
+   one needed something to say what belongs there. */
+.hpd-photo {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-3);
+  min-height: clamp(300px, 30vw, 420px);
+  padding: clamp(12px, 1.6vw, 20px) 0;
+}
+.hpd-photo img {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+}
+.hpd-photo figcaption {
+  max-width: 30ch;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: clamp(0.92rem, 1.05vw, 1rem);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
 @media (max-width: 1040px) {
   /* the kitchen drops under the menu before the cards get too narrow
      to hold a name and its bean count on one line */

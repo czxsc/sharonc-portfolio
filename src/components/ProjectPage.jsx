@@ -652,9 +652,14 @@ function Section({ s }) {
           both reads screenshots first, then the marks. */}
       {s.compare &&
         (Array.isArray(s.compare) ? s.compare : [s.compare]).map((cmp) => (
-          <Compare cmp={cmp} key={cmp.caption} />
+          <Compare cmp={cmp} key={cmp.before.label} />
         ))}
-      {s.cursorTrail && <CursorTrail trail={s.cursorTrail} />}
+      {s.cursorTrail && (
+        <>
+          <PassCopy pass={s.cursorTrail} />
+          <CursorTrail trail={s.cursorTrail} />
+        </>
+      )}
       {s.zones && <ZoneStudy zones={s.zones} />}
       {/* the four graded tilesets, laid out so the shared grey rock
           reads across the row — same argument as ZoneStudy, one floor
@@ -682,33 +687,90 @@ function Section({ s }) {
   );
 }
 
+/* the prose above one iteration, shared by the before/after pairs and
+   the cursor figure so a run of passes reads on one rhythm: a section
+   name in the rail, the pass's title, then the problem and what was
+   done about it.
+
+   `Problem` / `Solution` are run-in tags rather than words in the copy,
+   which keeps the sentences clean and lets the pair carry the same
+   faint→espresso relationship the Before/After labels already do. A
+   lone `text` (the older shape, still used by other case studies)
+   renders as a plain lead paragraph.
+
+   Everything here is a direct child of the section on purpose: the
+   paragraphs pick up body type from `.pp-section > p`, so they must not
+   be wrapped. */
+function PassCopy({ pass }) {
+  const { label, title, problem, solution, text } = pass;
+  return (
+    <>
+      {(label || title) && (
+        <div className="pp-pass-head">
+          {label && <span className="pp-pass-eyebrow">{label}</span>}
+          {title && <h3>{title}</h3>}
+        </div>
+      )}
+      {problem && (
+        <p className="pp-pass-p">
+          <span className="pp-pass-tag">Problem</span>
+          {problem}
+        </p>
+      )}
+      {solution && (
+        <p className="pp-pass-p is-solution">
+          <span className="pp-pass-tag">Solution</span>
+          {solution}
+        </p>
+      )}
+      {text && <p className="pp-lead">{text}</p>}
+    </>
+  );
+}
+
 /* a labelled before/after pair, side by side.
 
    The default crops both shots to 8:5, which is right for app captures
    that are already close to square. `natural` is for much wider shots
    of a whole page section, where that crop would remove the
-   composition being argued about: it keeps each at its own ratio. */
+   composition being argued about: it keeps each at its own ratio.
+   `framed` adds the hairline back for shots of a paper-coloured
+   section, which has no edge of its own against the page.
+
+   The copy above it comes from PassCopy, and it's body prose rather
+   than a figcaption because it is meant to be read (what the section
+   was, why it changed, what the change bought) rather than to label a
+   picture. The Fragment is load-bearing: `.pp-section > p` is a
+   direct-child selector, so wrapping the two in a div would drop the
+   paragraph out of the body type. */
 function Compare({ cmp }) {
   return (
-    <figure className={`pp-compare ${cmp.natural ? 'is-natural' : ''}`}>
-      <div className="pp-compare-grid">
-        {[cmp.before, cmp.after].map((c) => (
-          <div className="pp-compare-item" key={c.label}>
-            <span className="pp-compare-label">{c.label}</span>
-            <img
-              src={c.src}
-              alt=""
-              loading="lazy"
-              style={{
-                objectPosition: c.position,
-                objectFit: c.fit ? 'contain' : undefined,
-              }}
-            />
-          </div>
-        ))}
-      </div>
-      {cmp.caption && <figcaption>{cmp.caption}</figcaption>}
-    </figure>
+    <>
+      <PassCopy pass={cmp} />
+      <figure
+        className={`pp-compare ${cmp.natural ? 'is-natural' : ''} ${
+          cmp.framed ? 'is-framed' : ''
+        }`}
+      >
+        <div className="pp-compare-grid">
+          {[cmp.before, cmp.after].map((c) => (
+            <div className="pp-compare-item" key={c.label}>
+              <span className="pp-compare-label">{c.label}</span>
+              <img
+                src={c.src}
+                alt=""
+                loading="lazy"
+                style={{
+                  objectPosition: c.position,
+                  objectFit: c.fit ? 'contain' : undefined,
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        {cmp.caption && <figcaption>{cmp.caption}</figcaption>}
+      </figure>
+    </>
   );
 }
 

@@ -100,7 +100,7 @@ export default function HobbyPage({ hobby, img, origin, onClose }) {
             <GamingBlocks blocks={hobby.page.blocks} />
           ) : hobby.slug === 'stories' ? (
             <StoriesBlocks blocks={hobby.page.blocks} />
-          ) : hobby.slug === 'drinks' ? (
+          ) : hobby.slug === 'eats' ? (
             <DrinksBlocks blocks={hobby.page.blocks} />
           ) : (
             <div className="hp-blocks">
@@ -446,21 +446,28 @@ function DrinksBlocks({ blocks }) {
         <h2 className="hpb-label">
           <span>{kitchen.title}</span>
         </h2>
-        <div className="hpd-frame">
-          {/* a drawn asterisk, for the same reason as the triangle */}
-          <svg className="hpd-frame-mark" viewBox="0 0 20 20" aria-hidden="true">
-            <g
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            >
-              <path d="M10 3.4v13.2M4.3 6.7l11.4 6.6M15.7 6.7 4.3 13.3" />
-            </g>
-          </svg>
-          <p className="hpd-frame-note">{kitchen.note}</p>
-          <p className="hpd-frame-tag">In progress</p>
-        </div>
+        {kitchen.src ? (
+          <figure className="hpd-photo">
+            <img src={kitchen.src} alt={kitchen.caption || ''} loading="lazy" />
+            {kitchen.caption && <figcaption>{kitchen.caption}</figcaption>}
+          </figure>
+        ) : (
+          <div className="hpd-frame">
+            {/* a drawn asterisk, for the same reason as the triangle */}
+            <svg className="hpd-frame-mark" viewBox="0 0 20 20" aria-hidden="true">
+              <g
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              >
+                <path d="M10 3.4v13.2M4.3 6.7l11.4 6.6M15.7 6.7 4.3 13.3" />
+              </g>
+            </svg>
+            <p className="hpd-frame-note">{kitchen.note}</p>
+            <p className="hpd-frame-tag">In progress</p>
+          </div>
+        )}
       </section>
     </div>
   );

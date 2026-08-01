@@ -673,6 +673,64 @@
 .pp-compare {
   margin: var(--sp-4) 0 0;
 }
+/* the paragraph a visual reads under. Set as body copy by
+   `.pp-section > p`, so all it needs here is the grouping: a clear
+   break above it, and its own figure pulled up close underneath, so a
+   run of iterations reads as blocks rather than an even column of
+   paragraphs and pictures. */
+.pp-lead {
+  margin-top: var(--sp-5);
+}
+.pp-lead + .pp-compare,
+.pp-lead + .ct {
+  margin-top: var(--sp-3);
+}
+/* ---------- one iteration's copy ----------
+   Section name in small caps over the pass's title, then the problem
+   and the solution. The gap above the head is what separates one pass
+   from the last one's screenshots; the visual it argues about is
+   pulled up tight underneath, so each pass reads as a block. */
+.pp-pass-head {
+  margin-top: var(--sp-6);
+}
+.pp-pass-eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.pp-pass-head h3 {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.pp-pass-p {
+  margin-top: var(--sp-3);
+}
+/* the run-in label. Faint for the problem and espresso for the
+   solution, the same pairing the Before/After labels carry, so the
+   prose and the screenshots under it are read in the same order. */
+.pp-pass-tag {
+  margin-right: 0.7em;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.pp-pass-p.is-solution .pp-pass-tag {
+  color: var(--espresso);
+}
+.pp-pass-p + .pp-compare,
+.pp-pass-p + .ct {
+  margin-top: var(--sp-4);
+}
 .pp-compare-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -714,6 +772,13 @@
      would print a rim around them */
   background: transparent;
   border-color: transparent;
+}
+/* `framed`: a natural capture of a section that is itself paper, which
+   would otherwise bleed into the page it is printed on with no edge at
+   all. The hairline is the same one the cropped pairs carry — it marks
+   where the screenshot stops, nothing more. */
+.pp-compare.is-natural.is-framed .pp-compare-item img {
+  border-color: var(--line-soft);
 }
 .pp-compare figcaption {
   margin-top: 10px;
