@@ -657,7 +657,9 @@ function Section({ s }) {
       {s.cursorTrail && (
         <>
           <PassCopy pass={s.cursorTrail} />
-          <CursorTrail trail={s.cursorTrail} />
+          {/* the pass head above carries the label and title, so the
+              figure's own head keeps just the hint */}
+          <CursorTrail trail={s.cursorTrail} showTitle={false} />
         </>
       )}
       {s.zones && <ZoneStudy zones={s.zones} />}

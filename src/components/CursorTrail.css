@@ -28,7 +28,10 @@
   font-weight: 600;
   letter-spacing: -0.01em;
 }
+/* holds the right edge whether or not the head carries a title, so the
+   hint stays over the two mark columns it is describing */
 .ct-hint {
+  margin-left: auto;
   font-family: var(--mono);
   font-size: var(--fs-label);
   letter-spacing: 0.08em;

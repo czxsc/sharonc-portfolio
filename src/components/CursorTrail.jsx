@@ -17,14 +17,19 @@ import './CursorTrail.css';
    record still says what it said if the palette moves later or the
    page is read in dark theme.
 
-   Data shape (content.js → section.cursorTrail). `text` is the lead
-   paragraph, rendered by the section above this figure rather than
-   inside it, so it sits in the body flow like the compare pairs' own:
-   { text, title, hint,
+   Data shape (content.js → section.cursorTrail). The copy keys
+   (label / title / problem / solution) are read by PassCopy, which
+   renders them above this figure so they sit in the body flow like
+   the compare pairs' own:
+   { title, hint,
      grounds: [{ id, label, color }],
      stages: [{ id, name, current?, note,
                 marks: { <groundId>: { rest, link } } }],   // { src }
      caption }
+
+   `showTitle` is false when a PassCopy head is standing above this
+   figure. Both read `title` off the same object, so without it the
+   heading would print twice.
    ------------------------------------------------------------------ */
 
 const STATES = [
@@ -32,14 +37,12 @@ const STATES = [
   ['link', 'over a link'],
 ];
 
-export default function CursorTrail({ trail }) {
+export default function CursorTrail({ trail, showTitle = true }) {
   const { grounds, stages } = trail;
   return (
     <figure className="ct">
       <div className="ct-head">
-        {/* omitted when the pass above already carries the title
-            (see PassCopy in ProjectPage), so the hint sits alone */}
-        {trail.title && <h3>{trail.title}</h3>}
+        {showTitle && trail.title && <h3>{trail.title}</h3>}
         {trail.hint && <p className="ct-hint">{trail.hint}</p>}
       </div>
 

@@ -1933,9 +1933,9 @@ export const projects = [
     name: 'Dishcovery',
     slug: 'dishcovery',
     category: 'ML · Full-Stack',
-    year: '2025',
+    year: '2026',
     blurb: 'Restaurant recommendations from food, ambiance, and price queries.',
-    tech: ['React', 'Python', 'SVD', 'LLM'],
+    tech: ['Python', 'scikit-learn', 'React', 'LLM'],
     image: dishcoveryImg,
     tone: ['var(--tone-d1)', 'var(--tone-d2)'],
     href: '#work',
@@ -1943,50 +1943,200 @@ export const projects = [
       status: 'Completed',
       // show the whole demo screenshot instead of the 21:9 hero crop
       hero: { fit: true },
-      subtitle: 'Restaurant recommendations from plain-language cravings.',
+      subtitle: 'Latent semantic search over restaurant reviews.',
       intro:
-        'Dishcovery answers the question review sites can’t: “somewhere quiet with great hand-pulled noodles, under $20.” It parses free-form queries about food, ambiance, and price, and ranks restaurants against thousands of reviews.',
-      links: [{ label: 'Demo', href: '#' }, { label: 'GitHub', href: '#' }],
+        'Dishcovery turns a sentence like “Nashville quiet cheap lunch” into ten ranked restaurants, scored against the text of their reviews rather than their star average. Built by four students for INFO 4300, Language and Information, at Cornell. This page covers the retrieval and ranking layer.',
+      links: [{ label: 'GitHub', href: 'https://github.com/sanikashar/Dishcovery' }],
       meta: [
-        { label: 'Category', value: 'Machine Learning, Full-Stack' },
-        { label: 'My role', value: 'ML & frontend' },
-        { label: 'Timeline', value: '2025' },
-        { label: 'Skills', value: 'React, Python, SVD, LLM integration' },
-        { label: 'Team', value: 'Team of 5 — TODO: teammate names' },
+        { label: 'Category', value: 'Information retrieval, Full-Stack' },
+        { label: 'My role', value: 'Retrieval and ranking' },
+        { label: 'Timeline', value: 'Spring 2026' },
+        { label: 'Skills', value: 'Python, scikit-learn, TF-IDF, SVD, sentence embeddings, RAG' },
+        { label: 'Team', value: 'Rhea Agrawal, Sanika Sharma, Enaika Kishnani, and me' },
       ],
       sections: [
         {
-          heading: 'Problem: Reviews answer questions nobody asked',
+          heading: 'Why a star rating answers the wrong question',
           body: [
-            'Star ratings average away exactly what you care about. A four-star restaurant might be perfect for a date and wrong for a work lunch — the signal is in the review text, and nobody reads three hundred reviews.',
+            'A four star average is taken over every reason anyone liked a place, so it cannot say whether the room is quiet, whether the ramen is the thing to order, or whether it holds up as a cheap weekday lunch. That detail lives in the review text, and nobody reads three hundred reviews.',
+            'So the review text becomes the searchable document, and the query is read as a description of a vibe instead of a set of keywords.',
           ],
         },
         {
-          heading: 'How it works',
+          heading: 'The dataset',
           body: [
-            'The pipeline turns a sentence of preferences into a ranked shortlist with receipts.',
+            'The corpus is a sampled slice of the public Yelp open dataset, cut down far enough that the whole index rebuilds in minutes.',
           ],
           facts: [
             {
-              title: 'SVD retrieval',
-              text: 'Latent-semantic search over review text finds candidates that match the vibe, not just the keywords.',
+              title: '150k businesses in, 8k out',
+              text: 'Businesses are filtered to restaurants and fast food, then sampled proportionally across the ten cities holding the most of them, keeping only places with at least fifteen reviews.',
             },
             {
-              title: 'LLM reranking',
-              text: 'A second pass scores candidates against the specific query — food, ambiance, and price separately.',
+              title: 'One document per restaurant',
+              text: 'Up to twenty five reviews are lowercased, stripped of punctuation and stop words, and joined into a single field of roughly eight thousand characters.',
             },
             {
-              title: 'Evidence surfaced',
-              text: 'Each recommendation quotes the review lines that earned it, so you can trust the match.',
+              title: 'Attributes become words',
+              text: 'Price tier, noise level, meal flags, takeout and alcohol are rewritten as terms like cheap, quiet and lunch, so structured fields land in the same vector space as the prose.',
             },
           ],
         },
         {
-          heading: 'Impact',
+          heading: 'Anatomy of a search',
           body: [
-            'The demo consistently beat keyword search on ambiance-heavy queries in our evaluation set, and the evidence-quoting pattern became the feature testers mentioned first.',
+            'A request runs through query parsing, ranking, filtering and two optional model calls before anything reaches the page. The React and TypeScript frontend stays deliberately thin, since every ranking decision happens in Flask.',
           ],
-          media: { src: dishcoveryImg, fit: true, caption: 'Dishcovery results view — query to ranked shortlist.' },
+          // the isometric pile (StackDiagram.jsx); one plate per tool,
+          // grouped by layer, request path in the default card
+          stack: {
+            title: 'One query, four layers',
+            hint: 'Hover a layer to see what it holds.',
+            flow: [
+              { title: 'Query in', note: 'city and cravings, pulled apart before anything is scored' },
+              { title: 'Rank against the city', note: 'TF-IDF and SVD in a cached per city latent space' },
+              { title: 'Ten results out', note: 'deduplicated, filtered, each carrying the dimensions that earned it' },
+            ],
+            // diagram-specific hues (not site tokens): the translucent
+            // plates blend when stacked, so the bands need genuinely
+            // different hue families — rust / blue / amber / green
+            groups: [
+              {
+                name: 'Frontend',
+                tone: '#b05438',
+                tools: [
+                  { name: 'React and TypeScript', note: 'search bar, filters, result cards' },
+                  { name: 'Tailwind', note: 'styling and layout' },
+                  { name: 'Keyword map', note: 'marks which tag pills a query actually hit' },
+                ],
+              },
+              {
+                name: 'Flask API',
+                tone: '#3e6b9e',
+                tools: [
+                  { name: '/api/search', note: 'pure retrieval, no model calls' },
+                  { name: '/api/rag-search', note: 'retrieval wrapped in a rewrite and a summary' },
+                  { name: '/api/explain', note: 'one card explained, requested on demand' },
+                ],
+              },
+              {
+                name: 'Retrieval core',
+                tone: '#c99a3d',
+                tools: [
+                  { name: 'Query preprocessing', note: 'city extraction, filler removal, fuzzy repair' },
+                  { name: 'TF-IDF vectorizer', note: 'unigrams and bigrams over four restaurant fields' },
+                  { name: 'Truncated SVD', note: 'one hundred latent dimensions, fitted per city' },
+                  { name: 'Cosine ranking', note: 'query projected into the same space, top ten by score' },
+                  { name: 'Dimension readout', note: 'what pushed a result up, and what pushed it down' },
+                ],
+              },
+              {
+                name: 'LLM layer',
+                tone: '#55855a',
+                tools: [
+                  { name: 'Query rewriter', note: 'a sentence becomes search terms before retrieval runs' },
+                  { name: 'Overview writer', note: 'two or three sentences across the top five' },
+                  { name: 'Result explainer', note: 'grounded in one restaurant’s own attributes and reviews' },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          heading: 'How the ranking model evolved',
+          body: [
+            'Ranking started as the simplest thing that could work and was rebuilt four times, each pass fixing a failure the previous one made visible.',
+          ],
+          subs: [
+            {
+              title: 'Cosine similarity over raw TF-IDF',
+              deck: 'The first version scored a query against one bag of words per restaurant.',
+              bullets: [
+                'Reviews dominated the vector, so ambience words like romantic or divey were buried under thousands of words about food.',
+                'Ambience terms parsed from the Yelp attributes were repeated three times per document to give them real mass, alongside the rewritten attribute words.',
+                'It handled “sushi” and fell apart on “fancy formal sushi”, which is the query the project exists for.',
+              ],
+            },
+            {
+              title: 'Latent semantics through SVD',
+              deck: 'Truncated SVD compresses the sparse TF-IDF matrix into one hundred dimensions per city.',
+              bullets: [
+                'Queries project into the same space, so a search for upscale reaches restaurants whose reviews say classy or refined without sharing a term.',
+                'Fitting one decomposition per city keeps dimensions tied to local vocabulary and keeps every matrix small.',
+                'A thirty thousand feature cap and a minimum document frequency of two cut build time with no visible change in the top ten.',
+              ],
+            },
+            {
+              title: 'Fuzzy repair before projection',
+              deck: 'Any query word missing from the TF-IDF vocabulary is swapped for its nearest neighbour in that vocabulary.',
+              bullets: [
+                'Close matching runs at a 0.75 cutoff, so “romantik” resolves while a genuinely unfamiliar word passes through untouched.',
+                'It has to run before projection, because a typo in the latent space is not a near miss, it is noise spread across every dimension.',
+              ],
+            },
+            {
+              title: 'A bake-off the simpler model won',
+              deck: 'Two embedding approaches were built and measured against the TF-IDF and SVD baseline.',
+              bullets: [
+                'GloVe vectors weighted by TF-IDF, and Sentence BERT on all-MiniLM-L6-v2, both scored four fields separately, ambience, cuisine, reviews and practical, then fused the per field cosines with weights favouring ambience.',
+                'Both read as smoother on vibe queries, both were far slower to build, and neither could point at why a given restaurant ranked where it did.',
+                'SVD stayed in production. The embedding paths stayed in the codebase behind a model type switch.',
+              ],
+            },
+            {
+              title: 'Constraints outside the vector space',
+              deck: 'Some parts of a query are facts, not semantics, and are handled as facts.',
+              bullets: [
+                'Time words like brunch or late night are checked against opening hours rather than matched as text.',
+                'Rating and price filters run on the client over the returned cards, so narrowing never refires a search.',
+              ],
+            },
+          ],
+        },
+        {
+          heading: 'Showing why a result ranked',
+          body: [
+            'Every score ships with the latent dimensions behind it. For the query, the strongest activated dimensions are read out of the SVD components and labelled by their heaviest loading terms. For a single restaurant, the per dimension products of query and document coordinates split into the dimensions that pulled it up and the ones that pulled it down, which surface as tooltips on the card.',
+            'Dimensions whose top terms are all generic get dropped before display. A tooltip reading “good / great / really” explains nothing, so terms like food, place and service are filtered out and the next honest dimension takes the slot.',
+          ],
+        },
+        {
+          heading: 'Where the language model sits',
+          body: [
+            'The LLM wraps retrieval rather than replacing it. A rewrite runs first, turning “I am looking for somewhere nice for a date in Tampa” into the short phrase the vectorizer wants. After ranking, one call summarizes the top five, and a second, fired only when a card is opened, explains that one restaurant from its own categories, ambience tags, price, rating and a truncated slice of its reviews.',
+            'Nothing in the ranking path depends on it. With no API key or a failed call, the endpoints fall back to pure retrieval and the page still renders.',
+          ],
+        },
+        {
+          heading: 'Making it fast enough to demo',
+          body: [
+            'The first working build refit a vectorizer on every keystroke of a demo, which made the whole thing feel broken. Almost all of that time was work being repeated.',
+          ],
+          facts: [
+            {
+              title: 'Fitted once, at boot',
+              text: 'Every city corpus is built at startup and held in memory, so a search costs one projection and one matrix multiply instead of a fit.',
+            },
+            {
+              title: 'Cached to disk',
+              text: 'Fitted vectorizers and document matrices are pickled under a hash of their business ids and dimension count, gzipped, and reloaded on the next boot.',
+            },
+            {
+              title: 'Vectorized embedding',
+              text: 'The GloVe path went from a loop over documents to a single sparse multiply against a vocabulary embedding matrix, built once.',
+            },
+            {
+              title: 'Cheap top ten',
+              text: 'Duplicate names collapse in a dictionary and the final ten come off a heap, so nothing sorts the full city twice.',
+            },
+          ],
+        },
+        {
+          heading: 'What I would change',
+          body: [
+            'Ranking and filtering stayed too far apart. Hours, price and rating are applied after the vector step, so a narrow query can rank ten results and then hide most of them, with nothing reaching further down the list to refill. Folding the structured constraints into candidate selection is the shape I would build now.',
+            'The field weighted embedding path was the more interesting model and it lost on explainability alone. Given a way to attribute a sentence embedding score back to individual fields, I think that call flips.',
+          ],
         },
       ],
     },
