@@ -647,6 +647,13 @@ function Section({ s }) {
       {s.codeMap && <CodeMap map={s.codeMap} />}
       {s.flow && <FlowDiagram flow={s.flow} />}
       {s.archMap && <ArchMap map={s.archMap} />}
+      {/* one entry, or a list of them where a section walks through
+          several passes. Sits above cursorTrail so a section that has
+          both reads screenshots first, then the marks. */}
+      {s.compare &&
+        (Array.isArray(s.compare) ? s.compare : [s.compare]).map((cmp) => (
+          <Compare cmp={cmp} key={cmp.caption} />
+        ))}
       {s.cursorTrail && <CursorTrail trail={s.cursorTrail} />}
       {s.zones && <ZoneStudy zones={s.zones} />}
       {/* the four graded tilesets, laid out so the shared grey rock
@@ -670,29 +677,38 @@ function Section({ s }) {
           {s.tiles.caption && <figcaption>{s.tiles.caption}</figcaption>}
         </figure>
       )}
-      {s.compare && (
-        <figure className="pp-compare">
-          <div className="pp-compare-grid">
-            {[s.compare.before, s.compare.after].map((c) => (
-              <div className="pp-compare-item" key={c.label}>
-                <span className="pp-compare-label">{c.label}</span>
-                <img
-                  src={c.src}
-                  alt=""
-                  loading="lazy"
-                  style={{
-                    objectPosition: c.position,
-                    objectFit: c.fit ? 'contain' : undefined,
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-          {s.compare.caption && <figcaption>{s.compare.caption}</figcaption>}
-        </figure>
-      )}
       {!s.imagesFirst && pictures}
     </section>
+  );
+}
+
+/* a labelled before/after pair, side by side.
+
+   The default crops both shots to 8:5, which is right for app captures
+   that are already close to square. `natural` is for much wider shots
+   of a whole page section, where that crop would remove the
+   composition being argued about: it keeps each at its own ratio. */
+function Compare({ cmp }) {
+  return (
+    <figure className={`pp-compare ${cmp.natural ? 'is-natural' : ''}`}>
+      <div className="pp-compare-grid">
+        {[cmp.before, cmp.after].map((c) => (
+          <div className="pp-compare-item" key={c.label}>
+            <span className="pp-compare-label">{c.label}</span>
+            <img
+              src={c.src}
+              alt=""
+              loading="lazy"
+              style={{
+                objectPosition: c.position,
+                objectFit: c.fit ? 'contain' : undefined,
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      {cmp.caption && <figcaption>{cmp.caption}</figcaption>}
+    </figure>
   );
 }
 

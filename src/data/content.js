@@ -47,6 +47,14 @@ import cursorOutlineCream from '../assets/projects/portfolio/cursors/03-outline-
 import cursorNowInk from '../assets/projects/portfolio/cursors/04-bean.png';
 import cursorNowCream from '../assets/projects/portfolio/cursors/04-bean-cream.png';
 
+/* About, either side of the rebuild. Both captured from the running
+   site at the same viewport and the same crop box, the before off a
+   detached checkout of 7d9fd6a (the last commit before the pour), so
+   the two line up and only the redesign moves between them.
+   Regenerate with scripts/shoot-iterations.mjs. */
+import aboutBeforeImg from '../assets/projects/portfolio/iterations/about_before.webp';
+import aboutAfterImg from '../assets/projects/portfolio/iterations/about_after.webp';
+
 /* Save-file snapshots for the permanent three — a `shot` on a favourite
    is what the hover peek picks up (HobbyPage · FavesList). Titles without
    one behave exactly as before, so the other two can land whenever the
@@ -204,12 +212,14 @@ export const experience = [
                (+ Team only where it was a team project)
    - sections: [{ heading, body: [paragraphs], facts?: [{title, text}],
                   points?: [{icon, text}], stack?, flow?,
-                  compare?: { before, after: {src, label}, caption },
+                  compare?: { before, after: {src, label}, caption,
+                              stacked? } — or an array of those,
                   media?: { src?, fit?, caption },
                   gallery?: [{src, caption}] }] — media without src
                renders a placeholder panel; fit shows the whole image
                instead of the 21:9 crop; points renders icon tiles;
-               compare renders a labeled before/after pair;
+               compare renders a labeled before/after pair, side by
+               side, or stacked full width for section-wide captures;
                stack renders StackDiagram.jsx, flow FlowDiagram.jsx
 
    TODO(sharon): all case copy below is placeholder — replace with the
@@ -636,11 +646,18 @@ export const projects = [
             },
             {
               caption:
-                'About, before and after. One block of text became a shorter statement set on the espresso pool.',
-            },
-            {
-              caption:
                 'The work index, before and after. Titles and images alone became stack on hover, a one line description and filtering by field.',
+            },
+          ],
+          /* `natural`: these are full-width captures of one section, so
+             the default 8:5 crop would cut the layout being compared. */
+          compare: [
+            {
+              natural: true,
+              before: { src: aboutBeforeImg, label: 'Before · Flat panel' },
+              after: { src: aboutAfterImg, label: 'After · Espresso pool' },
+              caption:
+                'About, either side of the rebuild. Two paragraphs of biography became one statement poured onto the espresso pool, with experience moved into a paper window beside it.',
             },
           ],
           /* The cursor is the one iteration with no screenshots to wait
@@ -672,7 +689,7 @@ export const projects = [
                   light: { rest: { src: cursorSolid }, link: { src: cursorSolid } },
                   dark: { rest: { src: cursorSolid }, link: { src: cursorSolid } },
                 },
-                note: 'Much simpler shape and recognizable even at small sizes. However, not distinguishable when something is interactable, and blends into dark backgrounds.',
+                note: 'Simpler shape and recognizable even at small sizes. However, doesn\'t signal what is interactable and blends into dark backgrounds.',
               },
               {
                 id: '03',

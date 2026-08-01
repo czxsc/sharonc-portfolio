@@ -702,6 +702,19 @@
   border: 1px solid var(--line-soft);
   background: var(--paper-2);
 }
+/* natural: captures of a whole page section, which are far wider than
+   8:5. The default crop would cut away the composition being compared,
+   so these keep their own ratio and sit at whatever height that gives,
+   still two across. The pair is the same shape, so the two tops and
+   bottoms line up on their own. */
+.pp-compare.is-natural .pp-compare-item img {
+  aspect-ratio: auto;
+  object-fit: contain;
+  /* the shots are already a dark panel, so a paper-coloured backing
+     would print a rim around them */
+  background: transparent;
+  border-color: transparent;
+}
 .pp-compare figcaption {
   margin-top: 10px;
   font-family: var(--mono);
@@ -770,15 +783,22 @@
   color: var(--ink-soft);
 }
 /* a hairline tick rather than a bullet glyph, so the list reads as
-   ruled editorial detail instead of a spec sheet */
+   ruled editorial detail instead of a spec sheet.
+
+   Drawn as a glyph rather than a 1px box. As a box this was a
+   sub-device-pixel rectangle, and at 1x its span could round to an
+   empty range and paint nothing at all, so individual ticks went
+   missing while their neighbours stayed — an on/off dropout, not a
+   faint one. A glyph is rasterized by the text pipeline, which always
+   antialiases to something, so the marker cannot vanish. The en dash
+   at this size is the same 9px hairline it was before. */
 .pp-sub-list li::before {
-  content: '';
+  content: '\2013';
   position: absolute;
   left: 0;
-  top: 0.62em;
-  width: 9px;
-  height: 1px;
-  background: var(--espresso);
+  top: 0;
+  line-height: inherit;
+  color: var(--espresso);
   opacity: 0.55;
 }
 
