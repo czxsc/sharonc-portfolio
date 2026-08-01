@@ -193,12 +193,14 @@ function Block({ block }) {
 }
 
 /* Music gets its own composition rather than the generic stacked
-   blocks: a tracklist beside the Receiptify slip (the two belong
-   together), then the concert carousel opened up wider as the
-   closing, most visual moment. The piano pull-quote closes the
-   tracklist column instead of taking a band of its own — the slip is
-   printed tall, so the column beside it has the height to spare and
-   the carousel starts that much sooner. */
+   blocks: the artist list beside the Receiptify slip (who is on repeat
+   next to what that actually played), then the concert carousel opened
+   up wider as the closing, most visual moment.
+
+   The optional `text` block still renders as a pull-quote closing the
+   list column rather than taking a band of its own — the slip is
+   printed tall, so the column beside it has height to spare. Music
+   currently ships without one. */
 function MusicBlocks({ blocks }) {
   const list = blocks.find((b) => b.kind === 'list');
   const receipt = blocks.find((b) => b.kind === 'image');

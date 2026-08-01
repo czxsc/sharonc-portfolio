@@ -24,7 +24,7 @@ import concertSunkisImg from '../assets/hobby/music/concerts/sunkis.jpg';
 import concertSlopeDayImg from '../assets/hobby/music/concerts/slope_day.jpg';
 import concertKiofImg from '../assets/hobby/music/concerts/kiof.jpg';
 import concertBibiImg from '../assets/hobby/music/concerts/bibi_selfie.jpg';
-import receiptifyImg from '../assets/hobby/music/receiptify.png';
+import receiptifyImg from '../assets/hobby/music/top_tracks_medium_term.png';
 import pcBuildImg from '../assets/hobby/gaming/pc_build.webp';
 
 /* The reference wall the site's direction was picked off, sized down
@@ -2559,24 +2559,25 @@ export const hobbies = [
     icon: 'headphones',
     slug: 'music',
     title: 'Music',
-    note: 'Debussy when the debugging gets hard.',
+    note: 'Korean rock and Mandarin pop, mostly.',
     tone: 'var(--tone-d2)',
     page: {
-      tagline: 'Debussy when the debugging gets hard; everything else the rest of the time.',
+      tagline: 'Korean rock, Mandarin pop, and a concert calendar that keeps filling up.',
       blocks: [
         {
           kind: 'list',
           title: 'On rotation',
           items: [
-            { name: 'Clair de lune', meta: 'Debussy', note: 'The debugging soundtrack.' },
-            { name: 'Merry Christmas Mr. Lawrence', meta: 'Ryuichi Sakamoto', note: 'For late trains and late commits.' },
-            { name: 'Holocene', meta: 'Bon Iver', note: 'The walk-home track.' },
+            { name: 'The Rose', meta: 'Korean rock' },
+            { name: 'IU', meta: 'K-pop' },
+            { name: '邹沛沛', meta: 'Mandarin pop' },
+            { name: 'BIBI', meta: 'Korean R&B' },
           ],
         },
         {
           kind: 'image',
           src: receiptifyImg,
-          caption: 'receipts don’t lie',
+          caption: 'top songs recently',
         },
         {
           kind: 'carousel',
@@ -2591,10 +2592,6 @@ export const hobbies = [
             { caption: 'Kiss Of Life', src: concertKiofImg },
             { caption: 'Bibi Concert', src: concertBibiImg },
           ],
-        },
-        {
-          kind: 'text',
-          body: ['Years of piano lessons mostly left me with strong opinions about voicing and a soft spot for anything in D-flat.'],
         },
       ],
     },
