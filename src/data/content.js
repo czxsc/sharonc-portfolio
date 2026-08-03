@@ -18,12 +18,12 @@ import pokeleetCollectionImg from '../assets/projects/pokeleet/collection.webp';
 import pokeleetGachaImg from '../assets/projects/pokeleet/gacha.webp';
 import pokeleetDetailImg from '../assets/projects/pokeleet/detail.webp';
 import pokeleetRecallImg from '../assets/projects/pokeleet/recall.webp';
-import concertRoseImg from '../assets/hobby/music/concerts/rose.jpg';
-import concertTwiceImg from '../assets/hobby/music/concerts/twice.jpg';
-import concertSunkisImg from '../assets/hobby/music/concerts/sunkis.jpg';
-import concertSlopeDayImg from '../assets/hobby/music/concerts/slope_day.jpg';
-import concertKiofImg from '../assets/hobby/music/concerts/kiof.jpg';
-import concertBibiImg from '../assets/hobby/music/concerts/bibi_selfie.jpg';
+import concertRoseImg from '../assets/hobby/music/concerts/rose.webp';
+import concertTwiceImg from '../assets/hobby/music/concerts/twice.webp';
+import concertSunkisImg from '../assets/hobby/music/concerts/sunkis.webp';
+import concertSlopeDayImg from '../assets/hobby/music/concerts/slope_day.webp';
+import concertKiofImg from '../assets/hobby/music/concerts/kiof.webp';
+import concertBibiImg from '../assets/hobby/music/concerts/bibi_selfie.webp';
 import receiptifyImg from '../assets/hobby/music/top_tracks_medium_term.png';
 import pcBuildImg from '../assets/hobby/gaming/pc_build.webp';
 
