@@ -38,11 +38,6 @@
 .nav-mark:hover .nav-mark-cat {
   transform: rotate(-6deg) scale(1.06);
 }
-@media (prefers-color-scheme: dark) {
-  .nav-mark-cat { filter: invert(0.92) sepia(0.12); }
-}
-:root[data-theme='dark'] .nav-mark-cat { filter: invert(0.92) sepia(0.12); }
-:root[data-theme='light'] .nav-mark-cat { filter: none; }
 .nav-mark-name {
   font-family: var(--serif);
   font-weight: 600;

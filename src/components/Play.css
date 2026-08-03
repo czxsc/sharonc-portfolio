@@ -424,27 +424,3 @@
     height: 9px;
   }
 }
-
-/* Dark paper takes a lighter touch: a black ellipse under an object on
-   #16130f is a hole, not a shadow. The ground is warmed and pulled
-   most of the way back — on a dark ground the pale objects separate on
-   their own, and the shadow only has to say where they touch. */
-@media (prefers-color-scheme: dark) {
-  .bag-scene {
-    --shade: 8 6 4;
-  }
-  .bag-obj::before {
-    opacity: 0.55;
-  }
-  .bag-item-btn:hover .bag-obj::before,
-  .bag-item-btn:focus-visible .bag-obj::before {
-    opacity: 0.4;
-  }
-  .bag-obj img {
-    filter: drop-shadow(0 3px 7px rgb(var(--shade) / 0.32));
-  }
-  .bag-item-btn:hover .bag-obj img,
-  .bag-item-btn:focus-visible .bag-obj img {
-    filter: drop-shadow(0 14px 18px rgb(var(--shade) / 0.42));
-  }
-}

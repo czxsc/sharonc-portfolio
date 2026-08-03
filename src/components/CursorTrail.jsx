@@ -14,8 +14,7 @@ import './CursorTrail.css';
    their real size, 32px, because "the drawing closes up at cursor
    size" is a claim the reader should be able to check rather than
    take on trust. And the grounds are quoted hexes, not tokens, so the
-   record still says what it said if the palette moves later or the
-   page is read in dark theme.
+   record still says what it said if the palette moves later.
 
    Data shape (content.js → section.cursorTrail). The copy keys
    (label / title / problem / solution) are read by PassCopy, which

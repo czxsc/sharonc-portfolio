@@ -16,10 +16,8 @@
 
 /* ---------- paper stock ----------
    Deliberately NOT --card / --ink. This window sits on the espresso
-   pool, which is dark in BOTH themes, so its own colours can't follow
-   the page theme or it would vanish in dark mode. What it does follow
-   is brightness: in dark mode the stock steps down a few levels, so a
-   light panel on a dark page reads as paper rather than as a lamp. */
+   pool, which is near black, so its own colours are fixed against the
+   pool rather than borrowed from the page. */
 .sheet-paper {
   --w-stock: #ece5da;
   --w-stock-2: #e1d8ca; /* the chrome bar — one step down from the leaf */
@@ -35,14 +33,6 @@
      composited layer (see SheetFlip.css). */
   box-shadow: 0 2px 3px rgba(10, 7, 4, 0.22),
     0 26px 44px -30px rgba(10, 7, 4, 0.66);
-}
-
-@media (prefers-color-scheme: dark) {
-  .sheet-paper {
-    --w-stock: #d8cfc0;
-    --w-stock-2: #cdc3b2;
-    --w-line: #c0b5a3;
-  }
 }
 
 .sheet-bar {

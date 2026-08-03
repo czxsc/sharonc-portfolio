@@ -4,6 +4,13 @@
    ============================================================ */
 
 :root {
+  /* The site is one theme, warm paper, in every environment. This pins
+     the UA's own surfaces — scrollbars, form controls, the canvas behind
+     an overscroll — to the light set, so a visitor whose OS is in dark
+     mode gets the same page as everyone else instead of paper-coloured
+     content framed by inverted chrome. */
+  color-scheme: light;
+
   /* — Color: ground & ink — */
   --paper: #f5f4f1;        /* primary ground — cool paper-white */
   --paper-2: #eceae4;      /* insets, side columns */
@@ -123,39 +130,4 @@
   --cur-bean-cream: url('/bean-cursor-light-sm.png') 4 4;
   --cur-idle: var(--cur-bean-cream);
   --cur-tap: var(--cur-bean);
-}
-
-/* Dark theme — a warm charcoal, not a naive invert. Accents lift to stay legible. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #16130f;
-    --paper-2: #1e1a15;
-    --card: #201b15;
-    --ink: #efe8dd;
-    --ink-soft: #bcb2a4;
-    --ink-faint: #8a8073;
-    --line: #322b23;
-    --line-soft: #262019;
-    --espresso: #cba587;
-    --espresso-deep: #d9b89e;
-    --sage: #a3b39a;
-    --navy: #97b3c8;
-    --ok: #82b98b;
-    --wip: #d9b06a;
-    /* liquid lifts a touch so the frame separates from the dark ground */
-    /* sits a few levels above the light theme's pool: here the ground
-       behind it is --paper #16130f, and the frame still has to read as
-       an object on it rather than a hole in it */
-    --liquid: #201a17;
-    --liquid-soft: #574a3f;
-    --liquid-lobe: 87 74 63;
-    --liquid-warm: 108 72 46;
-    --liquid-deep: 16 12 10;
-    --tone-a1: #3f4a3e; --tone-a2: #24303d;
-    --tone-b1: #5a4636; --tone-b2: #7c6650;
-    --tone-c1: #2c3a4a; --tone-c2: #3d5364;
-    --tone-d1: #443f38; --tone-d2: #5f5347;
-    --tone-e1: #3f4a3e; --tone-e2: #5a4636;
-    --tone-f1: #2c3a4a; --tone-f2: #3f4a3e;
-  }
 }

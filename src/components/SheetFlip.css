@@ -93,17 +93,6 @@
     scale(calc(1 + var(--air, 0) * 0.06));
 }
 
-@media (prefers-color-scheme: dark) {
-  .sheet-flight-shade {
-    background: radial-gradient(
-      closest-side ellipse at 50% 50%,
-      rgba(0, 0, 0, 0.55),
-      rgba(0, 0, 0, 0.22) 58%,
-      transparent 78%
-    );
-  }
-}
-
 /* Reduced motion: the card never mounts (App doesn't render it), so
    there is nothing to disable here — both sections simply keep their
    own window. */
