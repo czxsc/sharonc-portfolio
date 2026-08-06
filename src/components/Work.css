@@ -49,7 +49,7 @@
 .work-gallery {
   display: grid;
   grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
-  gap: clamp(28px, 4vw, 68px);
+  gap: clamp(28px, 2.5vw + 13px, 68px);
   align-items: end;
 }
 
@@ -135,7 +135,7 @@
 .preview-body {
   position: relative;
   flex: 1;
-  padding: clamp(20px, 3vw, 34px);
+  padding: clamp(20px, 0.875vw + 14.8px, 34px);
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -264,8 +264,8 @@
   width: 100%;
   display: flex;
   align-items: baseline;
-  gap: clamp(12px, 1.6vw, 20px);
-  padding: clamp(9px, 1.3vw, 13px) 4px;
+  gap: clamp(12px, 0.5vw + 9px, 20px);
+  padding: clamp(9px, 0.25vw + 7.5px, 13px) 4px;
   border-bottom: 1px solid var(--line);
   text-align: left;
   color: var(--ink-faint);
@@ -286,7 +286,7 @@
 .work-name {
   font-family: var(--serif);
   font-weight: 600;
-  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  font-size: clamp(1.1rem, 0.485vw + 0.918rem, 1.5rem);
   letter-spacing: -0.015em;
   line-height: 1.1;
   margin-right: auto;

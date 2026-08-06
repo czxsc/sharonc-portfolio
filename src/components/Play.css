@@ -31,7 +31,7 @@
 
   --cat-w: 32;            /* the drawing's width, in scene-width % */
   --shelf-x: 17.5;        /* where the rule starts — the tote's left edge */
-  --stage-h: clamp(144px, 11.5vw, 178px); /* shelf up to the top of the air */
+  --stage-h: clamp(144px, 2.125vw + 131.2px, 178px); /* shelf up to the top of the air */
   --cap-h: 34px;          /* shelf down to the baseline of the label */
   --row-h: calc(var(--stage-h) + var(--cap-h));
   --rows: 1;

@@ -4,7 +4,7 @@
 .contact-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: clamp(40px, 8vw, 128px);
+  gap: clamp(40px, 5.5vw + 7px, 128px);
   align-items: start;
 }
 .contact-main { position: relative; }
@@ -15,7 +15,7 @@
   margin-left: 10px;
 }
 .contact-body {
-  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+  font-size: clamp(1.05rem, 0.242vw + 0.959rem, 1.25rem);
   line-height: 1.55;
   color: var(--ink-soft);
   max-width: 48ch;
@@ -33,10 +33,10 @@
   display: inline-block;
   font-family: var(--serif);
   font-weight: 500;
-  font-size: clamp(1.25rem, 2.35vw, 2rem);
+  font-size: clamp(1.25rem, 0.909vw + 0.909rem, 2rem);
   letter-spacing: -0.02em;
   color: var(--ink);
-  margin-top: clamp(24px, 3vw, 36px);
+  margin-top: clamp(24px, 0.75vw + 19.5px, 36px);
   /* the wash needs room to sit around the letters without touching
      the copy above it */
   padding: 0.06em 0.16em;
@@ -150,7 +150,7 @@
 
 /* footer */
 .footer {
-  margin-top: clamp(56px, 8vw, 96px);
+  margin-top: clamp(56px, 2.5vw + 41px, 96px);
   border-top: 1px solid var(--line);
   padding-block: var(--sp-4);
 }

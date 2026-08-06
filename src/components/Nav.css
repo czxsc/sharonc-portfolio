@@ -58,7 +58,7 @@
   position: relative; /* the travelling dot is placed against this box */
   display: flex;
   align-items: center;
-  gap: clamp(14px, 2.4vw, 34px);
+  gap: clamp(14px, 1.25vw + 6.5px, 34px);
 }
 /* the marker itself — one dot for the whole nav; Nav.jsx moves it */
 .nav-dot {

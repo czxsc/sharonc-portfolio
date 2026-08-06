@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useReducedMotion } from 'motion/react';
 import Nav from './components/Nav.jsx';
 import HeroPourTransition from './components/HeroPourTransition.jsx';
@@ -8,10 +8,18 @@ import Play from './components/Play.jsx';
 import Contact from './components/Contact.jsx';
 import { useReveal } from './hooks/useReveal.js';
 import { useLenis } from './hooks/useLenis.js';
+import { normalizePath } from './routes.js';
 
 export default function App() {
   useReveal();
   useLenis();
+
+  /* Last, after Work has read the path and decided whether a case
+     study is open: a path nobody claimed shows the index, so it
+     shouldn't stay in the address bar pretending to be somewhere. */
+  useEffect(() => {
+    normalizePath();
+  }, []);
 
   const reduce = useReducedMotion();
   /* which cover the Work preview is showing — written by Work, read by

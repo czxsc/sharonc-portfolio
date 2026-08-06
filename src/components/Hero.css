@@ -10,7 +10,7 @@
 .hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.4fr) minmax(0, 1.2fr);
-  gap: clamp(20px, 3vw, 48px);
+  gap: clamp(20px, 1.75vw + 9.5px, 48px);
   align-items: center;
   width: 100%;
 }
@@ -23,7 +23,7 @@
   align-self: stretch;
   padding-top: clamp(12px, 6vh, 60px);
   border-right: 1px solid var(--line);
-  padding-right: clamp(12px, 2vw, 28px);
+  padding-right: clamp(12px, 1vw + 6px, 28px);
 }
 .hero-note {
   font-family: var(--mono);
@@ -54,7 +54,7 @@
   font-size: var(--fs-display);
   line-height: 0.88;
   letter-spacing: -0.035em;
-  margin-bottom: clamp(20px, 3vw, 34px);
+  margin-bottom: clamp(20px, 0.875vw + 14.8px, 34px);
 }
 /* the display face is set tightest of all (0.88) — its glyphs spill
    furthest past the line box, so the mask needs more relief than the
@@ -74,8 +74,8 @@
 .hero-cta {
   display: flex;
   align-items: center;
-  gap: clamp(16px, 2.5vw, 32px);
-  margin-top: clamp(28px, 4vw, 44px);
+  gap: clamp(16px, 1vw + 10px, 32px);
+  margin-top: clamp(28px, 1vw + 22px, 44px);
   flex-wrap: wrap;
 }
 .hero-email {

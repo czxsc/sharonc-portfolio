@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { projects } from '../data/content.js';
+import { projectIndexFromPath } from '../routes.js';
 import { ArrowRight } from './Doodles.jsx';
 import ProjectPage from './ProjectPage.jsx';
 import SetType from './SetType.jsx';
@@ -42,9 +43,17 @@ const matches = (i, tag) => projects[i].category.split(' · ').includes(tag);
    re-run the About section's scroll transforms.
    `flight` is false only under reduced motion, where no card exists. */
 export default function Work({ previewRef, flight = false }) {
-  const [active, setActive] = useState(0); // the row under the cursor
-  const [shown, setShown] = useState(0); // the cover the frame has settled on
-  const [openIndex, setOpenIndex] = useState(null); // case study overlay
+  /* A case study can be arrived at directly (/dishcovery). It is the
+     same overlay either way — the URL only decides whether it is
+     already up on the first frame, and the index behind it starts on
+     that project rather than on the first one, so closing returns to
+     the row it would have been opened from. */
+  const [entry] = useState(projectIndexFromPath); // linked-to project, or null
+  const [deep, setDeep] = useState(entry !== null); // true until that first close
+
+  const [active, setActive] = useState(entry ?? 0); // the row under the cursor
+  const [shown, setShown] = useState(entry ?? 0); // the cover the frame has settled on
+  const [openIndex, setOpenIndex] = useState(entry); // case study overlay
   const [order, setOrder] = useState(projects.map((_, i) => i));
   const [hoverTag, setHoverTag] = useState(null); // previewed via hover/focus
   const [pinTag, setPinTag] = useState(null); // clicked: sorted + held lit
@@ -259,8 +268,27 @@ export default function Work({ previewRef, flight = false }) {
     else showNow(i); // the tap itself is the dwell
   };
 
+  /* Where the index belongs behind a case study that was linked to
+     rather than opened: at Work, with the preview frame the closing
+     flight is about to land in sitting a third of the way down the
+     viewport.
+
+     That third is not arbitrary. The frame is hidden until SheetFlip's
+     card has finished its own flight and handed over (see SheetFlip),
+     and this is comfortably past the point where the card has locked
+     onto the frame's geometry — so whichever of the two is showing
+     when the overlay dissolves, it is the same picture in the same
+     place, and the returning hero lands on it either way. */
+  const workLanding = useCallback(() => {
+    const el = frameRef.current;
+    if (!el) return 0;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    return Math.max(0, Math.round(top - window.innerHeight * 0.3));
+  }, []);
+
   const closeProject = () => {
     const i = openIndex;
+    setDeep(false); // the URL got us here once; not again
     setOpenIndex(null);
     setActive(i);
     // after the overlay unmounts and #root sheds `inert` — a focus()
@@ -371,6 +399,8 @@ export default function Work({ previewRef, flight = false }) {
         <ProjectPage
           index={openIndex}
           getOrigin={getFrameRect}
+          deep={deep}
+          landing={workLanding}
           onNavigate={openProject}
           onClose={closeProject}
         />

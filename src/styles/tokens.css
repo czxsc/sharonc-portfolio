@@ -75,24 +75,66 @@
   --grot: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
-  /* — Type scale (fluid) — */
-  --fs-display: clamp(3rem, 8vw, 7rem);      /* hero name */
-  --fs-h1: clamp(2.4rem, 5.4vw, 4.6rem);
-  --fs-h2: clamp(1.7rem, 3.4vw, 2.6rem);     /* section titles */
-  --fs-h3: clamp(1.35rem, 2.4vw, 1.9rem);    /* project titles */
-  --fs-lead: clamp(1.15rem, 1.7vw, 1.45rem);
-  --fs-body: 1.03rem;
-  --fs-small: 0.875rem;
-  --fs-label: 0.7rem;
+  /* — Fluid ramps —
+     Every fluid value here is `clamp(min, <slope>vw + <intercept>, max)`,
+     and they all share two reference widths so the page scales as one
+     thing rather than as forty independent curves:
 
-  /* — Spacing (8-based) — */
-  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 16px; --sp-4: 24px;
-  --sp-5: 48px; --sp-6: 96px; --sp-7: 128px;
+       type   reaches its min at 600px  and its max at 1920px
+       space  reaches its min at 600px  and its max at 2200px
+
+     Space tops out later than type on purpose. Past ~1920 the headings
+     hold still and only the air around them keeps opening, which is the
+     difference between a big screen showing a bigger page and a big
+     screen showing the same page stranded in a margin.
+
+     The old scale ran out at ~1150–1400px, so a 1440 laptop was already
+     sitting on every maximum: display type at its full 112px with a
+     40px gutter beside it. That is the "zoomed in" reading. Anchoring
+     the top of the ramp at 1920 puts a laptop mid-curve, where the type
+     is smaller and the margins are real.
+
+     To add a fluid value: slope = 100·(max−min)/(v2−v1),
+     intercept = min − slope/100·v1. Keep to the two v1/v2 pairs above. */
+
+  /* — Type scale (fluid) — */
+  --fs-display: clamp(3rem, 4.848vw + 1.182rem, 7rem);   /* hero name */
+  --fs-h1: clamp(2.4rem, 2.667vw + 1.4rem, 4.6rem);
+  --fs-h2: clamp(1.7rem, 1.091vw + 1.291rem, 2.6rem);    /* section titles */
+  --fs-h3: clamp(1.35rem, 0.667vw + 1.1rem, 1.9rem);     /* project titles */
+  --fs-lead: clamp(1.15rem, 0.364vw + 1.014rem, 1.45rem);
+  /* Reading sizes are the exception: they hold flat across every laptop
+     and only lift above 1440, where the viewing distance genuinely grows.
+     Shrinking body copy to buy margin is a bad trade — the margin comes
+     from the headings coming down instead, and nothing here goes under
+     16px at any width. */
+  --fs-body: clamp(1.025rem, 0.25vw + 0.8rem, 1.1rem);
+  --fs-small: clamp(0.87rem, 0.208vw + 0.681rem, 0.93rem);
+  --fs-label: clamp(0.7rem, 0.167vw + 0.55rem, 0.75rem);
+
+  /* — Spacing (8-based at the small end, fluid above it) —
+     1 and 2 stay fixed: they are hairline offsets and optical nudges,
+     and a 4px gap that grows to 5px is just a rounding error. */
+  --sp-1: 4px;  --sp-2: 8px;
+  --sp-3: clamp(16px, 0.25vw + 14.5px, 20px);
+  --sp-4: clamp(24px, 0.5vw + 21px, 32px);
+  --sp-5: clamp(48px, 1vw + 42px, 64px);
+  --sp-6: clamp(96px, 2vw + 84px, 128px);
+  --sp-7: clamp(128px, 3vw + 110px, 176px);
 
   /* — Layout — */
-  --maxw: 1440px;
-  --gutter: clamp(18px, 3.5vw, 40px);
-  --section-y: clamp(72px, 12vh, 148px);
+  /* The column grows a little past 1440 so a 2560 monitor isn't showing
+     a 1440 page with 560px of dead paper either side. It stops at 1680:
+     wider than that and the editorial grid starts reading as a spread. */
+  --maxw: clamp(1440px, 30vw + 960px, 1680px);
+  /* was clamp(18px, 3.5vw, 40px) — which hit its cap at 1143px, i.e.
+     before any laptop. The gutter is the whole margin on mobile and the
+     breathing room beside the grid on a monitor; it has to keep going. */
+  --gutter: clamp(20px, 3.75vw - 2.5px, 80px);
+  /* Width-driven, with a vh ceiling so a short window (a laptop with the
+     dock and a browser chrome eating it) doesn't spend a fifth of its
+     height on section padding. */
+  --section-y: min(clamp(64px, 6.5vw + 25px, 168px), 15vh);
 
   /* — Motion —
      One language: ink and paper. Type is *set* (pressed, then released),

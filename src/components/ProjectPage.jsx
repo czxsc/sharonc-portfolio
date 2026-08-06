@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { projects } from '../data/content.js';
 import { useOverlayPage } from '../hooks/useOverlayPage.js';
+import { projectPath } from '../routes.js';
 import StackDiagram from './StackDiagram.jsx';
 import CodeMap from './CodeMap.jsx';
 import FlowDiagram from './FlowDiagram.jsx';
@@ -306,7 +307,19 @@ const POINT_ICONS = {
   ),
 };
 
-export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
+/* `deep` — this case study was the URL the visitor arrived at, rather
+   than a row they clicked. It changes two things and nothing else: it
+   opens without the flight (there is no preview frame it grew out of,
+   and the index behind it has never been seen), and it closes onto
+   `landing` instead of onto a remembered scroll position. */
+export default function ProjectPage({
+  index,
+  getOrigin,
+  deep = false,
+  landing = null,
+  onNavigate,
+  onClose,
+}) {
   const project = projects[index];
   const page = project.page;
   const backRef = useRef(null);
@@ -316,6 +329,9 @@ export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
   const [dir, setDir] = useState(0); // which way ←/→ last moved
   const { state, requestClose } = useOverlayPage({
     slug: project.slug,
+    path: projectPath(project.slug),
+    deep,
+    landing,
     closeMs: CLOSE_MS,
     onClose,
     focusRef: backRef,
@@ -330,7 +346,8 @@ export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
      the clone with it. */
   const abortRef = useRef(null);
   useLayoutEffect(() => {
-    if (reduce || flownRef.current || !getOrigin) return () => abortRef.current?.();
+    if (reduce || deep || flownRef.current || !getOrigin)
+      return () => abortRef.current?.();
     flownRef.current = true;
     abortRef.current = flyHero(heroRef.current, getOrigin());
     return () => abortRef.current?.();
@@ -380,6 +397,17 @@ export default function ProjectPage({ index, getOrigin, onNavigate, onClose }) {
     setView(page.toggle?.options[0]?.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
+
+  /* A page with its own URL should have its own name: the tab, the
+     history entry and anything bookmarked from here all read this.
+     Put back on close, so the index never inherits a project's name. */
+  useEffect(() => {
+    const held = document.title;
+    document.title = `${project.name} — Sharon Chen`;
+    return () => {
+      document.title = held;
+    };
+  }, [project.name]);
 
   // arrow keys page between projects
   useEffect(() => {

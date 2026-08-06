@@ -4,9 +4,27 @@ import Lenis from 'lenis';
 // current instance, so overlays (HobbyPage) can stop/start page scroll;
 // null under prefers-reduced-motion, where Lenis never runs
 let instance = null;
+let holds = 0; // overlays currently asking for page scroll to stay stopped
 
 export function getLenis() {
   return instance;
+}
+
+/* Overlays pause the page behind them while they are up.
+
+   Counted, and honoured at creation as well as on a live instance,
+   because the request can arrive before Lenis exists: a case study
+   opened from its own URL is mounted on the first render, and effects
+   run child-first, so the overlay asks while useLenis is still one
+   effect away from running. */
+export function holdLenis() {
+  holds += 1;
+  instance?.stop();
+}
+
+export function releaseLenis() {
+  holds = Math.max(0, holds - 1);
+  if (!holds) instance?.start();
 }
 
 /**
@@ -35,6 +53,7 @@ export function useLenis() {
       },
     });
     instance = lenis;
+    if (holds) lenis.stop(); // an overlay is already up — see holdLenis
     return () => {
       instance = null;
       lenis.destroy();
