@@ -162,16 +162,28 @@ export const hero = {
    biggest type on the idea instead. `statement` is set line by line —
    the breaks are a typographic decision, not the layout engine's —
    and *asterisks* mark the words that get a hand-inked underline
-   drawn under them as the section arrives. */
+   drawn under them as the section arrives.
+
+   Keep the marked words off the START of a line where the line above
+   also ends in one: the stroke hangs below its own baseline, and two
+   of them stacked in the same column is the one arrangement that
+   reads as a collision. Here the three fall right / left / middle. */
 export const about = {
   greeting: 'Hello, I’m Sharon!',
   statement: [
-    'I build in the overlap:',
-    '*software*, *AI*, *design*,',
-    'and the systems underneath.',
+    'I’m passionate about building',
+    'at the intersection of *AI*,',
+    '*software*, and *design*.',
   ],
+  /* Stroke length per mark, in reading order, as a multiple of the
+     word it sits under. A hand-drawn underline doesn't stop at the
+     last letter, and it doesn't overrun every word by the same amount
+     either — these are set by eye against the three words rather than
+     derived, which is the point of having them here. Each stroke
+     stays centred on its word however long it runs. */
+  markScale: [1.15, 1.2, 1.2],
   note:
-    'That’s usually where the interesting problems are. Whether it’s an ML pipeline, autopilot software for a plane, or an interface someone actually touches, I want to know how each layer moves the next — and to leave the top one feeling obvious.',
+    'I’m a third-year Computer Science student at Cornell University, minoring in Artificial Intelligence. I love exploring new ideas and building software that’s both functional and thoughtfully designed. In my spare time, you’ll usually find me reading, painting, or making a cup of coffee.',
 };
 
 export const stack = [

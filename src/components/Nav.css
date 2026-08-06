@@ -115,3 +115,19 @@
   .nav-links { gap: 12px; }
   .nav-mark-name { font-size: 0.98rem; }
 }
+/* Below ~420 the wordmark and the four links stop fitting on one line,
+   and since the mark is nowrap they overlap rather than wrap. Both
+   sides give up a little instead of either one being dropped. */
+@media (max-width: 420px) {
+  .nav-mark { gap: 8px; }
+  .nav-mark-cat { height: 30px; }
+  .nav-mark-name { font-size: 0.9rem; }
+  .nav-links { gap: 9px; }
+  .nav-link { font-size: 0.6rem; letter-spacing: 0.08em; }
+}
+/* At 320 even that doesn't hold. The set name goes and the cat stays —
+   it is the mark, it still links home, and the name is the first line
+   of the hero directly beneath it either way. */
+@media (max-width: 360px) {
+  .nav-mark-name { display: none; }
+}

@@ -503,7 +503,7 @@
   transform: translateY(calc((1 - var(--rv, 1)) * 16px));
 }
 
-/* ---- top rule: label — hairline — the one fact worth reading first ---- */
+/* ---- top rule: label, then the hairline out to the margin ---- */
 .pour-rule {
   grid-area: rule;
   display: flex;
@@ -531,6 +531,11 @@
 /* ---- left column ---- */
 .pour-about-main {
   grid-area: main;
+  /* Hoisted so the aside can be measured against the display type
+     rather than against its own. vh in the middle term keeps the
+     display size honest on short laptop screens, where the section
+     has one viewport and no more. */
+  --statement-fs: clamp(1.6rem, min(3.4vw, 5.2vh), 2.9rem);
 }
 
 /* italic, and deliberately small: the hero already set the name at
@@ -551,10 +556,18 @@
   margin-top: clamp(10px, 1.8vh, 20px);
   font-family: var(--serif);
   font-weight: 600;
-  /* vh in the middle term keeps the display size honest on short
-     laptop screens, where the section has one viewport and no more */
-  font-size: clamp(1.6rem, min(3.4vw, 5.2vh), 2.9rem);
-  line-height: 1.16;
+  font-size: var(--statement-fs);
+  /* Opened from 1.16 to clear the inked underlines.
+
+     Newsreader's content box is exactly 1.000em (ascent 0.735,
+     descent 0.265, no line gap), so the gap between two lines' inline
+     boxes is line-height − 1. The stroke hangs --mark-drop below its
+     box and eats into that gap; at 1.16 / 0.2em it came out 0.04em
+     SHORT, which is why the marks used to sit on the ascenders of the
+     line beneath. 1.28 / 0.08em leaves 0.2em of air instead. Keep
+     (line-height − 1) − --mark-drop comfortably positive. */
+  --mark-drop: 0.08em;
+  line-height: 1.28;
   letter-spacing: -0.022em;
   color: var(--on-liquid);
 }
@@ -564,9 +577,9 @@
    pinned stage every line is already "in view" from the start, so
    this one has to come off the scrub instead.
 
-   The relief pads the mask past the cap height and past the inked
-   underline below the baseline; the negative margins hand the space
-   straight back so the layout doesn't move. */
+   The relief pads the mask past the cap height and past the descenders
+   below the baseline; the negative margins hand the space straight
+   back so the layout doesn't move. */
 .pour-set-line {
   --relief-top: 0.2em;
   --relief-bottom: 0.46em;
@@ -587,35 +600,61 @@
   letter-spacing: calc(-0.022em + (1 - var(--lv)) * 0.035em);
 }
 
-/* ---- the signature: hand-inked marks under the three disciplines ---- */
+/* ---- the signature: hand-inked marks under three of the words ----
+
+   The stroke hangs --mark-drop below the inline box, in leading the
+   statement's line-height has to actually provide — see the note
+   there. Marked words are also spread across the lines rather than
+   run together on one (see about.statement): three squiggles with
+   only a comma between them read as one broken rule, not as three
+   marks. */
 .pour-mark {
   position: relative;
   white-space: nowrap;
 }
 .pour-mark-ink {
   position: absolute;
-  left: -0.05em;
-  right: -0.05em;
-  bottom: -0.2em;
-  width: auto;
-  /* the left/right offsets size it; the global `svg { max-width:100% }`
-     reset would shave the overhang back off */
+  /* centred on the word, so --ms can lengthen the stroke past both
+     ends of it rather than growing off to the right */
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--mark-drop) * -1);
+  /* Width has to be STATED, not inferred from left + right. An svg is
+     a replaced element, and an absolutely positioned replaced box with
+     `width: auto` takes its intrinsic size and drops the `right`
+     offset on the floor — so every mark came out exactly 100px wide
+     (the viewBox), which is why the short words overshot and the long
+     ones were underlined for only their first few letters. A
+     percentage resolves against .pour-mark, i.e. the word itself.
+     --ms (about.markScale) then runs it longer per word. */
+  width: calc((100% + 0.1em) * var(--ms, 1));
+  /* the global `svg { max-width: 100% }` reset would shave the
+     overhang back off */
   max-width: none;
-  height: 0.32em;
+  height: 0.26em;
   overflow: visible;
+  /* This mark's own 0→1, offset by its position in the block so the
+     strokes land left to right rather than all at once. */
+  --mv: clamp(0, calc(var(--ink, 1) * 2.4 - var(--mi, 0) * 0.7), 1);
+  /* The reveal is a clip, not a dash. stroke-dasharray + pathValue="1"
+     did the same job in one line, but a dash pattern can only ever be
+     trusted to draw one segment if the UA agrees with you about the
+     path's length — and when it doesn't you get a stroke with a hole
+     in it and a detached fragment near the end, which is exactly what
+     showed up under "software". A clip has no such opinion: at --mv 1
+     the inset is zero and the whole squiggle is visible, full stop. */
+  clip-path: inset(0 calc((1 - var(--mv)) * 100%) 0 0);
+  /* behind the glyphs, so the stroke passes under the descender of a
+     "g" instead of cutting through it. .pour-set-in's transform
+     already makes each line a stacking context, so this stays inside
+     its own line and can't fall behind the liquid. */
+  z-index: -1;
 }
 .pour-mark-ink path {
-  /* this mark's own 0→1, offset by its position in the line so the
-     three strokes land left to right rather than all at once */
-  --mv: clamp(0, calc(var(--ink, 1) * 2.4 - var(--mi, 0) * 0.7), 1);
   fill: none;
   stroke: var(--on-liquid-ink);
   stroke-width: 1.7;
   stroke-linecap: round;
-  /* pathLength="1" normalises the squiggle, so drawing it is just
-     dashoffset 1 → 0 — no getTotalLength(), no layout read */
-  stroke-dasharray: 1;
-  stroke-dashoffset: calc(1 - var(--mv));
   transition: stroke-width var(--dur) var(--ease-rule),
     stroke var(--dur) var(--ease);
 }
@@ -630,7 +669,15 @@
   position: relative;
   margin-top: clamp(20px, 3.4vh, 38px);
   padding-left: clamp(20px, 0.875vw + 14.75px, 34px);
-  max-width: 54ch;
+  /* Finishes on the same right edge as the statement above it, rather
+     than at a generic measure. The statement's longest line ("I’m
+     passionate about building", Newsreader 600 tracking −0.022em)
+     sets 11.85 × its own font-size, so the aside is measured in that
+     size too — a ch value of the aside's type could only match at one
+     viewport, since the two scale on different clamps. Box is
+     border-box, so this includes the arrow gutter. Re-measure if the
+     line breaks change. */
+  max-width: calc(var(--statement-fs) * 11.85);
   font-size: clamp(0.85rem, 0.145vw + 0.7955rem, 0.97rem);
   line-height: 1.72;
   color: var(--on-liquid-soft);
@@ -761,8 +808,10 @@
   .pour-about-grid {
     row-gap: clamp(16px, 2.8vh, 30px);
   }
-  .pour-statement {
-    font-size: clamp(1.5rem, min(3vw, 4.6vh), 2.4rem);
+  /* on the variable, not on .pour-statement — the aside's measure is
+     derived from it, and the two have to shrink together */
+  .pour-about-main {
+    --statement-fs: clamp(1.5rem, min(3vw, 4.6vh), 2.4rem);
   }
   .pour-note {
     margin-top: clamp(14px, 2.4vh, 24px);

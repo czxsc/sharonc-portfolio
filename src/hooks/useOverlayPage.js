@@ -147,7 +147,19 @@ export function useOverlayPage({
     holdLenis();
     root?.setAttribute('inert', '');
     document.documentElement.style.overflow = 'hidden';
-    focusRef?.current?.focus({ preventScroll: true });
+    /* Focus is moved here because it was somewhere else — on the row
+       that opened this page, inside a subtree about to go inert. A
+       deep entry has no such debt: the document opens with focus at
+       its start, and #root is inert, so the first Tab arrives at this
+       same control anyway.
+
+       Doing it regardless is what put a focus ring on the back button
+       on arrival. Typing a URL is keyboard input, so the browser is
+       in keyboard modality when the page loads and matches
+       :focus-visible on anything focused programmatically — a
+       prominent outline around the one control the reader hasn't
+       reached for, on the first thing they see of the site. */
+    if (!deep) focusRef?.current?.focus({ preventScroll: true });
     return () => {
       root?.removeAttribute('inert');
       document.documentElement.style.overflow = '';

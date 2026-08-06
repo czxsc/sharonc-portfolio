@@ -8,7 +8,7 @@ import {
 } from 'motion/react';
 import Hero from './Hero.jsx';
 import { ExperienceSheet } from './SheetWindow.jsx';
-import { about, meta, stack } from '../data/content.js';
+import { about, stack } from '../data/content.js';
 import './HeroPourTransition.css';
 
 /* ==================================================================
@@ -41,7 +41,7 @@ const T = {
   rule: [0.42, 0.52], // top hairline draws across; folio labels arrive
   greet: [0.46, 0.56], // "Hello, I'm Sharon!" — the small italic line
   set: [0.5, 0.72], // the statement, three lines cascading out of their masks
-  ink: [0.65, 0.77], // marks stroke under software / AI / design, in reading
+  ink: [0.65, 0.77], // marks stroke under AI / software / design, in reading
   //                    order and only once their line has finished setting
   note: [0.64, 0.74], // the supporting aside, alongside the ink
   rail: [0.66, 0.78], // experience timeline draws down
@@ -163,11 +163,14 @@ const STATEMENT = about.statement.map((line) =>
    The squiggle is a single stroke in a 100×8 box stretched to the
    word's width (preserveAspectRatio="none"), so it fits any measure;
    non-scaling-stroke keeps the nib a constant weight through the
-   stretch. pathLength="1" normalises the path so the draw is just
-   dashoffset 1 → 0 — no measuring, no layout read. */
+   stretch. The left-to-right reveal is a clip on the svg box (see the
+   stylesheet), so the path itself carries no animation state. */
 function Mark({ text, index }) {
   return (
-    <span className="pour-mark" style={{ '--mi': index }}>
+    <span
+      className="pour-mark"
+      style={{ '--mi': index, '--ms': about.markScale?.[index] ?? 1 }}
+    >
       {text}
       <svg
         className="pour-mark-ink"
@@ -177,7 +180,6 @@ function Mark({ text, index }) {
       >
         <path
           d="M1 5.2 C14 2 27 6.9 40 4.3 S67 1.7 80 4.9 S95 6.5 99 3.4"
-          pathLength="1"
           vectorEffect="non-scaling-stroke"
         />
       </svg>
@@ -198,11 +200,10 @@ function Mark({ text, index }) {
 function AboutInk({ ruleStyle, greetStyle, setStyle, inkStyle, noteStyle, railStyle, colophonStyle }) {
   return (
     <div className="pour-about-grid">
-      {/* top rule: what this is, and the one fact worth reading first */}
+      {/* top rule: one word, then the hairline runs out to the margin */}
       <motion.div className="pour-rule" style={ruleStyle}>
         <span className="pour-rule-label">About</span>
         <span className="pour-rule-line" aria-hidden="true" />
-        <span className="pour-rule-label">{meta.status}</span>
       </motion.div>
 
       <div className="pour-about-main">

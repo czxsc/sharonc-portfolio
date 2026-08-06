@@ -83,6 +83,8 @@
        type   reaches its min at 600px  and its max at 1920px
        space  reaches its min at 600px  and its max at 2200px
 
+     --gutter is the one deliberate exception; its note explains why.
+
      Space tops out later than type on purpose. Past ~1920 the headings
      hold still and only the air around them keeps opening, which is the
      difference between a big screen showing a bigger page and a big
@@ -98,8 +100,14 @@
      intercept = min − slope/100·v1. Keep to the two v1/v2 pairs above. */
 
   /* — Type scale (fluid) — */
-  --fs-display: clamp(3rem, 4.848vw + 1.182rem, 7rem);   /* hero name */
-  --fs-h1: clamp(2.4rem, 2.667vw + 1.4rem, 4.6rem);
+  /* The two big faces come down a step (7 → 6.4rem, 4.6 → 4.25rem).
+     Both ends of the ramp move together, so this is felt most in the
+     middle of the curve, which is exactly where a laptop sits: the
+     hero name goes 81px → 76px at 1280. Enough that the wider gutter
+     reads as margin around the type rather than as the type being
+     pushed. h2 and below were already sized for a laptop. */
+  --fs-display: clamp(3rem, 4.121vw + 1.454rem, 6.4rem);   /* hero name */
+  --fs-h1: clamp(2.4rem, 2.242vw + 1.559rem, 4.25rem);
   --fs-h2: clamp(1.7rem, 1.091vw + 1.291rem, 2.6rem);    /* section titles */
   --fs-h3: clamp(1.35rem, 0.667vw + 1.1rem, 1.9rem);     /* project titles */
   --fs-lead: clamp(1.15rem, 0.364vw + 1.014rem, 1.45rem);
@@ -127,10 +135,18 @@
      a 1440 page with 560px of dead paper either side. It stops at 1680:
      wider than that and the editorial grid starts reading as a spread. */
   --maxw: clamp(1440px, 30vw + 960px, 1680px);
-  /* was clamp(18px, 3.5vw, 40px) — which hit its cap at 1143px, i.e.
-     before any laptop. The gutter is the whole margin on mobile and the
-     breathing room beside the grid on a monitor; it has to keep going. */
-  --gutter: clamp(20px, 3.75vw - 2.5px, 80px);
+  /* The gutter is the whole margin on mobile and the breathing room
+     beside the grid everywhere else. Two things were wrong with the
+     old curve (3.75vw − 2.5px): it was too shallow, so a 1280 laptop
+     got 45px of margin — under 4% of the window, which reads as the
+     header running edge to edge — and it was pinned to the same 2200px
+     top as the rest of the space ramp, which is the wrong reference
+     for this one value. Past --maxw the container is already centred
+     by auto margins, so gutter beyond that point only eats the column;
+     it tops out at 1600 instead, and above that the extra air comes
+     from the centring rather than from the padding.
+     600 → 20px · 1280 → 66px · 1440 → 77px · 1600+ → 88px */
+  --gutter: clamp(20px, 6.8vw - 20.8px, 88px);
   /* Width-driven, with a vh ceiling so a short window (a laptop with the
      dock and a browser chrome eating it) doesn't spend a fifth of its
      height on section padding. */
