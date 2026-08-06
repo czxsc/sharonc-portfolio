@@ -868,11 +868,24 @@
 }
 
 /* three findings, ruled like the meta rows */
+.pp-facts-block {
+  margin-top: var(--sp-4);
+}
+/* names the set when the three columns are one subject rather than
+   three separate findings; sits on the rule the columns hang from */
+.pp-facts-label {
+  display: block;
+  margin-bottom: 14px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
 .pp-facts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sp-4);
-  margin-top: var(--sp-4);
 }
 .pp-fact {
   border-top: 1px solid var(--line);
@@ -887,6 +900,17 @@
   font-size: var(--fs-small);
   line-height: 1.6;
   color: var(--ink-soft);
+}
+/* a citation inside the prose, quiet until pointed at */
+.pp-fact-link {
+  color: var(--ink);
+  text-decoration: underline dotted color-mix(in srgb, var(--ink-faint) 60%, transparent);
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--dur-quick) var(--ease-exit);
+}
+.pp-fact-link:hover,
+.pp-fact-link:focus-visible {
+  text-decoration-color: var(--ink);
 }
 
 /* ---------- colour ramp ----------

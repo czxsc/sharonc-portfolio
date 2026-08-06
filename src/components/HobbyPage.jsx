@@ -102,6 +102,8 @@ export default function HobbyPage({ hobby, img, origin, onClose }) {
             <StoriesBlocks blocks={hobby.page.blocks} />
           ) : hobby.slug === 'eats' ? (
             <DrinksBlocks blocks={hobby.page.blocks} />
+          ) : hobby.slug === 'art' ? (
+            <ArtBlocks blocks={hobby.page.blocks} />
           ) : (
             <div className="hp-blocks">
               {hobby.page.blocks.map((b, i) => (
@@ -161,23 +163,6 @@ function Block({ block }) {
         </dl>
       )}
 
-      {block.kind === 'gallery' && (
-        <div className="hpb-gallery">
-          {block.items.map((it) => (
-            <figure className="hp-frame" key={it.caption}>
-              {it.src ? (
-                <img src={it.src} alt={it.caption} loading="lazy" />
-              ) : (
-                <div className="hp-ph" role="img" aria-label={`${it.caption} — image coming soon`}>
-                  soon
-                </div>
-              )}
-              <figcaption>{it.caption}</figcaption>
-            </figure>
-          ))}
-        </div>
-      )}
-
       {block.kind === 'carousel' && (
         <Carousel items={block.items} direction={block.direction} />
       )}
@@ -193,14 +178,21 @@ function Block({ block }) {
 }
 
 /* Music gets its own composition rather than the generic stacked
-   blocks: the artist list beside the Receiptify slip (who is on repeat
-   next to what that actually played), then the concert carousel opened
-   up wider as the closing, most visual moment.
+   blocks. There is barely a page of content here — four names, one
+   slip, six photographs — so the page is composed as a single band
+   instead of three stacked ones: who is on repeat and what that
+   actually played sit in the main column, one above the other, and
+   the Receiptify slip runs down a rail beside both of them. The slip
+   is printed long and narrow, so given the height of the whole band
+   it can be set large enough to read rather than shrunk to an accent.
+
+   The names go two across rather than down a single list. Four rows
+   of a name and a genre in a column this wide leave most of every
+   rule running into nothing; paired off, they read as a set.
 
    The optional `text` block still renders as a pull-quote closing the
-   list column rather than taking a band of its own — the slip is
-   printed tall, so the column beside it has height to spare. Music
-   currently ships without one. */
+   names, rather than taking a band of its own. Music currently ships
+   without one. */
 function MusicBlocks({ blocks }) {
   const list = blocks.find((b) => b.kind === 'list');
   const receipt = blocks.find((b) => b.kind === 'image');
@@ -209,23 +201,23 @@ function MusicBlocks({ blocks }) {
 
   return (
     <div className="hp-music">
-      <div className="hpm-top">
-        <div className="hpm-tracks">
+      <div className="hpm-main">
+        <section className="hpm-rotation">
           <h2 className="hpb-label">
             <span>{list.title}</span>
             <span className="hpm-eq" aria-hidden="true">
               <i /><i /><i />
             </span>
           </h2>
-          <ol className="hpm-tracklist">
+          <ol className="hpm-artists">
             {list.items.map((it, i) => (
               <li key={it.name}>
                 <span className="hpm-num">{String(i + 1).padStart(2, '0')}</span>
                 <span className="hpm-info">
                   <span className="hpm-name">{it.name}</span>
                   {it.meta && <span className="hpm-meta">{it.meta}</span>}
+                  {it.note && <span className="hpm-note">{it.note}</span>}
                 </span>
-                {it.note && <span className="hpm-note">{it.note}</span>}
               </li>
             ))}
           </ol>
@@ -237,23 +229,26 @@ function MusicBlocks({ blocks }) {
               ))}
             </blockquote>
           )}
-        </div>
+        </section>
 
-        {receipt && (
-          <figure className="hpm-receipt">
-            <img src={receipt.src} alt={receipt.caption || ''} loading="lazy" />
-            {receipt.caption && <figcaption>{receipt.caption}</figcaption>}
-          </figure>
+        {carousel && (
+          <section className="hpm-live">
+            <h2 className="hpb-label">
+              <span>{carousel.title}</span>
+            </h2>
+            <Carousel items={carousel.items} direction={carousel.direction} />
+          </section>
         )}
       </div>
 
-      {carousel && (
-        <section className="hpm-live">
-          <h2 className="hpb-label">
-            <span>{carousel.title}</span>
-          </h2>
-          <Carousel items={carousel.items} direction={carousel.direction} />
-        </section>
+      {receipt && (
+        <figure className="hpm-receipt">
+          {/* taped up, like the book jackets on Stories — the slip is
+              the one piece of paper on this page */}
+          <span className="hpm-tape" aria-hidden="true" />
+          <img src={receipt.src} alt={receipt.caption || ''} loading="lazy" />
+          {receipt.caption && <figcaption>{receipt.caption}</figcaption>}
+        </figure>
       )}
     </div>
   );
@@ -471,6 +466,51 @@ function DrinksBlocks({ blocks }) {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+/* Art is a wall rather than a page of sections, so the gallery block is
+   the whole composition: six pieces in three bands of a 12-column grid,
+   two to a band and none of them much larger than the rest.
+
+   Each piece takes the width its `span` asks for and the shape its
+   `ratio` gives it, and the two are picked together (content.js) so that
+   everything in a band comes out the same height. Six different mediums
+   photographed six different ways won't do that on their own, so a piece
+   whose own proportions differ is cropped to fill its frame rather than
+   letterboxed into it, with `focus` holding the part that matters inside
+   the crop. Every crop here is a few percent off one edge; the concept
+   sheets hang at their own shape and are not cropped at all.
+
+   The caption sits under each piece as one hairline-topped row, the
+   piece on the left and the medium on the right, and that rule is the
+   only line drawn on this page. */
+function ArtBlocks({ blocks }) {
+  const wall = blocks.find((b) => b.kind === 'gallery');
+
+  return (
+    <div className="hp-art">
+      <h2 className="hpb-label">
+        <span>{wall.title}</span>
+        <span className="hpa-count">{wall.items.length} pieces</span>
+      </h2>
+      <ul className="hpa-wall">
+        {wall.items.map((it) => (
+          <li
+            key={it.caption}
+            style={{ '--span': it.span, '--ratio': it.ratio, '--focus': it.focus }}
+          >
+            <figure className="hpa-piece">
+              <img src={it.src} alt={it.caption} loading="lazy" />
+              <figcaption>
+                <span className="hpa-title">{it.caption}</span>
+                <span className="hpa-medium">{it.meta}</span>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

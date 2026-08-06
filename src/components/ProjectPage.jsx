@@ -662,13 +662,36 @@ function Section({ s }) {
         </ol>
       )}
       {s.facts && (
-        <div className="pp-facts">
-          {s.facts.map((f) => (
-            <div className="pp-fact" key={f.title}>
-              <h3>{f.title}</h3>
-              <p>{f.text}</p>
-            </div>
-          ))}
+        /* an optional eyebrow names the set, for sections where the
+           three columns are one thing (the data) rather than findings */
+        <div className="pp-facts-block">
+          {s.factsLabel && <span className="pp-facts-label">{s.factsLabel}</span>}
+          <div className="pp-facts">
+            {s.facts.map((f) => (
+              <div className="pp-fact" key={f.title}>
+                <h3>{f.title}</h3>
+                {/* `text` is a string, or a run of parts where an
+                    object is a link set inline in the sentence */}
+                <p>
+                  {(Array.isArray(f.text) ? f.text : [f.text]).map((part, i) =>
+                    typeof part === 'string' ? (
+                      part
+                    ) : (
+                      <a
+                        key={i}
+                        className="pp-fact-link"
+                        href={part.href}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {part.label}
+                      </a>
+                    ),
+                  )}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {s.stack && <StackDiagram stack={s.stack} />}

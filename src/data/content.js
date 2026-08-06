@@ -90,6 +90,16 @@ import drinkSesameHojicha from '../assets/hobby/drinks/sesame_hojicha.webp';
 import drinkJasmineMatcha from '../assets/hobby/drinks/jasmine_matcha.webp';
 import kitchenFood from '../assets/hobby/drinks/food.webp';
 
+/* The art wall, exported by scripts/export-art-web.py. Sized per piece
+   off how wide it hangs in the gallery band, so the panorama is the only
+   large one. */
+import artNyc from '../assets/hobby/art/nyc_art.webp';
+import artDrinks from '../assets/hobby/art/drinks_painting.webp';
+import artLittleWonder from '../assets/hobby/art/littlewonder_concept.webp';
+import artTrail from '../assets/hobby/art/goache_trail_painting.webp';
+import artConceptFish from '../assets/hobby/art/concept_fish.webp';
+import artConceptCity from '../assets/hobby/art/concept_tech.webp';
+
 /* Die-cut stickers for the Stories watch row — each one trimmed to its
    subject on transparent, so the white outline is drawn in CSS. */
 import stickerOdyssey from '../assets/hobby/stories/shows/odyssey.webp';
@@ -183,7 +193,7 @@ export const about = {
      stays centred on its word however long it runs. */
   markScale: [1.15, 1.2, 1.2],
   note:
-    'I’m a third-year Computer Science student at Cornell University, minoring in Artificial Intelligence. I love exploring new ideas and building software that’s both functional and thoughtfully designed. In my spare time, you’ll usually find me reading, painting, or making a cup of coffee.',
+    'I’m a third-year Computer Science student at Cornell University, minoring in Artificial Intelligence. I love exploring new ideas and building software that’s both functional and thoughtfully designed. In my spare time, you’ll usually find me reading, painting, or making a cup of coffee!',
 };
 
 export const stack = [
@@ -317,13 +327,13 @@ export const projects = [
               { title: 'Embed → route → retrieve', note: 'CLIP encoder + confidence gate' },
               { title: 'Context out', note: 'top match + synthesized history' },
             ],
-            // diagram-specific hues (not site tokens): the translucent
-            // plates blend when stacked, so the bands need genuinely
-            // different hue families — rust / blue / amber / green
+            // one muted ramp rather than four hues: the plates sit
+            // directly on top of each other, so separation reads from
+            // value, with a slow warm-to-cool drift going deeper
             groups: [
               {
                 name: 'Frontend',
-                tone: '#b05438',
+                tone: '#9a8266',
                 tools: [
                   { name: 'React + TypeScript', note: 'capture, scan, and reading views' },
                   { name: 'Vite', note: 'build and dev tooling' },
@@ -332,7 +342,7 @@ export const projects = [
               },
               {
                 name: 'Backend & data',
-                tone: '#3e6b9e',
+                tone: '#6f6353',
                 tools: [
                   { name: 'Node.js API', note: 'scan orchestration and session state' },
                   { name: 'Job queue', note: 'rate-limited model calls' },
@@ -343,7 +353,7 @@ export const projects = [
               },
               {
                 name: 'Vision model',
-                tone: '#c99a3d',
+                tone: '#4a5450',
                 tools: [
                   { name: 'CLIP encoder', note: 'shared image embeddings' },
                   { name: 'Retrieval head', note: 'exact match against the index' },
@@ -352,7 +362,7 @@ export const projects = [
               },
               {
                 name: 'RAG & context',
-                tone: '#55855a',
+                tone: '#2c3a4a',
                 tools: [
                   { name: 'Claude API', note: 'history and technique, synthesized' },
                   { name: 'Corpus retrieval', note: 'curated art-history passages' },
@@ -1955,42 +1965,48 @@ export const projects = [
       status: 'Completed',
       // show the whole demo screenshot instead of the 21:9 hero crop
       hero: { fit: true },
-      subtitle: 'Latent semantic search over restaurant reviews.',
+      subtitle: 'Semantic search and recommendation over restaurant reviews.',
       intro:
-        'Dishcovery turns a sentence like “Nashville quiet cheap lunch” into ten ranked restaurants, scored against the text of their reviews rather than their star average. Built by four students for INFO 4300, Language and Information, at Cornell. This page covers the retrieval and ranking layer.',
+        'A restaurant search and recommendation engine built on Yelp Open Dataset reviews, for INFO 4300, Language and Information, at Cornell. This page covers the retrieval, ranking and generation layers.',
       links: [{ label: 'GitHub', href: 'https://github.com/sanikashar/Dishcovery' }],
       meta: [
         { label: 'Category', value: 'Information retrieval, Full-Stack' },
         { label: 'My role', value: 'Retrieval and ranking' },
         { label: 'Timeline', value: 'Spring 2026' },
-        { label: 'Skills', value: 'Python, scikit-learn, TF-IDF, SVD, sentence embeddings, RAG' },
+        {
+          label: 'Skills',
+          value:
+            'Python, scikit-learn, Flask, TF-IDF, latent semantic analysis, truncated SVD, cosine ranking, sentence embeddings, RAG, query rewriting',
+        },
         { label: 'Team', value: 'Rhea Agrawal, Sanika Sharma, Enaika Kishnani, and me' },
       ],
       sections: [
         {
-          heading: 'Why a star rating answers the wrong question',
+          heading: 'Overview',
           body: [
-            'A four star average is taken over every reason anyone liked a place, so it cannot say whether the room is quiet, whether the ramen is the thing to order, or whether it holds up as a cheap weekday lunch. That detail lives in the review text, and nobody reads three hundred reviews.',
-            'So the review text becomes the searchable document, and the query is read as a description of a vibe instead of a set of keywords.',
+            'Dishcovery is a search and recommendation system for restaurants, driven by what reviewers actually wrote rather than by star averages. A plain sentence such as “Nashville quiet cheap lunch” returns ten ranked restaurants, each shown with the reasons it placed.',
+            'A star average aggregates every reason anyone liked a place, so it says nothing about whether a room is quiet, which dish is worth ordering, or whether the price holds up. Those details sit in the review text, which makes this an information retrieval problem over unstructured language rather than a filtering problem over a database.',
           ],
-        },
-        {
-          heading: 'The dataset',
-          body: [
-            'The corpus is a sampled slice of the public Yelp open dataset, cut down far enough that the whole index rebuilds in minutes.',
-          ],
+          factsLabel: 'Data',
           facts: [
             {
-              title: '150k businesses in, 8k out',
-              text: 'Businesses are filtered to restaurants and fast food, then sampled proportionally across the ten cities holding the most of them, keeping only places with at least fifteen reviews.',
+              title: 'Corpus',
+              // the label is the link, so the sentence opens on the source
+              text: [
+                {
+                  label: 'The Yelp Open Dataset',
+                  href: 'https://business.yelp.com/data/resources/open-dataset/',
+                },
+                ', roughly 150 thousand businesses and 7 million reviews, restricted here to restaurants and fast food across ten cities. Each restaurant becomes one document, formed by concatenating its reviews with its Yelp metadata.',
+              ],
             },
             {
-              title: 'One document per restaurant',
-              text: 'Up to twenty five reviews are lowercased, stripped of punctuation and stop words, and joined into a single field of roughly eight thousand characters.',
+              title: 'Text normalization',
+              text: 'Text is stripped of punctuation, lowercased, tokenized and filtered against a stop word list. Queries and documents run through the same pipeline, so they land in a comparable space.',
             },
             {
-              title: 'Attributes become words',
-              text: 'Price tier, noise level, meal flags, takeout and alcohol are rewritten as terms like cheap, quiet and lunch, so structured fields land in the same vector space as the prose.',
+              title: 'Structured fields as terms',
+              text: 'Price tier, noise level, meal flags, takeout and alcohol are rewritten into lexical terms such as cheap, quiet and lunch, so categorical metadata is indexed in the same vector space as the prose.',
             },
           ],
         },
@@ -2009,13 +2025,13 @@ export const projects = [
               { title: 'Rank against the city', note: 'TF-IDF and SVD in a cached per city latent space' },
               { title: 'Ten results out', note: 'deduplicated, filtered, each carrying the dimensions that earned it' },
             ],
-            // diagram-specific hues (not site tokens): the translucent
-            // plates blend when stacked, so the bands need genuinely
-            // different hue families — rust / blue / amber / green
+            // one muted ramp rather than four hues: the plates sit
+            // directly on top of each other, so separation reads from
+            // value, with a slow warm-to-cool drift going deeper
             groups: [
               {
                 name: 'Frontend',
-                tone: '#b05438',
+                tone: '#9a8266',
                 tools: [
                   { name: 'React and TypeScript', note: 'search bar, filters, result cards' },
                   { name: 'Tailwind', note: 'styling and layout' },
@@ -2024,7 +2040,7 @@ export const projects = [
               },
               {
                 name: 'Flask API',
-                tone: '#3e6b9e',
+                tone: '#6f6353',
                 tools: [
                   { name: '/api/search', note: 'pure retrieval, no model calls' },
                   { name: '/api/rag-search', note: 'retrieval wrapped in a rewrite and a summary' },
@@ -2033,7 +2049,7 @@ export const projects = [
               },
               {
                 name: 'Retrieval core',
-                tone: '#c99a3d',
+                tone: '#4a5450',
                 tools: [
                   { name: 'Query preprocessing', note: 'city extraction, filler removal, fuzzy repair' },
                   { name: 'TF-IDF vectorizer', note: 'unigrams and bigrams over four restaurant fields' },
@@ -2044,7 +2060,7 @@ export const projects = [
               },
               {
                 name: 'LLM layer',
-                tone: '#55855a',
+                tone: '#2c3a4a',
                 tools: [
                   { name: 'Query rewriter', note: 'a sentence becomes search terms before retrieval runs' },
                   { name: 'Overview writer', note: 'two or three sentences across the top five' },
@@ -2055,99 +2071,167 @@ export const projects = [
           },
         },
         {
-          heading: 'How the ranking model evolved',
+          heading: 'The search and recommendation model',
           body: [
-            'Ranking started as the simplest thing that could work and was rebuilt four times, each pass fixing a failure the previous one made visible.',
+            'Retrieval is a vector space model. Each restaurant is a row in a term document matrix, each query is projected into the same space, and results are ranked by descending cosine similarity. The model was rebuilt across four iterations, each one addressing a failure mode the previous iteration exposed.',
           ],
           subs: [
             {
-              title: 'Cosine similarity over raw TF-IDF',
-              deck: 'The first version scored a query against one bag of words per restaurant.',
+              title: 'TF-IDF weighting over a term document matrix',
+              deck: 'Documents are vectorized with scikit-learn TfidfVectorizer and scored by cosine similarity against the query vector.',
               bullets: [
-                'Reviews dominated the vector, so ambience words like romantic or divey were buried under thousands of words about food.',
-                'Ambience terms parsed from the Yelp attributes were repeated three times per document to give them real mass, alongside the rewritten attribute words.',
-                'It handled “sushi” and fell apart on “fancy formal sushi”, which is the query the project exists for.',
+                'An n-gram range of one to two captures multiword concepts such as late night and dim sum, a minimum document frequency of two drops terms appearing in a single restaurant, and sublinear term frequency scaling keeps heavily repeated terms from dominating a long document.',
+                'Cosine normalizes for document length, so a restaurant with three hundred reviews does not outrank a smaller one purely on term mass.',
+                'Restaurant text is split into weighted fields, reviews, categories and cuisine, ambience, and practical attributes, so the relative importance of each signal is tunable. Ambience terms parsed from Yelp attributes are repeated to give a small field real weight against the review field.',
+                'This baseline handled single term queries such as sushi and degraded on compositional queries such as fancy formal sushi, which is the query class the system targets.',
               ],
             },
             {
-              title: 'Latent semantics through SVD',
-              deck: 'Truncated SVD compresses the sparse TF-IDF matrix into one hundred dimensions per city.',
+              title: 'Latent semantic analysis through truncated SVD',
+              deck: 'Truncated SVD reduces the sparse TF-IDF matrix to one hundred latent dimensions, fitted independently per city.',
               bullets: [
-                'Queries project into the same space, so a search for upscale reaches restaurants whose reviews say classy or refined without sharing a term.',
-                'Fitting one decomposition per city keeps dimensions tied to local vocabulary and keeps every matrix small.',
-                'A thirty thousand feature cap and a minimum document frequency of two cut build time with no visible change in the top ten.',
+                'Dimensionality reduction addresses vocabulary mismatch. A query for upscale reaches restaurants whose reviews say classy or refined, because the decomposition groups co-occurring terms into shared concepts rather than requiring exact term overlap.',
+                'Measured cosine similarity on the top results rose from roughly 0.06 to 0.11 under TF-IDF alone to roughly 0.55 to 0.83 under TF-IDF with SVD, with a corresponding gain in judged relevance.',
+                'Fitting one decomposition per city keeps latent dimensions tied to local vocabulary and keeps each matrix small enough to hold in memory.',
+                'A thirty thousand feature cap paired with the minimum document frequency cut index build time with no observed change in the top ten.',
               ],
             },
             {
-              title: 'Fuzzy repair before projection',
-              deck: 'Any query word missing from the TF-IDF vocabulary is swapped for its nearest neighbour in that vocabulary.',
+              title: 'Dense retrieval evaluated against the sparse baseline',
+              deck: 'Two embedding based retrievers were implemented and measured against the TF-IDF and SVD model.',
               bullets: [
-                'Close matching runs at a 0.75 cutoff, so “romantik” resolves while a genuinely unfamiliar word passes through untouched.',
-                'It has to run before projection, because a typo in the latent space is not a near miss, it is noise spread across every dimension.',
+                'The first used GloVe vectors pooled with TF-IDF weights. The second used Sentence BERT on all-MiniLM-L6-v2 to encode each field.',
+                'Both scored the four fields separately and fused the per field cosines late, with weights favouring ambience, rather than encoding one concatenated document.',
+                'Both produced smoother rankings on subjective vibe queries, both were substantially slower to index, and neither supported attribution of a score back to interpretable features.',
+                'The sparse model stayed in production on explainability and latency. The dense paths remain in the codebase behind a model type switch.',
               ],
             },
             {
-              title: 'A bake-off the simpler model won',
-              deck: 'Two embedding approaches were built and measured against the TF-IDF and SVD baseline.',
+              title: 'Ranking explainability from the latent space',
+              deck: 'Every score is returned with the latent dimensions that produced it, so a ranking can be inspected rather than trusted.',
               bullets: [
-                'GloVe vectors weighted by TF-IDF, and Sentence BERT on all-MiniLM-L6-v2, both scored four fields separately, ambience, cuisine, reviews and practical, then fused the per field cosines with weights favouring ambience.',
-                'Both read as smoother on vibe queries, both were far slower to build, and neither could point at why a given restaurant ranked where it did.',
-                'SVD stayed in production. The embedding paths stayed in the codebase behind a model type switch.',
-              ],
-            },
-            {
-              title: 'Constraints outside the vector space',
-              deck: 'Some parts of a query are facts, not semantics, and are handled as facts.',
-              bullets: [
-                'Time words like brunch or late night are checked against opening hours rather than matched as text.',
-                'Rating and price filters run on the client over the returned cards, so narrowing never refires a search.',
+                'For the query, the strongest activated dimensions are read out of the SVD components and labelled by their heaviest loading terms.',
+                'For a single result, the per dimension products of query and document coordinates are split into the dimensions that contributed positively and negatively, and surfaced on the card as a “Why this result” panel.',
+                'Dimensions whose top terms are all generic are dropped before display. Corpus wide terms such as food, place and service are filtered out and the next informative dimension takes the slot.',
               ],
             },
           ],
         },
         {
-          heading: 'Showing why a result ranked',
+          heading: 'The LLM and RAG layer',
           body: [
-            'Every score ships with the latent dimensions behind it. For the query, the strongest activated dimensions are read out of the SVD components and labelled by their heaviest loading terms. For a single restaurant, the per dimension products of query and document coordinates split into the dimensions that pulled it up and the ones that pulled it down, which surface as tooltips on the card.',
-            'Dimensions whose top terms are all generic get dropped before display. A tooltip reading “good / great / really” explains nothing, so terms like food, place and service are filtered out and the next honest dimension takes the slot.',
+            'Generation wraps retrieval rather than replacing it. The language model performs query rewriting before the retrieval stage and grounded summarization after it, and every generated string is conditioned on retrieved documents rather than on model priors.',
+          ],
+          subs: [
+            {
+              title: 'Query rewriting before retrieval',
+              deck: 'A verbose natural language query is rewritten into a compact search phrase, which is then vectorized and ranked.',
+              bullets: [
+                'Conversational filler adds noise to the query vector and pulls cosine scores toward generic documents. Rewriting “Nashville cozy matcha delicious i want” to “Nashville cozy matcha” restores results where the raw query returned none.',
+                'On a longer query naming two cuisines, the unrewritten pipeline returned three Italian results. After rewriting, the top three covered both Italian and Mediterranean, matching the stated intent.',
+                'The rewritten query is displayed under the results, so the transformation applied to the input is visible rather than hidden.',
+              ],
+            },
+            {
+              title: 'Retrieval augmented overview of the result set',
+              deck: 'One call summarizes the ranked set before the individual cards are read.',
+              bullets: [
+                'The prompt is grounded in retrieved context only, the original and rewritten queries plus categories, ambience tags, ratings, hours and match scores for the top five.',
+                'The output is a short overview at the head of the results, which removes the need to read every card to understand what the set contains.',
+              ],
+            },
+            {
+              title: 'On demand grounded explanation per result',
+              deck: 'A second call explains a single restaurant, fired only when that card is opened.',
+              bullets: [
+                'Context is that restaurant’s own metadata, categories, ambience tags, price and rating, plus a 900 character review excerpt, so the explanation cites evidence from the retrieved document.',
+                'The output is capped at one to two sentences and requested lazily, which bounds both token cost and added latency to the cards a user actually inspects.',
+              ],
+            },
+            {
+              title: 'Generation is never on the critical path',
+              deck: 'Ranking does not depend on the model being available.',
+              bullets: [
+                'The pure retrieval endpoint makes no model calls at all, and the RAG endpoints degrade to it when no API key is present or a call fails.',
+                'A failed generation removes the summary and the explanation, and returns the same ranked list.',
+              ],
+            },
           ],
         },
         {
-          heading: 'Where the language model sits',
+          heading: 'Retrieval quality across the pipeline',
           body: [
-            'The LLM wraps retrieval rather than replacing it. A rewrite runs first, turning “I am looking for somewhere nice for a date in Tampa” into the short phrase the vectorizer wants. After ranking, one call summarizes the top five, and a second, fired only when a card is opened, explains that one restaurant from its own categories, ambience tags, price, rating and a truncated slice of its reviews.',
-            'Nothing in the ranking path depends on it. With no API key or a failed call, the endpoints fall back to pure retrieval and the page still renders.',
+            'A number of failures were not ranking failures. They came from query text the vectorizer could not use, or from constraints that are factual and should never have been treated as semantic signal.',
+          ],
+          subs: [
+            {
+              title: 'Query specific preprocessing',
+              deck: 'Beyond the shared normalization pipeline, a query needs terms removed that a document does not.',
+              bullets: [
+                'The city name is extracted from the query and stripped from the term stream, since it selects which index to search rather than contributing to the score.',
+                'Beyond standard English stop words, a query specific list removes intent filler such as want and looking, which carries no discriminative weight but does shift the query vector.',
+              ],
+            },
+            {
+              title: 'Fuzzy matching for out of vocabulary terms',
+              deck: 'Query terms absent from the TF-IDF vocabulary are mapped to their nearest in vocabulary neighbour.',
+              bullets: [
+                'Matching uses difflib similarity ratios at a 0.75 cutoff, so romantik resolves to romantic while a genuinely unrelated term is left untouched rather than forced onto a wrong match.',
+                'Repair has to run before projection. An unmatched typo is not a near miss in the latent space, it is noise distributed across all one hundred dimensions.',
+              ],
+            },
+            {
+              title: 'Hard constraints outside the vector space',
+              deck: 'Temporal constraints are enforced against structured data instead of matched as text.',
+              bullets: [
+                'Late night was originally a soft lexical signal, which let a restaurant closing at 6 pm rank second on the query “Tampa late night ramen”.',
+                'It is now a hard filter defined as 10 pm to 3 am and evaluated against opening hours, so every result on that query closes at or after 10 pm.',
+                'Brunch and similar time words follow the same path, resolving to an hours predicate rather than a term match.',
+              ],
+            },
+            {
+              title: 'Faceted filtering and deduplication',
+              deck: 'Post ranking refinements that never refire a search.',
+              bullets: [
+                'Price and rating are applied as client side facets over the returned set, so narrowing is instant and the price range is inclusive at both bounds.',
+                'Duplicate restaurant names collapse before the final cut, so a chain with several locations does not occupy the whole result list.',
+              ],
+            },
           ],
         },
         {
-          heading: 'Making it fast enough to demo',
+          heading: 'Cutting retrieval latency',
           body: [
-            'The first working build refit a vectorizer on every keystroke of a demo, which made the whole thing feel broken. Almost all of that time was work being repeated.',
+            'The first working build refit a vectorizer on every query, which put index construction inside the request path. Almost all of that cost was repeated work, and it was moved out of the request or removed.',
           ],
           facts: [
             {
-              title: 'Fitted once, at boot',
-              text: 'Every city corpus is built at startup and held in memory, so a search costs one projection and one matrix multiply instead of a fit.',
+              title: 'Index fitted once at boot',
+              text: 'Each city corpus is vectorized and decomposed at startup and held in memory, so a query costs one projection and one matrix multiply rather than a full fit.',
             },
             {
-              title: 'Cached to disk',
-              text: 'Fitted vectorizers and document matrices are pickled under a hash of their business ids and dimension count, gzipped, and reloaded on the next boot.',
+              title: 'Persisted index cache',
+              text: 'Fitted vectorizers and document matrices are pickled under a hash of their business ids and dimension count, gzipped, and reloaded on the next boot instead of rebuilt.',
             },
             {
-              title: 'Vectorized embedding',
-              text: 'The GloVe path went from a loop over documents to a single sparse multiply against a vocabulary embedding matrix, built once.',
+              title: 'Vectorized embedding construction',
+              text: 'The GloVe path moved from a per document loop to a single sparse multiply against a vocabulary embedding matrix built once, which removed most of that model’s index time.',
             },
             {
-              title: 'Cheap top ten',
-              text: 'Duplicate names collapse in a dictionary and the final ten come off a heap, so nothing sorts the full city twice.',
+              title: 'Heap based top-k selection',
+              text: 'Deduplication runs in a dictionary and the final ten come off a heap, so no request sorts the full city score vector.',
+            },
+            {
+              title: 'Cached result sets per city',
+              text: 'Results are cached client side, so switching between cities and back does not recompute a ranking that was already scored.',
             },
           ],
         },
         {
           heading: 'What I would change',
           body: [
-            'Ranking and filtering stayed too far apart. Hours, price and rating are applied after the vector step, so a narrow query can rank ten results and then hide most of them, with nothing reaching further down the list to refill. Folding the structured constraints into candidate selection is the shape I would build now.',
-            'The field weighted embedding path was the more interesting model and it lost on explainability alone. Given a way to attribute a sentence embedding score back to individual fields, I think that call flips.',
+            'Candidate generation and constraint filtering are too far apart. Hours, price and rating are applied after the top ten is cut, so a narrow query can rank ten results and then hide most of them, with nothing reaching further down the ranked list to refill. Pushing the structured predicates into candidate selection would preserve recall at a fixed k.',
+            'The field weighted dense retriever was the stronger model on subjective queries and lost on interpretability alone. Given a way to attribute a sentence embedding score back to individual fields, that decision likely reverses.',
           ],
         },
       ],
@@ -2248,7 +2332,11 @@ export const projects = [
        { kind: 'text',    title?, body: [paragraphs] }
        { kind: 'list',    title,  items: [{ name, meta, note }] }
        { kind: 'specs',   title,  rows:  [{ label, value }] }
-       { kind: 'gallery', title,  items: [{ caption, src? }] } — no src → placeholder frame
+       { kind: 'gallery', title,
+         items: [{ caption, meta, src, span, ratio, focus? }] } —
+         the art wall; span is the piece's width in the 12-column band
+         and ratio the shape it hangs at, so the three together are the
+         whole composition (see ArtBlocks)
        { kind: 'carousel', title, direction?: 'horizontal'|'vertical', items: [{ caption, src }] }
          — hover/tap-to-expand strip, view-only (no links)
        { kind: 'image',   src, caption?, align?: 'left'|'right' } — small tilted accent photo
@@ -2271,8 +2359,7 @@ export const projects = [
          items: [{ name, serve, caffeine, build, taste, src? }] }
          — cafe menu cards; caffeine is a bean count, build the pour
        { kind: 'soon', title, note } — an empty frame holding a slot open
-   TODO(sharon): art below is still sample copy — swap in the real one,
-   and add gallery image imports. */
+   Art has one too (ArtBlocks): the gallery block, hung as a wall. */
 export const hobbies = [
   {
     icon: 'laptop',
@@ -2282,7 +2369,7 @@ export const hobbies = [
     tone: 'var(--tone-c2)',
     page: {
       tagline:
-        'No real loyalty to the format, paperback, subtitles, whatever gets it across, I just love a good story.',
+        'Paperback, subtitles, or anything in between. I’m just here for a good story!',
       blocks: [
         {
           id: 'read',
@@ -2365,7 +2452,7 @@ export const hobbies = [
     tone: 'var(--espresso)',
     page: {
       tagline:
-        'Pour-overs on slow mornings, matcha when it’s warm, and whatever’s actually cooking in the kitchen.',
+        'Coffee, matcha, and everything I’ve been cooking up',
       /* Drinks gets a bespoke composition (DrinksBlocks): a menu of
          cards down the left, the kitchen beside it. Blocks are picked
          by `id`. */
@@ -2446,7 +2533,7 @@ export const hobbies = [
     tone: 'var(--navy)',
     page: {
       tagline:
-        'I love playing a bit of everything, from short indie games to full-on triple-A titles, but my favorite are always games that make me plan and think',
+        'I love playing a bit of everything, from short indie games to full-on triple-A titles, but my favorite are always games that make me plan and think a bit',
       blocks: [
         {
           id: 'genres',
@@ -2574,7 +2661,7 @@ export const hobbies = [
     note: 'Korean rock and Mandarin pop, mostly.',
     tone: 'var(--tone-d2)',
     page: {
-      tagline: 'Korean rock, Mandarin pop, and a concert calendar that keeps filling up.',
+      tagline: 'Current favorite songs, top artist, and concert memories.',
       blocks: [
         {
           kind: 'list',
@@ -2615,25 +2702,78 @@ export const hobbies = [
     note: 'Margins full of small, useless doodles.',
     tone: 'var(--sage)',
     page: {
-      tagline: 'Margins full of small, useless doodles — and a sketchbook that gets the serious attempts.',
+      tagline:
+        'A collection of some of the things I\'ve created! I love working across a variety of different mediums, from goache paintings to digital illustrations',
       blocks: [
         {
           kind: 'gallery',
-          title: 'From the sketchbook',
-          // TODO(sharon): add `src: importedImage` per piece; captionless
-          // frames render as placeholders until then
+          title: 'On the wall',
+          /* Hung in bands of a 12-column grid. `span` is the piece's
+             width in the band; `ratio` is the shape it hangs at, chosen
+             so the pieces beside it come out the same height (width over
+             ratio is constant across a band). Where that shape differs
+             from the photograph's own, the piece is cropped to fill it
+             rather than letterboxed, so `focus` names the part that must
+             survive the crop.
+
+             Three bands of two, and no piece much larger than any other,
+             so the wall reads as one hang rather than as a feature with
+             thumbnails under it. The heights land within 80px of each
+             other across all three bands, which is the closest the six
+             shapes come without cropping any of them hard. What varies is
+             how a band splits, evenly twice and then narrow against wide,
+             which both gives the panorama its length and lets the wall
+             close on its shortest band. */
           items: [
-            { caption: 'figure studies, ink' },
-            { caption: 'hands, again' },
-            { caption: 'subway sketches' },
-            { caption: 'portrait practice' },
-            { caption: 'the cat, unimpressed' },
-            { caption: 'perspective homework' },
+            {
+              caption: 'A weekend of eating in Manhattan',
+              meta: 'mixed media, goache, pen, highlighter',
+              src: artNyc,
+              span: 6,
+              ratio: 1.6, // a sliver off the top and bottom, both of them desk
+            },
+            {
+              caption: 'Painted some of my favorite drinks',
+              meta: 'pen and watercolour',
+              src: artDrinks,
+              span: 6,
+              ratio: 1.6, // and a sliver off its sides, to match
+            },
+            {
+              caption: 'Concept art - experimenting with mechanical and steampunk styles',
+              meta: 'digital, concept sheet',
+              src: artConceptFish,
+              span: 6,
+              ratio: 1.56, // the sheets hang uncropped, they are compositions
+            },
+            {
+              caption: 'Concept art - experimenting with composition and architecture',
+              meta: 'digital, concept sheet',
+              src: artConceptCity,
+              span: 6,
+              ratio: 1.56,
+            },
+            {
+              caption: 'A work in progress painting of a trail from my Washington DC trip with friends',
+              meta: 'gouache painting',
+              src: artTrail,
+              span: 4,
+              ratio: 1.37,
+              focus: '50% 58%', // the wet half of the page, not the desk above it
+            },
+            {
+              caption: 'Little Wonder concept illustration of Acornia',
+              meta: 'digital, game background',
+              src: artLittleWonder,
+              /* the widest slot on the wall, because it is the widest
+                 painting: at eight columns it comes out the same height
+                 as the gouache beside it and keeps nearly all of its
+                 length, where a narrower slot would have to cut the
+                 village out of it to hang level. */
+              span: 8,
+              ratio: 2.83,
+            },
           ],
-        },
-        {
-          kind: 'text',
-          body: ['Mostly ink and pencil, drawn from life when I can. The doodles in this site’s corners started in these pages.'],
         },
       ],
     },

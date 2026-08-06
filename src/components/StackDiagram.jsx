@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './StackDiagram.css';
 
 /* ------------------------------------------------------------------
    Interactive system-architecture stack (references/architecture_ref
-   .jpg): an isometric pile of translucent plates, one plate per tool,
-   grouped by layer. Hovering (or tapping / focusing) a group spreads
-   its plates apart and swaps the card on the right to that group's
-   tooling; everything else dims. Pure transform/opacity, so the
-   motion stays on the compositor.
+   .jpg): an isometric pile of plates, one plate per tool, grouped by
+   layer. Hovering (or tapping / focusing) a group spreads its plates
+   apart and swaps the card on the right to that group's tooling;
+   the rest drain toward paper. Position is transform-only, so the
+   spread stays on the compositor.
 
    Data shape (content.js → section.stack):
    { title, hint, flow: [{title, note}],
@@ -21,22 +21,65 @@ const GAP_HOT = 30;
 const PAD = 22;
 const PLATE_H = 150; // projected diamond height, keeps the pile centered
 const SCENE_H = 440;
+// matches the plate's transform transition, so a pick is only ever
+// taken from a pile that has stopped moving
+const SETTLE = 520;
+
+// lay the plates out top → bottom for a given selection, and record
+// the band each group occupies so the caller can pin one in place
+function layout(groups, hotIdx) {
+  const plates = [];
+  const bands = [];
+  let y = 0;
+  groups.forEach((g, gi) => {
+    if (hotIdx === gi && gi !== 0) y += PAD;
+    const from = y;
+    g.tools.forEach(() => {
+      plates.push({ gi, y, tone: g.tone });
+      y += hotIdx === gi ? GAP_HOT : GAP;
+    });
+    if (hotIdx === gi) y += PAD;
+    bands.push((from + y) / 2);
+  });
+  return { plates, bands, total: y };
+}
 
 export default function StackDiagram({ stack }) {
   const [hot, setHot] = useState(null); // hovered/selected group index
+  // held while the pile is gliding; plate hover is ignored until it
+  // clears (see pickFromPlate)
+  const moving = useRef(false);
+  const timer = useRef(0);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
-  // lay the plates out top → bottom; positions transition in CSS
-  const plates = [];
-  let y = 0;
-  stack.groups.forEach((g, gi) => {
-    if (hot === gi && gi !== 0) y += PAD;
-    g.tools.forEach(() => {
-      plates.push({ gi, y, tone: g.tone });
-      y += hot === gi ? GAP_HOT : GAP;
-    });
-    if (hot === gi) y += PAD;
-  });
-  const offset = Math.max(0, (SCENE_H - PLATE_H - y) / 2);
+  /* Positions transition in CSS. The pile is centred on its RESTING
+     height, and a spread group is then pinned so its own centre stays
+     where it was at rest. Centring on the spread height instead moved
+     every plate, including the one under the cursor — which handed a
+     neighbouring group the pointer, whose spread moved everything
+     back, and the two fought for it. Pinning means opening a group
+     pushes its neighbours away and leaves the group itself still. */
+  const rest = layout(stack.groups, null);
+  const { plates, bands } = layout(stack.groups, hot);
+  const base = Math.max(0, (SCENE_H - PLATE_H - rest.total) / 2);
+  const offset = hot == null ? base : base + rest.bands[hot] - bands[hot];
+
+  /* The legend is stationary, so it always gets its pick. The plates
+     are not: they are still gliding for half a second after a change,
+     and a plate sliding under a held cursor is not a new intent. So
+     plate picks go quiet until the motion settles. */
+  const pick = (gi) => {
+    moving.current = true;
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      moving.current = false;
+    }, SETTLE);
+    setHot(gi);
+  };
+  const pickFromPlate = (gi) => {
+    if (gi === hot || moving.current) return;
+    pick(gi);
+  };
 
   const group = hot != null ? stack.groups[hot] : null;
 
@@ -45,12 +88,15 @@ export default function StackDiagram({ stack }) {
       className="sd"
       onPointerLeave={(e) => {
         // a touch pointer "leaves" right after tapping — keep the pick
-        if (e.pointerType !== 'touch') setHot(null);
+        if (e.pointerType === 'touch') return;
+        // coming back in is a fresh intent, so it shouldn't wait
+        moving.current = false;
+        setHot(null);
       }}
     >
       {/* legend */}
       <div className="sd-legend">
-        <p className="sd-label">The stack · top → bottom</p>
+        <p className="sd-label">The stack</p>
         <ul>
           {stack.groups.map((g, gi) => (
             <li key={g.name}>
@@ -58,9 +104,9 @@ export default function StackDiagram({ stack }) {
                 type="button"
                 className={`sd-key ${hot === gi ? 'is-hot' : ''}`}
                 style={{ '--c': g.tone }}
-                onPointerEnter={() => setHot(gi)}
-                onFocus={() => setHot(gi)}
-                onClick={() => setHot(hot === gi ? null : gi)}
+                onPointerEnter={() => pick(gi)}
+                onFocus={() => pick(gi)}
+                onClick={() => pick(hot === gi ? null : gi)}
                 aria-pressed={hot === gi}
               >
                 <span className="sd-swatch" aria-hidden="true" />
@@ -87,7 +133,7 @@ export default function StackDiagram({ stack }) {
               key={i}
               className={`sd-plate ${p.gi === hot ? 'is-hot' : ''}`}
               style={{ '--c': p.tone, '--y': `${offset + p.y}px` }}
-              onPointerEnter={() => setHot(p.gi)}
+              onPointerEnter={() => pickFromPlate(p.gi)}
             />
           ))
           .reverse()}

@@ -196,8 +196,9 @@
 
 /* ---------- content blocks (column offset right of the header —
    the same asymmetry the rest of the site leans on) ---------- */
-/* wide enough that the art gallery lands in a single row of frames
-   rather than two — text inside still caps at its own measure */
+/* The fallback stack, for a hobby that hasn't been given a composition
+   of its own yet (every one on the page now has). Wider than the reading
+   measure so an image block has room; text inside still caps at its own. */
 .hp-blocks {
   display: grid;
   gap: var(--sp-5);
@@ -298,65 +299,6 @@
   margin: 0;
 }
 
-/* gallery — taped scrapbook frames, slightly off-square */
-.hpb-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-  gap: clamp(16px, 0.625vw + 12.25px, 26px);
-}
-.hp-frame {
-  position: relative;
-  margin: 0;
-  padding: 10px 10px 12px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  rotate: -1.1deg;
-}
-.hp-frame:nth-child(even) {
-  rotate: 1.2deg;
-}
-/* the tape */
-.hp-frame::before {
-  content: '';
-  position: absolute;
-  top: -9px;
-  left: 50%;
-  translate: -50%;
-  width: 56px;
-  height: 17px;
-  rotate: -2deg;
-  background: color-mix(in srgb, var(--tone) 16%, var(--paper-2));
-  opacity: 0.85;
-}
-.hp-frame img,
-.hp-ph {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-}
-.hp-ph {
-  display: grid;
-  place-items: center;
-  background: var(--paper-2);
-  border: 1px dashed var(--line);
-  font-family: var(--mono);
-  font-size: var(--fs-label);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-/* Picture captions across the hobby pages are set in the display serif's
-   italic — the caption voice comes from the italic and the smaller size,
-   not from a fourth family. */
-.hp-frame figcaption {
-  margin-top: 10px;
-  text-align: center;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 1.02rem;
-  color: var(--ink-soft);
-}
-
 /* ---------- carousel — hover (or tap) a panel to expand it; the
    others stay collapsed to a rounded sliver, echoing the tote/frame
    motif elsewhere on the page. View-only, nothing to click through to. */
@@ -421,22 +363,28 @@
   transform: none;
 }
 
-/* ---------- music — bespoke layout: tracklist beside the receipt with
-   the pull-quote under it in the same column, then the concert
-   carousel opened up wider as the closing, most visual moment ------ */
+/* ---------- music — one band rather than three stacked ones: the
+   names and the concert strip run down the main column, the
+   Receiptify slip down a rail beside both. The rail is what sets the
+   slip's size — it has the height of the whole band to fill, so it
+   prints large enough to read. ---------------------------------- */
 .hp-music {
   display: grid;
-  gap: var(--sp-5);
-  max-width: 1000px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: clamp(36px, 3vw + 12px, 80px);
+  align-items: start;
+  max-width: 1180px;
   margin-top: var(--sp-5);
-  margin-left: clamp(0px, 7.5vw - 45px, 120px);
+  margin-left: clamp(0px, 6vw - 36px, 96px);
 }
 
-.hpm-top {
+/* the two sections that share the main column. The gap between them
+   is the page's only vertical break, so it carries the section-sized
+   spacing the stacked layout used to spend three times. */
+.hpm-main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: clamp(32px, 2.5vw + 17px, 72px);
-  align-items: start;
+  gap: var(--sp-5);
+  min-width: 0;
 }
 
 /* "now playing" eq bars beside the label */
@@ -461,60 +409,85 @@
   50% { height: 13px; }
 }
 
-.hpm-tracklist {
+/* Names, two across. Each one is a name over its genre rather than a
+   name trailed by it: stacked, the pair holds the width of its half
+   instead of stranding a rule, and the four cells read as a set. The
+   closing rule belongs to the list, so it runs the full width under
+   both columns and the two halves finish on one line. */
+.hpm-artists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(28px, 2vw + 12px, 64px);
   list-style: none;
   margin: 0;
   padding: 0;
+  border-bottom: 1px solid var(--line);
 }
-.hpm-tracklist li {
+.hpm-artists li {
   display: grid;
   grid-template-columns: 2.2rem minmax(0, 1fr);
   column-gap: var(--sp-3);
-  padding-block: 15px;
+  padding-block: clamp(16px, 1vh + 8px, 22px);
   border-top: 1px solid var(--line);
 }
-.hpm-tracklist li:last-child {
-  border-bottom: 1px solid var(--line);
-}
 .hpm-num {
-  padding-top: 4px;
+  padding-top: 0.45em;
   font-family: var(--mono);
   font-size: var(--fs-small);
   color: var(--ink-faint);
 }
 .hpm-info {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: var(--sp-3);
+  min-width: 0;
 }
 .hpm-name {
+  display: block;
   font-family: var(--serif);
-  font-size: 1.3rem;
+  font-size: clamp(1.3rem, 0.35vw + 1.19rem, 1.62rem);
   font-weight: 500;
+  line-height: 1.15;
   letter-spacing: -0.01em;
 }
 .hpm-meta {
+  display: block;
+  margin-top: 7px;
   font-family: var(--mono);
   font-size: var(--fs-label);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-faint);
 }
 .hpm-note {
-  grid-column: 2 / -1;
-  max-width: 60ch;
-  margin-top: 6px;
+  display: block;
+  max-width: 46ch;
+  margin-top: 8px;
   font-size: var(--fs-small);
   color: var(--ink-soft);
 }
 
-/* the receipt — printed long and narrow, so let it stay that shape
-   rather than cropping it into a square accent frame */
+/* the slip — printed long and narrow, kept that shape and given the
+   rail's full height, so it reads as the piece of paper it is. It is
+   pinned rather than centred: the top of the slip lines up with the
+   top of the names it belongs beside. */
 .hpm-receipt {
-  width: clamp(124px, 12vw, 156px);
-  margin: 0 0 0 clamp(0px, 1.75vw - 10.5px, 28px);
+  position: relative;
+  width: clamp(132px, 15.5vw, 248px);
+  margin: 0;
+  padding-top: var(--sp-3);
   rotate: 2deg;
+}
+/* straddling the top edge of the slip rather than floating above it —
+   half on the paper, half on the page */
+.hpm-tape {
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  left: 50%;
+  translate: -50%;
+  width: 62px;
+  height: 26px;
+  rotate: -2.5deg;
+  background: color-mix(in srgb, var(--tone) 26%, var(--paper-2));
+  opacity: 0.8;
 }
 .hpm-receipt img {
   display: block;
@@ -522,7 +495,7 @@
   box-shadow: 0 18px 30px rgb(0 0 0 / 0.16);
 }
 .hpm-receipt figcaption {
-  margin-top: 12px;
+  margin-top: 14px;
   text-align: center;
   rotate: -1deg;
   font-family: var(--serif);
@@ -544,31 +517,51 @@
   color: var(--ink-soft);
 }
 
-.hpm-live {
-  max-width: none;
-}
+/* the photographs close the page, and they are the only saturated
+   thing on it — tall enough that the open panel is a picture rather
+   than a thumbnail */
 .hpm-live .hpb-carousel {
-  height: clamp(240px, 24vw, 340px);
+  height: clamp(260px, 27vw, 400px);
 }
 
-@media (max-width: 860px) {
-  .hpm-top {
-    gap: var(--sp-5);
-  }
-}
-
+/* No room for a rail. The slip comes inline instead, between the names
+   and the photographs — which is the order it belongs in anyway, since
+   it is the receipt for the names above it. `display: contents` on the
+   main column is what lets it land between the two sections without a
+   second copy of the markup. */
 @media (max-width: 700px) {
   .hp-music {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sp-4);
     margin-left: 0;
   }
-  .hpm-top {
-    grid-template-columns: 1fr;
-    gap: var(--sp-4);
+  .hpm-main {
+    display: contents;
+  }
+  .hpm-rotation {
+    order: 1;
   }
   .hpm-receipt {
-    width: 112px;
-    margin-left: 0;
+    order: 2;
+    width: 136px;
     justify-self: start;
+    padding-top: 12px;
+  }
+  .hpm-live {
+    order: 3;
+  }
+  .hpm-tape {
+    top: 2px;
+    width: 46px;
+    height: 20px;
+  }
+}
+
+/* one column of names, once two would break the genre onto its own
+   second line more often than not */
+@media (max-width: 520px) {
+  .hpm-artists {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -1793,6 +1786,111 @@
   }
   .hpd-art {
     width: 92px;
+  }
+}
+
+/* ============================================================
+   ART — one wall, hung in bands
+   ============================================================ */
+
+/* Wider and pushed a little less far right than the reading column:
+   the pieces are the content on this page, and the width is what keeps
+   the panorama from thinning to a strip. */
+.hp-art {
+  max-width: 1180px;
+  margin-top: var(--sp-5);
+  margin-left: clamp(0px, 6vw - 36px, 96px);
+}
+
+/* the far end of the section rule, opposite the label */
+.hpa-count {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A 12-column band. Each piece's width (`--span`) and shape (`--ratio`)
+   are set on it in content.js, so the composition is edited with the work
+   rather than in here. Both are proportions rather than pixels, so a band
+   holds its matched heights at any width the page is read at.
+
+   Nothing needs aligning: the pieces in a band are already the same
+   height, so they hang from a common top and only the captions, which
+   wrap at their own rate, run on below. */
+.hpa-wall {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(26px, 1.25vw + 12px, 44px) clamp(18px, 1.25vw + 6px, 34px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hpa-wall > li {
+  grid-column: span var(--span, 6);
+}
+
+.hpa-piece {
+  margin: 0;
+}
+/* cover, not contain: a piece hangs at the shape its band asks for, and
+   `--focus` decides what the crop keeps rather than defaulting to the
+   middle of a photograph that isn't centred on its subject */
+.hpa-piece img {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--ratio, 1.55);
+  object-fit: cover;
+  object-position: var(--focus, 50% 50%);
+  border: 1px solid var(--line);
+  transition: translate 420ms var(--ease), border-color 420ms var(--ease);
+}
+/* the whole print lifts off the paper by a couple of pixels; nothing
+   scales, so the work never crops or blurs under the pointer */
+.hpa-piece:hover img {
+  translate: 0 -3px;
+  border-color: color-mix(in srgb, var(--tone) 42%, var(--line));
+}
+
+/* a gallery label under each piece, under the one hairline this page
+   draws. Title over medium rather than across from it: at a third of the
+   band the two only sometimes fit on a line together, and a row that
+   holds for three captions and breaks for the fourth reads as a mistake
+   where the stack reads as the label it is. */
+.hpa-piece figcaption {
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+  margin-top: 11px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
+}
+.hpa-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.02rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+.hpa-medium {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+@media (max-width: 900px) {
+  /* the bands stop being composable once a span of three is narrower
+     than a phone photo deserves — the wall becomes one column, in the
+     same order, and each piece gets the full measure */
+  .hpa-wall > li {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 700px) {
+  .hp-art {
+    margin-left: 0;
   }
 }
 
