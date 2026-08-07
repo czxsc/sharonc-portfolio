@@ -497,6 +497,38 @@
   line-height: 1.7;
 }
 
+/* scan list inside body copy, at body size since it sits among
+   paragraphs, with the decision named in the bold lead so the leads
+   alone read as the list. A round bullet rather than the hairline tick
+   .pp-sub-list uses, since these are list items in prose rather than
+   ruled detail under a numbered principle. */
+.pp-body-list {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: var(--sp-3) 0 var(--sp-3) 2px;
+  padding: 0;
+}
+.pp-body-list li {
+  position: relative;
+  padding-left: 20px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+.pp-body-list li::before {
+  content: '\2022';
+  position: absolute;
+  left: 0;
+  top: 0;
+  line-height: inherit;
+  color: var(--espresso);
+  opacity: 0.55;
+}
+.pp-body-list strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
 .pp-section .pp-media {
   margin-top: var(--sp-4);
 }
@@ -886,6 +918,11 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sp-4);
+}
+/* four items read better as a square than as three plus one orphan */
+.pp-facts--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  row-gap: var(--sp-5);
 }
 .pp-fact {
   border-top: 1px solid var(--line);

@@ -51,7 +51,7 @@
   transition: background var(--dur) var(--ease), opacity var(--dur) var(--ease);
 }
 .sd-key.is-hot {
-  background: color-mix(in srgb, var(--c) 10%, transparent);
+  background: color-mix(in srgb, var(--c) 22%, transparent);
 }
 /* reads as one of the plates seen flat, so it uses the plate's mix */
 .sd-swatch {
@@ -59,12 +59,12 @@
   width: 13px;
   height: 13px;
   border-radius: 3.5px;
-  background: color-mix(in srgb, var(--c) 45%, var(--card));
-  border: 1px solid color-mix(in srgb, var(--c) 70%, var(--card));
+  background: color-mix(in srgb, var(--c) 70%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--c) 84%, var(--ink));
 }
 .sd-key.is-hot .sd-swatch {
-  background: color-mix(in srgb, var(--c) 80%, var(--card));
-  border-color: var(--c);
+  background: var(--c);
+  border-color: color-mix(in srgb, var(--c) 74%, var(--ink));
 }
 .sd-key-text {
   font-family: var(--serif);
@@ -99,8 +99,8 @@
   height: 200px;
   margin-left: -100px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--c) 30%, var(--card));
-  border: 1px solid color-mix(in srgb, var(--c) 62%, var(--card));
+  background: color-mix(in srgb, var(--c) 78%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--c) 86%, var(--ink));
   transform: translateY(var(--y)) rotateX(58deg) rotateZ(45deg);
   transition:
     transform 0.5s var(--ease),
@@ -112,12 +112,12 @@
    layers deepen and the rest drain toward paper rather than fading
    out — the pile stays solid instead of turning into ghosts */
 .sd-scene.has-hot .sd-plate {
-  background: color-mix(in srgb, var(--c) 8%, var(--card));
-  border-color: var(--line);
+  background: color-mix(in srgb, var(--c) 20%, var(--card));
+  border-color: color-mix(in srgb, var(--c) 30%, var(--line));
 }
 .sd-scene.has-hot .sd-plate.is-hot {
-  background: color-mix(in srgb, var(--c) 64%, var(--card));
-  border-color: color-mix(in srgb, var(--c) 92%, var(--card));
+  background: var(--c);
+  border-color: color-mix(in srgb, var(--c) 74%, var(--ink));
 }
 
 /* ---------- detail card ---------- */
@@ -127,6 +127,19 @@
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+}
+/* ghost and body share one cell, so the card is always as tall as the
+   tallest state and never resizes when the pick changes */
+.sd-card-stack {
+  display: grid;
+}
+.sd-card-stack > * {
+  grid-area: 1 / 1;
+}
+.sd-card-ghost {
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
 }
 .sd-card-body {
   animation: sd-swap 0.3s var(--ease) both;

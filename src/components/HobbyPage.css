@@ -380,11 +380,17 @@
 
 /* the two sections that share the main column. The gap between them
    is the page's only vertical break, so it carries the section-sized
-   spacing the stacked layout used to spend three times. */
+   spacing the stacked layout used to spend three times.
+
+   The column is capped short of the space the grid gives it: the rail
+   stays out at the page's right edge, so what the cap buys is air
+   between the two — the slip reads as sitting apart from the
+   photographs rather than up against them. */
 .hpm-main {
   display: grid;
   gap: var(--sp-5);
   min-width: 0;
+  max-width: 810px;
 }
 
 /* "now playing" eq bars beside the label */
@@ -442,7 +448,7 @@
 .hpm-name {
   display: block;
   font-family: var(--serif);
-  font-size: clamp(1.3rem, 0.35vw + 1.19rem, 1.62rem);
+  font-size: clamp(1.08rem, 0.26vw + 0.99rem, 1.32rem);
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.01em;
@@ -464,13 +470,16 @@
   color: var(--ink-soft);
 }
 
-/* the slip — printed long and narrow, kept that shape and given the
-   rail's full height, so it reads as the piece of paper it is. It is
-   pinned rather than centred: the top of the slip lines up with the
-   top of the names it belongs beside. */
+/* the slip — printed long and narrow, kept that shape and set large
+   enough off the rail's height to read as the piece of paper it is
+   rather than as an accent. It hangs centred on the band rather than
+   pinned to its top: nothing in the rail lines up with anything in
+   the main column, so an aligned top edge only advertised the two
+   columns as unequal. */
 .hpm-receipt {
   position: relative;
-  width: clamp(132px, 15.5vw, 248px);
+  align-self: center;
+  width: clamp(128px, 13vw, 208px);
   margin: 0;
   padding-top: var(--sp-3);
   rotate: 2deg;

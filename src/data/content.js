@@ -4,7 +4,7 @@
    ------------------------------------------------------------------ */
 import portfolioProjectImg from '../assets/projects/portfolio/cover.jpg';
 import dishcoveryImg from '../assets/projects/dishcovery/demo.jpg';
-import artificerImg from '../assets/projects/artificer/cover.jpg';
+import artificerImg from '../assets/projects/artificer/monet.jpg';
 import cuairGcsImg from '../assets/projects/preflight/cover.webp';
 import dpkMissionPlannerImg from '../assets/projects/preflight/mission_planner.png';
 import dpkAccelImg from '../assets/projects/preflight/accel.webp';
@@ -263,530 +263,6 @@ export const experience = [
 export const projects = [
   {
     index: '01',
-    name: 'Artificer',
-    slug: 'artificer',
-    category: 'ML · Full-Stack',
-    year: '2026',
-    blurb: 'ML powered app to scan artworks and learn their history.',
-    tech: ['React', 'TypeScript', 'Claude API'],
-    image: artificerImg,
-    tone: ['var(--tone-b1)', 'var(--tone-b2)'],
-    href: '#work',
-    page: {
-      status: 'Developing',
-      subtitle: 'Point your camera at a painting; get its story.',
-      intro:
-        'Artificer is an ML-powered app that identifies artworks from a photo and unpacks their history, technique, and context. I’m building it end to end — from the recognition pipeline to an interface that reads like a well-set gallery label.',
-      links: [{ label: 'GitHub', href: '#' }],
-      meta: [
-        { label: 'Category', value: 'Machine Learning, RAG, Full-Stack' },
-        { label: 'My role', value: 'Design & engineering' },
-        { label: 'Timeline', value: '2026 — in progress' },
-        { label: 'Skills', value: 'Evaluating ML Models, RAG, LLM, React, Javascript' },
-      ],
-      sections: [
-        {
-          heading: 'Problem: Art context is locked in wall text',
-          body: [
-            'Standing in front of a painting, most of what makes it interesting — who made it, why, what to look at — lives in a paragraph you have to find, or a tour you didn’t book. Outside a museum there’s even less: reverse image search returns listings, not stories.',
-            'Artificer starts from the moment of curiosity: you’re looking at the thing, and you want to know more right now.',
-          ],
-        },
-        {
-          heading: 'Approach',
-          body: [
-            'The build is organized around three decisions, each still being tested against real gallery visits.',
-          ],
-          facts: [
-            {
-              title: 'Recognition first',
-              text: 'Identification has to work on imperfect photos — glare, angles, crops — before anything else matters.',
-            },
-            {
-              title: 'Context, not captions',
-              text: 'The model’s output is edited into a structured story: era, technique, and one thing to look closer at.',
-            },
-            {
-              title: 'Gallery-label tone',
-              text: 'The interface borrows from wall text: quiet type, short measures, no feed mechanics.',
-            },
-          ],
-        },
-        {
-          heading: 'Architecture: From photograph to provenance',
-          body: [
-            'A single CLIP encoder feeds two parallel heads — exact-match retrieval and label classification. A confidence gate decides which signal to trust before handing a rewritten query to the RAG layer. Hover a layer to expand its stack.',
-          ],
-          // renders the interactive isometric pile (StackDiagram.jsx);
-          // one plate per tool, grouped top → bottom
-          stack: {
-            title: 'Four layers, one request',
-            hint: 'Hover a layer to expand its stack.',
-            flow: [
-              { title: 'Photograph in', note: 'museum capture, upload, or crop' },
-              { title: 'Embed → route → retrieve', note: 'CLIP encoder + confidence gate' },
-              { title: 'Context out', note: 'top match + synthesized history' },
-            ],
-            // one muted ramp rather than four hues: the plates sit
-            // directly on top of each other, so separation reads from
-            // value, with a slow warm-to-cool drift going deeper
-            groups: [
-              {
-                name: 'Frontend',
-                tone: '#9a8266',
-                tools: [
-                  { name: 'React + TypeScript', note: 'capture, scan, and reading views' },
-                  { name: 'Vite', note: 'build and dev tooling' },
-                  { name: 'Design tokens', note: 'the gallery-label reading experience' },
-                ],
-              },
-              {
-                name: 'Backend & data',
-                tone: '#6f6353',
-                tools: [
-                  { name: 'Node.js API', note: 'scan orchestration and session state' },
-                  { name: 'Job queue', note: 'rate-limited model calls' },
-                  { name: 'Vector index', note: 'artwork embeddings' },
-                  { name: 'Metadata store', note: 'artists, eras, provenance' },
-                  { name: 'Ingest pipeline', note: 'museum open-data sets' },
-                ],
-              },
-              {
-                name: 'Vision model',
-                tone: '#4a5450',
-                tools: [
-                  { name: 'CLIP encoder', note: 'shared image embeddings' },
-                  { name: 'Retrieval head', note: 'exact match against the index' },
-                  { name: 'Classifier + confidence gate', note: 'decides which signal to trust' },
-                ],
-              },
-              {
-                name: 'RAG & context',
-                tone: '#2c3a4a',
-                tools: [
-                  { name: 'Claude API', note: 'history and technique, synthesized' },
-                  { name: 'Corpus retrieval', note: 'curated art-history passages' },
-                  { name: 'Prompt templates', note: 'wall-label tone control' },
-                ],
-              },
-            ],
-          },
-        },
-        {
-          heading: 'Solution: A pocket docent',
-          body: [
-            'Scan a work and Artificer returns a label-sized summary with the option to go deeper — related works, the artist’s arc, and how this piece fits it. Depth is opt-in; the default reading takes under a minute.',
-          ],
-          media: { caption: 'Scan-to-story flow — screens coming as the build stabilizes.' },
-        },
-        {
-          heading: 'Status',
-          body: [
-            'The recognition pipeline and core reading experience are working; current focus is offline handling in low-signal galleries and the related-works graph.',
-          ],
-        },
-      ],
-    },
-  },
-  {
-    index: '02',
-    name: 'Portfolio',
-    slug: 'portfolio',
-    category: 'Frontend · Design',
-    year: '2026',
-    blurb: 'Personal portfolio site to learn about me and my work.',
-    tech: ['React', 'Vite', 'Motion', 'CSS'],
-    image: portfolioProjectImg,
-    tone: ['var(--tone-a1)', 'var(--tone-a2)'],
-    href: '#work',
-    page: {
-      status: 'Live',
-      subtitle: 'My portfolio website to display both my work and personality.',
-      intro:
-        'A custom portfolio built in React and Vite, covering the whole surface, from visual direction and hand-drawn illustration through to the motion work and the component architecture. It has to read as clean and professional but still feel unmistakably mine.',
-      links: [{ label: 'GitHub', href: 'https://github.com/czxsc/sharonc-portfolio' }],
-      meta: [
-        { label: 'Category', value: 'Frontend, Design' },
-        { label: 'My role', value: 'Design & engineering' },
-        { label: 'Timeline', value: '2026' },
-        { label: 'Skills', value: 'React, Vite, UI/UX design, motion design, illustration' },
-      ],
-      sections: [
-        {
-          heading: 'Design Process',
-          body: [
-            'To build a portfolio that effectively showcases my work, I began by defining my objective. I wanted to create a clean, easily readable interface that still preserved my personal touch and artistic personality. I initially explored a wide spectrum of visual directions, mapping out ideas on a scale from cluttered and expressive to minimal and professional. These concepts ranged from scrapbook-style layouts layered with post-its and polaroids, to retro game-inspired UIs, to clean minimalist grids paired with subtle hand-drawn doodles.',
-            'Evaluating these paths against my primary goal revealed a fundamental tension between expressiveness and clarity.',
-            {
-              list: [
-                {
-                  label: 'High expressiveness',
-                  note: 'Scrapbook, retro',
-                  text:
-                    'Layering, bold accent colours and creative layouts carried strong character, at the risk of overwhelming visitors and hiding the technical content.',
-                },
-                {
-                  label: 'Minimalistic',
-                  note: 'Modern, Simple',
-                  text:
-                    'Exceptionally professional, accessible and quick to scan, but a little too generic and detached from my creative identity.',
-                },
-              ],
-            },
-            'Ultimately, I chose the hybrid approach of Minimalism with Custom Hand-Drawn Accents, built on a palette of light cream and warm neutrals rather than stark black and white. This allowed me to leverage generous whitespace and a clean structure to keep my technical projects front and center, while using soft colors and custom illustrations to give the site a welcoming, unique identity without distracting from the content.',
-          ],
-          designBoard: {
-            reference: {
-              src: ideaBoardImg,
-              label: 'Reference board',
-              alt:
-                'A canvas of portfolio and studio sites grouped into illustrative, doodle, minimal, retro and scrapbook directions, with a checklist of decided themes at the right',
-            },
-            caption:
-              'Initial Brainstorming: A collection of visual references I liked, organized to clearly pin down the possible directions.',
-          },
-        },
-        {
-          heading: 'Style Guide',
-          body: [
-            'Everything the direction implied was written down before the first section was built. One token file holds the colour, type scale, spacing and easing, and no component is allowed a raw hex value, which is what lets the whole site be retuned from a single place. As a final layer of personality, I anchored the brand identity in a cohesive theme inspired by cats and coffee.',
-          ],
-          designBoard: {
-            /* The palette is quoted from tokens.css rather than read from
-               it: the card documents what was decided at the start, and a
-               swatch that silently re-tinted with a later token change
-               would stop being a record of that. `share` is how much of
-               the site each colour actually covers, and it sets the width
-               of that colour's segment in the bar — the ground is most of
-               what you see and the accents are a few percent, which an
-               even five-up strip would misreport.
-
-               The type specimens are live: `family` is set in `font`, so
-               the card shows the faces rather than naming them. `size` is
-               the range the site sets that family at (from the type scale
-               in tokens.css); `set` only exists to bring a specimen with
-               an odd x-height up to the others optically. */
-            card: {
-              label: 'Style guide v1',
-              palette: [
-                { hex: '#F5F4F1', name: 'Paper', share: 58 },
-                { hex: '#1B1B1B', name: 'Ink', share: 24 },
-                { hex: '#5A4636', name: 'Espresso', share: 10 },
-                { hex: '#3F4A3E', name: 'Sage', share: 4 },
-                { hex: '#2C3A4A', name: 'Navy', share: 4 },
-              ],
-              type: [
-                { family: 'Newsreader', role: 'Display', size: '22–112px', font: 'var(--serif)', weight: 600 },
-                { family: 'Archivo', role: 'Body & UI', size: '14–17px', font: 'var(--grot)' },
-                { family: 'JetBrains Mono', role: 'Labels', size: '11px', font: 'var(--mono)' },
-              ],
-              rules: [
-                { name: 'Radius', value: '12 / 16px' },
-                { name: 'Spacing', value: '8px base' },
-                { name: 'Duration', value: '0.18 / 0.42 / 0.72s' },
-                { name: 'Easing', value: 'settle · set · draw' },
-              ],
-            },
-            caption:
-              'Finalized design standards for the visual system of this site.',
-          },
-        },
-        {
-          heading: 'Building the Experience',
-          body: [
-            'I initially prototyped and built the site using Framer, as its visual interface made it straightforward to quickly draft layouts and iterate on design changes in real time. However, as the concept evolved, I quickly hit the platform\'s constraints. I wanted more customized elements and interactions which proved difficult with Framer\'s more templates component system. Rather than compromising on my design vision or paying for restrictive platform features, I decided to rebuild the site from scratch in React.',
-            'Building from scratch meant owning the structure too. To keep state complexity from bloating a single page app, the frontend is organized around three principles.',
-          ],
-          subs: [
-            {
-              title: 'Data-driven content abstraction',
-              deck: 'All copy, metadata and page structure is decoupled from the rendering layer and kept in a single data manifest.',
-              bullets: [
-                'content.js holds every project, case study section and hobby page as plain data, and components only render what they are handed.',
-                'Updating or adding a project is a schema edit rather than a component rewrite.',
-              ],
-            },
-            {
-              title: 'Centralized design system tokens',
-              deck: 'Visual variables live in one CSS custom property layer instead of in the components that use them.',
-              bullets: [
-                'tokens.css carries the colour palettes for both themes, the fluid type scale, the spacing grid and the motion easing curves.',
-                'Hardcoded hex values and inline magic numbers are off limits, so a global aesthetic change is a single file edit.',
-              ],
-            },
-            {
-              title: 'Reusable state and motion hooks',
-              deck: 'Shared mechanics are abstracted into custom hooks, so each component only owns what is unique to it.',
-              bullets: [
-                'useOverlayPage isolates the overlay plumbing, scroll lock, focus, Escape and browser back, leaving ProjectPage and HobbyPage to manage only their own transitions.',
-                'useLenis and useReveal standardize smooth scroll and entrance triggers across every section.',
-              ],
-            },
-          ],
-          /* renders the architecture elevation (CodeMap.jsx): tiers
-             stack downward and the ones below the surface span the
-             full width, because that is what shared looks like. The
-             four tiers are the three principles above plus the floor
-             they stand on, in that order, so the diagram reads as the
-             evidence for the paragraphs rather than a second list.
-             The last tier is marked `base`, which draws it as ground. */
-          codeMap: {
-            title: 'How the code is organized',
-            hint: 'Hover any file or package to see what it owns.',
-            stats: [
-              { value: '20', label: 'components' },
-              { value: '4', label: 'shared hooks' },
-              { value: '15k', label: 'lines' },
-            ],
-            tiers: [
-              {
-                id: '01',
-                name: 'Surface',
-                note: 'One component per section, each with its stylesheet beside it. Renders data, owns no copy.',
-                groups: [
-                  {
-                    name: 'Sections',
-                    items: [
-                      { name: 'Nav', note: 'active-section indicator, driven by useActiveSection' },
-                      { name: 'HeroPourTransition', note: 'hero and about, joined by the scroll-scrubbed pour' },
-                      { name: 'Work', note: 'project index, hover previews, tag filtering' },
-                      { name: 'Play', note: 'the tote-bag spill and the hobby flat-lay' },
-                      { name: 'Contact', note: 'the closing block' },
-                    ],
-                  },
-                  {
-                    name: 'Overlay pages',
-                    items: [
-                      { name: 'ProjectPage', note: 'case study, hero image flies out of the index' },
-                      { name: 'HobbyPage', note: 'mini-page, iris grows from the click point' },
-                      { name: 'SheetFlip', note: 'one virtual card, turning from the About window into the Work preview' },
-                    ],
-                  },
-                ],
-              },
-              {
-                id: '02',
-                name: 'Shared behaviour',
-                note: 'The mechanics every section would otherwise reimplement, written once.',
-                groups: [
-                  {
-                    name: 'Hooks',
-                    items: [
-                      { name: 'useOverlayPage', note: 'the overlay plumbing, scroll lock, focus, Escape, browser back, close timing' },
-                      { name: 'useReveal', note: 'scroll entrances that follow direction and speed' },
-                      { name: 'useLenis', note: 'interpolated scroll, so scrubbed animation glides' },
-                      { name: 'useActiveSection', note: 'an IntersectionObserver reporting which section is in view' },
-                    ],
-                  },
-                  {
-                    name: 'Primitives',
-                    items: [
-                      { name: 'SetType', note: 'per-line masked entrance for every title' },
-                      { name: 'SectionSeam', note: 'the rule between sections, scrubbed open against scroll' },
-                      { name: 'Doodles', note: 'the hand-drawn inline SVG set' },
-                    ],
-                  },
-                ],
-              },
-              {
-                id: '03',
-                name: 'Source of truth',
-                note: 'Copy and design values, edited here rather than in the components that read them.',
-                groups: [
-                  {
-                    items: [
-                      { name: 'content.js', note: 'every project, section and hobby page as plain data, one file' },
-                      { name: 'tokens.css', note: 'both palettes, the fluid type scale, spacing grid and easing curves' },
-                      { name: 'fonts.css', note: 'self-hosted woff2, latin subset' },
-                    ],
-                  },
-                ],
-              },
-              {
-                id: '04',
-                name: 'Toolchain',
-                base: true,
-                note: 'Two runtime dependencies past React. Everything else is written here.',
-                groups: [
-                  {
-                    items: [
-                      { name: 'react', note: 'the view layer, hooks and portals, no router and no UI kit on top of it' },
-                      { name: 'vite', note: 'dev server and production build, assets fingerprinted on the way out' },
-                      { name: 'motion', note: 'scroll progress and reduced-motion for the pour and the seam, the rest of the motion is CSS' },
-                      { name: 'lenis', note: 'interpolated scrolling, which is what lets an animation be scrubbed smoothly' },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        },
-        {
-          heading: 'UX Decisions',
-          body: [
-            'The site is written for two readers at once, someone giving it ninety seconds and someone who has decided to stay. My approach to the user experience was guided by a single core philosophy, optimize for efficiency first, then reward curiosity with engagement.',
-          ],
-          /* Four principles, each a one line claim with its supporting
-             detail broken out. `deck` is the claim, `bullets` the
-             detail. */
-          subs: [
-            {
-              title: 'The homepage should be enough',
-              deck: 'A single pass over the landing page carries the full picture.',
-              bullets: [
-                'Each project reveals its stack on hover, and can be sorted by domain so reviewers can instantly isolate the work most relevant for what they\'re looking for.',
-                'High-level project summaries and a brief snapshot of personal interests live right on the main page for quick scanning.',
-                'Dedicated subpages offer deeper technical breakdowns for those who want to dive into implementation details.',
-              ],
-            },
-            {
-              title: 'Motion should do a job',
-              deck: 'I used intentional animations to encourage exploration without creating visual noise.',
-              bullets: [
-                'Creative scroll-driven effects, like the coffee pour and flipping window, bring a pleasant surprise to visitors as they navigate down the page.',
-                'Subtle ambient motion, such as a moving background gradient in About and the animated swishing tail on landing, keeps resting states dynamic without distracting the reader.',
-                'Nearly all of the engineering behind it came down to keeping the browser doing cheap work.',
-              ],
-            },
-            {
-              title: 'Personality lives in small details',
-              deck: 'Small details sit in secondary visual layers, where they wouldn\'t interfere with readability.',
-              bullets: [
-                'A custom coffee bean cursor designed with adaptive contrast to ensure high visibility across both light and dark UI elements.',
-                'Custom hand-drawn cat animations and illustrations, placed outside primary reading zones, giving the site a warm, memorable personality without competing with core project content.',
-              ],
-            },
-            {
-              title: 'The site should work for everyone',
-              deck: 'Accessibility and responsiveness were part of the build rather than a pass at the end.',
-              bullets: [
-                'Every section is built from real headings and landmarks in order, so a screen reader hears the same structure the layout shows.',
-                'Text is held at high contrast everywhere, including over the moving espresso pool and the darker illustrated panels.',
-                'Narrow screens get reorganized layouts instead of one stacked column.',
-              ],
-            },
-          ],
-        },
-        {
-          heading: 'Iterations',
-          body: [
-            'Every section of the site went through several passes. Many of the redesign decisions were not only for the sake of aesthetics, but also for improving clarity, scannability, and visitor engagement.',
-          ],
-          /* Each pair reads under its own titled problem/solution pair
-             rather than a caption (see PassCopy in ProjectPage). The
-             labels are rendered as run-in tags, so the prose here
-             carries no "The Problem" lead-in of its own.
-
-             `natural`: these are full-width captures of one section, so
-             the default 8:5 crop would cut the layout being compared. */
-          compare: [
-            {
-              natural: true,
-              label: 'About section',
-              title: 'From static block to interactive transition',
-              problem:
-                'The initial draft relied on dense, multi-paragraph text blocks set against a flat dark panel. It felt like an unengaging wall of text, lacked visual elements, and felt skippable.',
-              solution:
-                'I trimmed the copy down to a clear, high-impact statement and restructured the layout into floating window cards. This change made the content significantly easier to scan while integrating seamlessly with the scroll-driven liquid fill transition from the Hero section. To keep resting states dynamic, I added a subtle background gradient animation that gently shifts like a pool of espresso, ensuring the viewport never feels completely static while someone is reading.',
-              before: { src: aboutBeforeImg, label: 'Before · Flat panel' },
-              after: { src: aboutAfterImg, label: 'After · Espresso pool' },
-            },
-            {
-              natural: true,
-              framed: true,
-              label: 'Work section',
-              title: 'Enhancing context and discoverability',
-              problem:
-                'The original project index simply paired project titles with a single image. Because project names alone rarely communicate what a project actually does, visitors had to click into case studies just to understand basic context or tech stacks, and search through to find the relevant projects they were looking for.',
-              solution:
-                'I expanded the project list to display domain tags and tech stacks on hover, giving visitors instant technical context. Additionally, I added a filtering system by field, ML versus full stack, allowing readers to quickly sort through projects relevant to their specific domain without leaving the main index.',
-              before: { src: workBeforeImg, label: 'Before · Titles and a photo' },
-              after: { src: workAfterImg, label: 'After · Field, stack and sorting' },
-            },
-          ],
-          /* The cursor is the one iteration with no screenshots to wait
-             on, since every version of it is a file we still have. Shown
-             as a matrix rather than a row (see CursorTrail): the marks
-             are 21px of bean, and what changed between passes only reads
-             against the two grounds they had to survive. */
-          cursorTrail: {
-            label: 'Custom cursor',
-            title: 'Balancing detail, contrast, and state',
-            problem:
-              'A custom cursor needs to function reliably at small sizes and across both light cream and dark espresso backgrounds without losing detail or confusing interactable states.',
-            solution:
-              'After four iterations, I arrived at a dual-ink design where each color is rimmed in the other. This ensures high contrast and crisp visibility across every background color on the site, reserving cursor changes purely for user interaction and hover feedback.',
-            hint: 'Left is cursor at rest, Right is cursor over clickable elements',
-            grounds: [
-              { id: 'light', label: 'On paper', color: '#f5f4f1' },
-              { id: 'dark', label: 'On dark', color: '#15110e' },
-            ],
-            stages: [
-              {
-                id: '01',
-                name: 'Latte art',
-                marks: {
-                  light: { rest: { src: cursorLatte }, link: { src: cursorLatteCream } },
-                  dark: { rest: { src: cursorLatte }, link: { src: cursorLatteCream } },
-                },
-                note: 'Loved original latte art cursor idea, but too much detail for 32px, and hard to see on some backgrounds.',
-              },
-              {
-                id: '02',
-                name: 'Solid bean',
-                marks: {
-                  light: { rest: { src: cursorSolid }, link: { src: cursorSolid } },
-                  dark: { rest: { src: cursorSolid }, link: { src: cursorSolid } },
-                },
-                note: 'Simpler shape and recognizable even at small sizes. However, doesn\'t signal what is interactable and blends into dark backgrounds.',
-              },
-              {
-                id: '03',
-                name: 'Bean and outline',
-                marks: {
-                  light: { rest: { src: cursorRimInk }, link: { src: cursorOutlineInk } },
-                  dark: { rest: { src: cursorRimCream }, link: { src: cursorOutlineCream } },
-                },
-                note: 'Color flipped depending on background for contrast, but four different cursor designs gave mixed signals on what was actually interactable.',
-              },
-              {
-                id: '04',
-                name: 'Cream and espresso',
-                current: true,
-                marks: {
-                  light: { rest: { src: cursorNowCream }, link: { src: cursorNowInk } },
-                  dark: { rest: { src: cursorNowCream }, link: { src: cursorNowInk } },
-                },
-                note: 'Each ink rimmed in the other, so colour is free to mean state.',
-              },
-            ],
-          },
-        },
-        {
-          heading: 'Reflections & Key Takeaways',
-          body: [
-            'The clearest throughline was that the creative and technical work kept turning out to be the same problem, prototyping cheaply in Framer and only rebuilding in code once a detail earned it. The site is still moving, with the hobby pages and a few case studies the parts I keep returning to.',
-          ],
-          facts: [
-            {
-              title: 'Motion & Performance',
-              text: 'A GIF clocks from decode, not render, so a cached cat animation in Play kept resuming out of sync. Stepping through webp frames in React fixed the timing and the frame drops together.',
-            },
-            {
-              title: 'Accessibility & Reflow',
-              text: 'A custom cursor and hand-drawn accents raised the bar on contrast and keyboard support. Small screens got reorganized layouts instead of a plain stack.',
-            },
-            {
-              title: 'Systems Thinking',
-              text: 'Hand-rolling the site instead of reaching for a builder meant real design tokens, decoupled content, and shared transition hooks in place of one-off styling.',
-            },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    index: '03',
     name: 'Preflight',
     slug: 'preflight',
     category: 'Full-Stack · Autonomous Systems',
@@ -1297,6 +773,530 @@ export const projects = [
     },
   },
   {
+    index: '02',
+    name: 'Artificer',
+    slug: 'artificer',
+    category: 'ML · Full-Stack',
+    year: '2026',
+    blurb: 'ML powered app to scan artworks and learn their history.',
+    tech: ['React', 'TypeScript', 'Claude API'],
+    image: artificerImg,
+    tone: ['var(--tone-b1)', 'var(--tone-b2)'],
+    href: '#work',
+    page: {
+      status: 'Developing',
+      subtitle: 'Point your camera at a painting; get its story.',
+      intro:
+        'Artificer is an ML-powered app that identifies artworks from a photo and unpacks their history, technique, and context. I’m building it end to end — from the recognition pipeline to an interface that reads like a well-set gallery label.',
+      links: [{ label: 'GitHub', href: '#' }],
+      meta: [
+        { label: 'Category', value: 'Machine Learning, RAG, Full-Stack' },
+        { label: 'My role', value: 'Design & engineering' },
+        { label: 'Timeline', value: '2026 — in progress' },
+        { label: 'Skills', value: 'Evaluating ML Models, RAG, LLM, React, Javascript' },
+      ],
+      sections: [
+        {
+          heading: 'Problem: Art context is locked in wall text',
+          body: [
+            'Standing in front of a painting, most of what makes it interesting — who made it, why, what to look at — lives in a paragraph you have to find, or a tour you didn’t book. Outside a museum there’s even less: reverse image search returns listings, not stories.',
+            'Artificer starts from the moment of curiosity: you’re looking at the thing, and you want to know more right now.',
+          ],
+        },
+        {
+          heading: 'Approach',
+          body: [
+            'The build is organized around three decisions, each still being tested against real gallery visits.',
+          ],
+          facts: [
+            {
+              title: 'Recognition first',
+              text: 'Identification has to work on imperfect photos — glare, angles, crops — before anything else matters.',
+            },
+            {
+              title: 'Context, not captions',
+              text: 'The model’s output is edited into a structured story: era, technique, and one thing to look closer at.',
+            },
+            {
+              title: 'Gallery-label tone',
+              text: 'The interface borrows from wall text: quiet type, short measures, no feed mechanics.',
+            },
+          ],
+        },
+        {
+          heading: 'Architecture: From photograph to provenance',
+          body: [
+            'A single CLIP encoder feeds two parallel heads — exact-match retrieval and label classification. A confidence gate decides which signal to trust before handing a rewritten query to the RAG layer. Hover a layer to expand its stack.',
+          ],
+          // renders the interactive isometric pile (StackDiagram.jsx);
+          // one plate per tool, grouped top → bottom
+          stack: {
+            title: 'Four layers, one request',
+            hint: 'Hover a layer to expand its stack.',
+            flow: [
+              { title: 'Photograph in', note: 'museum capture, upload, or crop' },
+              { title: 'Embed → route → retrieve', note: 'CLIP encoder + confidence gate' },
+              { title: 'Context out', note: 'top match + synthesized history' },
+            ],
+            // one muted ramp rather than four hues: the plates sit
+            // directly on top of each other, so separation reads from
+            // value, with a slow warm-to-cool drift going deeper
+            groups: [
+              {
+                name: 'Frontend',
+                tone: '#efc7c2',
+                tools: [
+                  { name: 'React + TypeScript', note: 'capture, scan, and reading views' },
+                  { name: 'Vite', note: 'build and dev tooling' },
+                  { name: 'Design tokens', note: 'the gallery-label reading experience' },
+                ],
+              },
+              {
+                name: 'Backend & data',
+                tone: '#ffe5d4',
+                tools: [
+                  { name: 'Node.js API', note: 'scan orchestration and session state' },
+                  { name: 'Job queue', note: 'rate-limited model calls' },
+                  { name: 'Vector index', note: 'artwork embeddings' },
+                  { name: 'Metadata store', note: 'artists, eras, provenance' },
+                  { name: 'Ingest pipeline', note: 'museum open-data sets' },
+                ],
+              },
+              {
+                name: 'Vision model',
+                tone: '#bfd3c1',
+                tools: [
+                  { name: 'CLIP encoder', note: 'shared image embeddings' },
+                  { name: 'Retrieval head', note: 'exact match against the index' },
+                  { name: 'Classifier + confidence gate', note: 'decides which signal to trust' },
+                ],
+              },
+              {
+                name: 'RAG & context',
+                tone: '#68a691',
+                tools: [
+                  { name: 'Claude API', note: 'history and technique, synthesized' },
+                  { name: 'Corpus retrieval', note: 'curated art-history passages' },
+                  { name: 'Prompt templates', note: 'wall-label tone control' },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          heading: 'Solution: A pocket docent',
+          body: [
+            'Scan a work and Artificer returns a label-sized summary with the option to go deeper — related works, the artist’s arc, and how this piece fits it. Depth is opt-in; the default reading takes under a minute.',
+          ],
+          media: { caption: 'Scan-to-story flow — screens coming as the build stabilizes.' },
+        },
+        {
+          heading: 'Status',
+          body: [
+            'The recognition pipeline and core reading experience are working; current focus is offline handling in low-signal galleries and the related-works graph.',
+          ],
+        },
+      ],
+    },
+  },
+  {
+    index: '03',
+    name: 'Portfolio',
+    slug: 'portfolio',
+    category: 'Frontend · Design',
+    year: '2026',
+    blurb: 'Personal portfolio site to learn about me and my work.',
+    tech: ['React', 'Vite', 'Motion', 'CSS'],
+    image: portfolioProjectImg,
+    tone: ['var(--tone-a1)', 'var(--tone-a2)'],
+    href: '#work',
+    page: {
+      status: 'Live',
+      subtitle: 'My portfolio website to display both my work and personality.',
+      intro:
+        'A custom portfolio built in React and Vite, covering the whole surface, from visual direction and hand-drawn illustration through to the motion work and the component architecture. It has to read as clean and professional but still feel unmistakably mine.',
+      links: [{ label: 'GitHub', href: 'https://github.com/czxsc/sharonc-portfolio' }],
+      meta: [
+        { label: 'Category', value: 'Frontend, Design' },
+        { label: 'My role', value: 'Design & engineering' },
+        { label: 'Timeline', value: '2026' },
+        { label: 'Skills', value: 'React, Vite, UI/UX design, motion design, illustration' },
+      ],
+      sections: [
+        {
+          heading: 'Design Process',
+          body: [
+            'To build a portfolio that effectively showcases my work, I began by defining my objective. I wanted to create a clean, easily readable interface that still preserved my personal touch and artistic personality. I initially explored a wide spectrum of visual directions, mapping out ideas on a scale from cluttered and expressive to minimal and professional. These concepts ranged from scrapbook-style layouts layered with post-its and polaroids, to retro game-inspired UIs, to clean minimalist grids paired with subtle hand-drawn doodles.',
+            'Evaluating these paths against my primary goal revealed a fundamental tension between expressiveness and clarity.',
+            {
+              list: [
+                {
+                  label: 'High expressiveness',
+                  note: 'Scrapbook, retro',
+                  text:
+                    'Layering, bold accent colours and creative layouts carried strong character, at the risk of overwhelming visitors and hiding the technical content.',
+                },
+                {
+                  label: 'Minimalistic',
+                  note: 'Modern, Simple',
+                  text:
+                    'Exceptionally professional, accessible and quick to scan, but a little too generic and detached from my creative identity.',
+                },
+              ],
+            },
+            'Ultimately, I chose the hybrid approach of Minimalism with Custom Hand-Drawn Accents, built on a palette of light cream and warm neutrals rather than stark black and white. This allowed me to leverage generous whitespace and a clean structure to keep my technical projects front and center, while using soft colors and custom illustrations to give the site a welcoming, unique identity without distracting from the content.',
+          ],
+          designBoard: {
+            reference: {
+              src: ideaBoardImg,
+              label: 'Reference board',
+              alt:
+                'A canvas of portfolio and studio sites grouped into illustrative, doodle, minimal, retro and scrapbook directions, with a checklist of decided themes at the right',
+            },
+            caption:
+              'Initial Brainstorming: A collection of visual references I liked, organized to clearly pin down the possible directions.',
+          },
+        },
+        {
+          heading: 'Style Guide',
+          body: [
+            'Everything the direction implied was written down before the first section was built. One token file holds the colour, type scale, spacing and easing, and no component is allowed a raw hex value, which is what lets the whole site be retuned from a single place. As a final layer of personality, I anchored the brand identity in a cohesive theme inspired by cats and coffee.',
+          ],
+          designBoard: {
+            /* The palette is quoted from tokens.css rather than read from
+               it: the card documents what was decided at the start, and a
+               swatch that silently re-tinted with a later token change
+               would stop being a record of that. `share` is how much of
+               the site each colour actually covers, and it sets the width
+               of that colour's segment in the bar — the ground is most of
+               what you see and the accents are a few percent, which an
+               even five-up strip would misreport.
+
+               The type specimens are live: `family` is set in `font`, so
+               the card shows the faces rather than naming them. `size` is
+               the range the site sets that family at (from the type scale
+               in tokens.css); `set` only exists to bring a specimen with
+               an odd x-height up to the others optically. */
+            card: {
+              label: 'Style guide v1',
+              palette: [
+                { hex: '#F5F4F1', name: 'Paper', share: 58 },
+                { hex: '#1B1B1B', name: 'Ink', share: 24 },
+                { hex: '#5A4636', name: 'Espresso', share: 10 },
+                { hex: '#3F4A3E', name: 'Sage', share: 4 },
+                { hex: '#2C3A4A', name: 'Navy', share: 4 },
+              ],
+              type: [
+                { family: 'Newsreader', role: 'Display', size: '22–112px', font: 'var(--serif)', weight: 600 },
+                { family: 'Archivo', role: 'Body & UI', size: '14–17px', font: 'var(--grot)' },
+                { family: 'JetBrains Mono', role: 'Labels', size: '11px', font: 'var(--mono)' },
+              ],
+              rules: [
+                { name: 'Radius', value: '12 / 16px' },
+                { name: 'Spacing', value: '8px base' },
+                { name: 'Duration', value: '0.18 / 0.42 / 0.72s' },
+                { name: 'Easing', value: 'settle · set · draw' },
+              ],
+            },
+            caption:
+              'Finalized design standards for the visual system of this site.',
+          },
+        },
+        {
+          heading: 'Building the Experience',
+          body: [
+            'I initially prototyped and built the site using Framer, as its visual interface made it straightforward to quickly draft layouts and iterate on design changes in real time. However, as the concept evolved, I quickly hit the platform\'s constraints. I wanted more customized elements and interactions which proved difficult with Framer\'s more templates component system. Rather than compromising on my design vision or paying for restrictive platform features, I decided to rebuild the site from scratch in React.',
+            'Building from scratch meant owning the structure too. To keep state complexity from bloating a single page app, the frontend is organized around three principles.',
+          ],
+          subs: [
+            {
+              title: 'Data-driven content abstraction',
+              deck: 'All copy, metadata and page structure is decoupled from the rendering layer and kept in a single data manifest.',
+              bullets: [
+                'content.js holds every project, case study section and hobby page as plain data, and components only render what they are handed.',
+                'Updating or adding a project is a schema edit rather than a component rewrite.',
+              ],
+            },
+            {
+              title: 'Centralized design system tokens',
+              deck: 'Visual variables live in one CSS custom property layer instead of in the components that use them.',
+              bullets: [
+                'tokens.css carries the colour palettes for both themes, the fluid type scale, the spacing grid and the motion easing curves.',
+                'Hardcoded hex values and inline magic numbers are off limits, so a global aesthetic change is a single file edit.',
+              ],
+            },
+            {
+              title: 'Reusable state and motion hooks',
+              deck: 'Shared mechanics are abstracted into custom hooks, so each component only owns what is unique to it.',
+              bullets: [
+                'useOverlayPage isolates the overlay plumbing, scroll lock, focus, Escape and browser back, leaving ProjectPage and HobbyPage to manage only their own transitions.',
+                'useLenis and useReveal standardize smooth scroll and entrance triggers across every section.',
+              ],
+            },
+          ],
+          /* renders the architecture elevation (CodeMap.jsx): tiers
+             stack downward and the ones below the surface span the
+             full width, because that is what shared looks like. The
+             four tiers are the three principles above plus the floor
+             they stand on, in that order, so the diagram reads as the
+             evidence for the paragraphs rather than a second list.
+             The last tier is marked `base`, which draws it as ground. */
+          codeMap: {
+            title: 'How the code is organized',
+            hint: 'Hover any file or package to see what it owns.',
+            stats: [
+              { value: '20', label: 'components' },
+              { value: '4', label: 'shared hooks' },
+              { value: '15k', label: 'lines' },
+            ],
+            tiers: [
+              {
+                id: '01',
+                name: 'Surface',
+                note: 'One component per section, each with its stylesheet beside it. Renders data, owns no copy.',
+                groups: [
+                  {
+                    name: 'Sections',
+                    items: [
+                      { name: 'Nav', note: 'active-section indicator, driven by useActiveSection' },
+                      { name: 'HeroPourTransition', note: 'hero and about, joined by the scroll-scrubbed pour' },
+                      { name: 'Work', note: 'project index, hover previews, tag filtering' },
+                      { name: 'Play', note: 'the tote-bag spill and the hobby flat-lay' },
+                      { name: 'Contact', note: 'the closing block' },
+                    ],
+                  },
+                  {
+                    name: 'Overlay pages',
+                    items: [
+                      { name: 'ProjectPage', note: 'case study, hero image flies out of the index' },
+                      { name: 'HobbyPage', note: 'mini-page, iris grows from the click point' },
+                      { name: 'SheetFlip', note: 'one virtual card, turning from the About window into the Work preview' },
+                    ],
+                  },
+                ],
+              },
+              {
+                id: '02',
+                name: 'Shared behaviour',
+                note: 'The mechanics every section would otherwise reimplement, written once.',
+                groups: [
+                  {
+                    name: 'Hooks',
+                    items: [
+                      { name: 'useOverlayPage', note: 'the overlay plumbing, scroll lock, focus, Escape, browser back, close timing' },
+                      { name: 'useReveal', note: 'scroll entrances that follow direction and speed' },
+                      { name: 'useLenis', note: 'interpolated scroll, so scrubbed animation glides' },
+                      { name: 'useActiveSection', note: 'an IntersectionObserver reporting which section is in view' },
+                    ],
+                  },
+                  {
+                    name: 'Primitives',
+                    items: [
+                      { name: 'SetType', note: 'per-line masked entrance for every title' },
+                      { name: 'SectionSeam', note: 'the rule between sections, scrubbed open against scroll' },
+                      { name: 'Doodles', note: 'the hand-drawn inline SVG set' },
+                    ],
+                  },
+                ],
+              },
+              {
+                id: '03',
+                name: 'Source of truth',
+                note: 'Copy and design values, edited here rather than in the components that read them.',
+                groups: [
+                  {
+                    items: [
+                      { name: 'content.js', note: 'every project, section and hobby page as plain data, one file' },
+                      { name: 'tokens.css', note: 'both palettes, the fluid type scale, spacing grid and easing curves' },
+                      { name: 'fonts.css', note: 'self-hosted woff2, latin subset' },
+                    ],
+                  },
+                ],
+              },
+              {
+                id: '04',
+                name: 'Toolchain',
+                base: true,
+                note: 'Two runtime dependencies past React. Everything else is written here.',
+                groups: [
+                  {
+                    items: [
+                      { name: 'react', note: 'the view layer, hooks and portals, no router and no UI kit on top of it' },
+                      { name: 'vite', note: 'dev server and production build, assets fingerprinted on the way out' },
+                      { name: 'motion', note: 'scroll progress and reduced-motion for the pour and the seam, the rest of the motion is CSS' },
+                      { name: 'lenis', note: 'interpolated scrolling, which is what lets an animation be scrubbed smoothly' },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          heading: 'UX Decisions',
+          body: [
+            'The site is written for two readers at once, someone giving it ninety seconds and someone who has decided to stay. My approach to the user experience was guided by a single core philosophy, optimize for efficiency first, then reward curiosity with engagement.',
+          ],
+          /* Four principles, each a one line claim with its supporting
+             detail broken out. `deck` is the claim, `bullets` the
+             detail. */
+          subs: [
+            {
+              title: 'The homepage should be enough',
+              deck: 'A single pass over the landing page carries the full picture.',
+              bullets: [
+                'Each project reveals its stack on hover, and can be sorted by domain so reviewers can instantly isolate the work most relevant for what they\'re looking for.',
+                'High-level project summaries and a brief snapshot of personal interests live right on the main page for quick scanning.',
+                'Dedicated subpages offer deeper technical breakdowns for those who want to dive into implementation details.',
+              ],
+            },
+            {
+              title: 'Motion should do a job',
+              deck: 'I used intentional animations to encourage exploration without creating visual noise.',
+              bullets: [
+                'Creative scroll-driven effects, like the coffee pour and flipping window, bring a pleasant surprise to visitors as they navigate down the page.',
+                'Subtle ambient motion, such as a moving background gradient in About and the animated swishing tail on landing, keeps resting states dynamic without distracting the reader.',
+                'Nearly all of the engineering behind it came down to keeping the browser doing cheap work.',
+              ],
+            },
+            {
+              title: 'Personality lives in small details',
+              deck: 'Small details sit in secondary visual layers, where they wouldn\'t interfere with readability.',
+              bullets: [
+                'A custom coffee bean cursor designed with adaptive contrast to ensure high visibility across both light and dark UI elements.',
+                'Custom hand-drawn cat animations and illustrations, placed outside primary reading zones, giving the site a warm, memorable personality without competing with core project content.',
+              ],
+            },
+            {
+              title: 'The site should work for everyone',
+              deck: 'Accessibility and responsiveness were part of the build rather than a pass at the end.',
+              bullets: [
+                'Every section is built from real headings and landmarks in order, so a screen reader hears the same structure the layout shows.',
+                'Text is held at high contrast everywhere, including over the moving espresso pool and the darker illustrated panels.',
+                'Narrow screens get reorganized layouts instead of one stacked column.',
+              ],
+            },
+          ],
+        },
+        {
+          heading: 'Iterations',
+          body: [
+            'Every section of the site went through several passes. Many of the redesign decisions were not only for the sake of aesthetics, but also for improving clarity, scannability, and visitor engagement.',
+          ],
+          /* Each pair reads under its own titled problem/solution pair
+             rather than a caption (see PassCopy in ProjectPage). The
+             labels are rendered as run-in tags, so the prose here
+             carries no "The Problem" lead-in of its own.
+
+             `natural`: these are full-width captures of one section, so
+             the default 8:5 crop would cut the layout being compared. */
+          compare: [
+            {
+              natural: true,
+              label: 'About section',
+              title: 'From static block to interactive transition',
+              problem:
+                'The initial draft relied on dense, multi-paragraph text blocks set against a flat dark panel. It felt like an unengaging wall of text, lacked visual elements, and felt skippable.',
+              solution:
+                'I trimmed the copy down to a clear, high-impact statement and restructured the layout into floating window cards. This change made the content significantly easier to scan while integrating seamlessly with the scroll-driven liquid fill transition from the Hero section. To keep resting states dynamic, I added a subtle background gradient animation that gently shifts like a pool of espresso, ensuring the viewport never feels completely static while someone is reading.',
+              before: { src: aboutBeforeImg, label: 'Before · Flat panel' },
+              after: { src: aboutAfterImg, label: 'After · Espresso pool' },
+            },
+            {
+              natural: true,
+              framed: true,
+              label: 'Work section',
+              title: 'Enhancing context and discoverability',
+              problem:
+                'The original project index simply paired project titles with a single image. Because project names alone rarely communicate what a project actually does, visitors had to click into case studies just to understand basic context or tech stacks, and search through to find the relevant projects they were looking for.',
+              solution:
+                'I expanded the project list to display domain tags and tech stacks on hover, giving visitors instant technical context. Additionally, I added a filtering system by field, ML versus full stack, allowing readers to quickly sort through projects relevant to their specific domain without leaving the main index.',
+              before: { src: workBeforeImg, label: 'Before · Titles and a photo' },
+              after: { src: workAfterImg, label: 'After · Field, stack and sorting' },
+            },
+          ],
+          /* The cursor is the one iteration with no screenshots to wait
+             on, since every version of it is a file we still have. Shown
+             as a matrix rather than a row (see CursorTrail): the marks
+             are 21px of bean, and what changed between passes only reads
+             against the two grounds they had to survive. */
+          cursorTrail: {
+            label: 'Custom cursor',
+            title: 'Balancing detail, contrast, and state',
+            problem:
+              'A custom cursor needs to function reliably at small sizes and across both light cream and dark espresso backgrounds without losing detail or confusing interactable states.',
+            solution:
+              'After four iterations, I arrived at a dual-ink design where each color is rimmed in the other. This ensures high contrast and crisp visibility across every background color on the site, reserving cursor changes purely for user interaction and hover feedback.',
+            hint: 'Left is cursor at rest, Right is cursor over clickable elements',
+            grounds: [
+              { id: 'light', label: 'On paper', color: '#f5f4f1' },
+              { id: 'dark', label: 'On dark', color: '#15110e' },
+            ],
+            stages: [
+              {
+                id: '01',
+                name: 'Latte art',
+                marks: {
+                  light: { rest: { src: cursorLatte }, link: { src: cursorLatteCream } },
+                  dark: { rest: { src: cursorLatte }, link: { src: cursorLatteCream } },
+                },
+                note: 'Loved original latte art cursor idea, but too much detail for 32px, and hard to see on some backgrounds.',
+              },
+              {
+                id: '02',
+                name: 'Solid bean',
+                marks: {
+                  light: { rest: { src: cursorSolid }, link: { src: cursorSolid } },
+                  dark: { rest: { src: cursorSolid }, link: { src: cursorSolid } },
+                },
+                note: 'Simpler shape and recognizable even at small sizes. However, doesn\'t signal what is interactable and blends into dark backgrounds.',
+              },
+              {
+                id: '03',
+                name: 'Bean and outline',
+                marks: {
+                  light: { rest: { src: cursorRimInk }, link: { src: cursorOutlineInk } },
+                  dark: { rest: { src: cursorRimCream }, link: { src: cursorOutlineCream } },
+                },
+                note: 'Color flipped depending on background for contrast, but four different cursor designs gave mixed signals on what was actually interactable.',
+              },
+              {
+                id: '04',
+                name: 'Cream and espresso',
+                current: true,
+                marks: {
+                  light: { rest: { src: cursorNowCream }, link: { src: cursorNowInk } },
+                  dark: { rest: { src: cursorNowCream }, link: { src: cursorNowInk } },
+                },
+                note: 'Each ink rimmed in the other, so colour is free to mean state.',
+              },
+            ],
+          },
+        },
+        {
+          heading: 'Reflections & Key Takeaways',
+          body: [
+            'The clearest throughline was that the creative and technical work kept turning out to be the same problem, prototyping cheaply in Framer and only rebuilding in code once a detail earned it. The site is still moving, with the hobby pages and a few case studies the parts I keep returning to.',
+          ],
+          facts: [
+            {
+              title: 'Motion & Performance',
+              text: 'A GIF clocks from decode, not render, so a cached cat animation in Play kept resuming out of sync. Stepping through webp frames in React fixed the timing and the frame drops together.',
+            },
+            {
+              title: 'Accessibility & Reflow',
+              text: 'A custom cursor and hand-drawn accents raised the bar on contrast and keyboard support. Small screens got reorganized layouts instead of a plain stack.',
+            },
+            {
+              title: 'Systems Thinking',
+              text: 'Hand-rolling the site instead of reaching for a builder meant real design tokens, decoupled content, and shared transition hooks in place of one-off styling.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     index: '04',
     name: 'Little Wonder',
     slug: 'little-wonder',
@@ -1311,14 +1311,14 @@ export const projects = [
       status: 'Completed',
       subtitle: 'A platformer set in a fantasy acorn world.',
       intro:
-        'Little Wonder is a 2D platformer built in Java with a small team — a forest adventure where you play an acorn sprite finding its way home. I owned character movement and level design, the two systems that decide whether a platformer feels good.',
+        'Little Wonder is a 2D platformer built in Java with a small team, a forest adventure where you play an acorn sprite finding its way home. I owned character movement and level design, the two systems that decide whether a platformer feels good.',
       links: [{ label: 'Play', href: 'https://gdiac.cs.cornell.edu/gdiac/showcase/games/little_wonder/' }],
       meta: [
         { label: 'Category', value: 'Game Design & Development' },
         { label: 'My role', value: 'Design Lead & Game Programmer' },
         { label: 'Timeline', value: 'Spring 2026' },
         { label: 'Skills', value: 'Java, libGDX, Box2D, game feel, environment art, colour design' },
-        { label: 'Team', value: 'Christian Amadeo, Caden Lau, Afram Ahmed, Paul Lukewesa, David Colle, Samantha Ahn, Thomas Myers' },
+        { label: 'Teammates', value: 'Christian Amadeo, Caden Lau, Afram Ahmed, Paul Lukewesa, David Colle, Samantha Ahn, Thomas Myers' },
       ],
       // shared top section — same for both toggle views
       sections: [
@@ -1334,32 +1334,32 @@ export const projects = [
       // the two breakdowns. Everything above and below this stays fixed.
       toggle: {
         options: [
-          { id: 'code', label: 'Code' },
           { id: 'design', label: 'Design' },
+          { id: 'code', label: 'Code' },
         ],
         sections: {
           code: [
             {
               heading: 'Prototyping: Movement first, then one enemy',
               body: [
-                'Little Wonder runs on Java and libGDX with Box2D physics, built on top of a Cornell teaching framework that supplied a physics-obstacle wrapper and a JSON-driven asset pipeline — the team\'s job was everything above that: 87 files and roughly 35,000 lines built out over three months and 1,269 commits across parallel feature branches.',
+                'Little Wonder runs on Java and libGDX with Box2D physics, built on top of a Cornell teaching framework that supplied a physics-obstacle wrapper and a JSON-driven asset pipeline. The team\'s job was everything above that, 87 files and roughly 35,000 lines built out over three months and 1,269 commits across parallel feature branches.',
                 'Before any levels existed, we proved out the core loop on one test map: basic movement against one basic enemy. I owned the player\'s dash and attack systems and its ammo/health state from that first prototype through to ship, plus enemy AI and getting our art assets working in-engine.',
               ],
               facts: [
                 {
                   title: 'Dash vs. attack',
-                  text: 'Dash was straightforward. Attack design took far longer — we were still choosing between melee, charged, and tracking styles before settling on three to prototype: a direct projectile, a charged beam, and an area-of-effect burst.',
+                  text: 'Dash was straightforward. Attack design took far longer, with melee, charged, and tracking styles all still on the table before three were picked for prototyping, a direct projectile, a charged beam, and an area-of-effect burst.',
                 },
                 {
                   title: 'Enemy AI v0',
-                  text: '"Move toward the player whenever they\'re in range" — the whole behavior, for exactly as long as it took to start playtesting.',
+                  text: '"Move toward the player whenever they\'re in range" was the whole behavior, for exactly as long as it took to start playtesting.',
                 },
               ],
             },
             {
               heading: 'Playtesting rewrote the attack kit',
               body: [
-                'Almost every attack changed shape between prototype and ship — the direct projectile was the only one that survived untouched. Getting combat to feel right meant treating it as a platforming-balance problem as much as a combat one.',
+                'Almost every attack changed shape between prototype and ship, and the direct projectile was the only one that survived untouched. Getting combat to feel right meant treating it as a platforming-balance problem as much as a combat one.',
                 'Enemies needed rework too: because the game is built around downward traversal, a plain "follow the player" behavior sent whole packs of enemies falling off platforms and piling up below. I rooted enemies to their spawn platforms and added the AI rules to keep formations intact, and gave the dash invincibility frames so it read as a real evasive tool instead of just a repositioning one.',
               ],
               facts: [
@@ -1380,7 +1380,7 @@ export const projects = [
             {
               heading: 'Architecture: How the game fits together',
               body: [
-                'Above the Cornell teaching framework that supplies the physics wrapper and asset pipeline, the game itself is a web of controllers, entities, and plain JSON data. My own work lived mainly in the AI and Combat corners of this, but the diagram below is the full picture — click a box for what it does and what it depends on.',
+                'Above the Cornell teaching framework that supplies the physics wrapper and asset pipeline, the game itself is a web of controllers, entities, and plain JSON data. My own work lived mainly in the AI and Combat corners of this, but the diagram below is the full picture. Click a box for what it does and what it depends on.',
               ],
               // renders the interactive dependency map (ArchMap.jsx): boxes
               // grouped into zones, arrows for who-calls-who, "depends on /
@@ -1403,7 +1403,7 @@ export const projects = [
                     id: 'model',
                     name: 'Model',
                     tone: '#55855a',
-                    note: 'Every physical object in the game — all sharing the same ObstacleSprite pattern.',
+                    note: 'Every physical object in the game, all sharing the same ObstacleSprite pattern.',
                     colStart: 1,
                     colEnd: 6,
                     rowStart: 5,
@@ -1413,7 +1413,7 @@ export const projects = [
                     id: 'content',
                     name: 'Content',
                     tone: '#3e9e8f',
-                    note: 'Levels and assets as plain JSON — no code, no knowledge of game objects.',
+                    note: 'Levels and assets as plain JSON, with no code and no knowledge of game objects.',
                     colStart: 1,
                     colEnd: 4,
                     rowStart: 6,
@@ -1423,7 +1423,7 @@ export const projects = [
                     id: 'presentation',
                     name: 'Presentation',
                     tone: '#6b4fa0',
-                    note: 'What the player sees and hears — HUD and audio.',
+                    note: 'What the player sees and hears, HUD and audio.',
                     colStart: 6,
                     colEnd: 8,
                     rowStart: 6,
@@ -1449,7 +1449,7 @@ export const projects = [
                     col: 3,
                     row: 5,
                     detail: {
-                      summary: 'One class for every archetype — Patrol, Hopper, Flying, Armored — since its behavior comes entirely from the strategies its EnemyController is built with.',
+                      summary: 'One class for every archetype (Patrol, Hopper, Flying, Armored), since its behavior comes entirely from the strategies its EnemyController is built with.',
                     },
                   },
                   {
@@ -1478,7 +1478,7 @@ export const projects = [
                     row: 5,
                     count: 4,
                     detail: {
-                      summary: 'The projectiles and effects themselves — spawned, ticked, and culled by their owning controller, not by Player or Enemy directly.',
+                      summary: 'The projectiles and effects themselves, spawned, ticked, and culled by their owning controller rather than by Player or Enemy directly.',
                       points: [
                         { text: 'Bullet' },
                         { text: 'Pellet' },
@@ -1495,7 +1495,7 @@ export const projects = [
                     col: 4,
                     row: 1,
                     detail: {
-                      summary: 'Runs a fixed 1/60s timestep accumulator so physics stays consistent regardless of render rate — the loop that calls everything else below it, once per tick.',
+                      summary: 'Runs a fixed 1/60s timestep accumulator so physics stays consistent regardless of render rate. The loop that calls everything else below it, once per tick.',
                     },
                   },
                   {
@@ -1515,7 +1515,7 @@ export const projects = [
                     col: 4,
                     row: 2,
                     detail: {
-                      summary: 'The composition root — owns every entity list, turns JSON level data into live objects, and orchestrates the whole per-frame update in order.',
+                      summary: 'The composition root. It owns every entity list, turns JSON level data into live objects, and orchestrates the whole per-frame update in order.',
                     },
                   },
                   {
@@ -1545,7 +1545,7 @@ export const projects = [
                     col: 5,
                     row: 3,
                     detail: {
-                      summary: 'Composes three swappable strategies per enemy — movement, targeting, attack — read straight from level JSON, and drives its finite-state machine.',
+                      summary: 'Composes three swappable strategies per enemy (movement, targeting, attack) read straight from level JSON, and drives its finite-state machine.',
                     },
                   },
                   {
@@ -1573,7 +1573,7 @@ export const projects = [
                     row: 4,
                     count: 4,
                     detail: {
-                      summary: 'The actual behaviors an EnemyController can be built from — a new enemy archetype is a new combination of these, not a new class.',
+                      summary: 'The actual behaviors an EnemyController can be built from. A new enemy archetype is a new combination of these, not a new class.',
                       points: [
                         { text: 'Patrol' },
                         { text: 'Hopper' },
@@ -1590,7 +1590,7 @@ export const projects = [
                     col: 1,
                     row: 6,
                     detail: {
-                      summary: 'Loads, saves, and lists levels purely as JSON trees — it has no idea what a Player or Enemy even is.',
+                      summary: 'Loads, saves, and lists levels purely as JSON trees, with no idea what a Player or Enemy even is.',
                     },
                   },
                   {
@@ -1600,7 +1600,7 @@ export const projects = [
                     col: 1,
                     row: 7,
                     detail: {
-                      summary: 'Flat, per-category arrays — surfaces, enemies, charges, doors, and more — each entry pure data with no code behind it.',
+                      summary: 'Flat, per-category arrays (surfaces, enemies, charges, doors, and more), each entry pure data with no code behind it.',
                     },
                   },
                   {
@@ -1620,7 +1620,7 @@ export const projects = [
                     col: 3,
                     row: 7,
                     detail: {
-                      summary: 'The manifest files themselves — a master texture list, plus per-level overlay bundles.',
+                      summary: 'The manifest files themselves, a master texture list plus per-level overlay bundles.',
                     },
                   },
                   // ---- Presentation ----
@@ -1631,7 +1631,7 @@ export const projects = [
                     col: 7,
                     row: 6,
                     detail: {
-                      summary: 'Four parallel scene2d Stages — main HUD, partial-fade, pause, full fade — laid out almost entirely from one shared JSON block instead of hardcoded values.',
+                      summary: 'Four parallel scene2d Stages (main HUD, partial-fade, pause, full fade), laid out almost entirely from one shared JSON block instead of hardcoded values.',
                     },
                   },
                   {
@@ -1678,15 +1678,15 @@ export const projects = [
               facts: [
                 {
                   title: 'Data-driven enemy archetypes',
-                  text: 'Each enemy is an EnemyController composed from three swappable strategies — movement, targeting, attack — read from level JSON. A new archetype is a new combination of existing strategies, not a new class.',
+                  text: 'Each enemy is an EnemyController composed from three swappable strategies (movement, targeting, attack) read from level JSON. A new archetype is a new combination of existing strategies, not a new class.',
                 },
                 {
                   title: 'AoE with real occlusion',
-                  text: 'The area attack casts 48 rays outward at the moment it explodes, builds a boundary polygon that respects walls, and only damages enemies whose position tests inside it — an actual geometry problem, not a flat-radius hitbox.',
+                  text: 'The area attack casts 48 rays outward at the moment it explodes, builds a boundary polygon that respects walls, and only damages enemies whose position tests inside it, an actual geometry problem rather than a flat-radius hitbox.',
                 },
                 {
                   title: 'Designer-tunable damage',
-                  text: 'Every hit resolves through one takeDamage(type, amount) contract, with each enemy\'s resistances and weaknesses stored as a JSON-loaded map — balance changes without touching code.',
+                  text: 'Every hit resolves through one takeDamage(type, amount) contract, with each enemy\'s resistances and weaknesses stored as a JSON-loaded map, so balance changes without touching code.',
                 },
               ],
             },
@@ -1702,7 +1702,7 @@ export const projects = [
                 },
                 {
                   title: 'Cheaper cleanup',
-                  text: 'Dead projectiles and enemies are cleared with a stop-and-copy pass — copying survivors into a fresh array — instead of deleting in place, trading O(n) for what would have been O(n²) under heavy fire.',
+                  text: 'Dead projectiles and enemies are cleared with a stop-and-copy pass, copying survivors into a fresh array, instead of deleting in place, trading O(n) for what would have been O(n²) under heavy fire.',
                 },
               ],
             },
@@ -1717,39 +1717,39 @@ export const projects = [
               heading: 'Setting the direction',
               imagesFirst: true,
               body: [
-                'I was design lead and owned everything behind the player — background art, environment assets, and the tileset.',
-                'We started on a reference board rather than in a drawing, pulling in anything that felt right until a direction showed up: plants and fungi, acorns and mushrooms, a world scaled down to the floor of a forest. The course required twelve unique levels; an open map suited the game better, so we split it into four layers of three dungeons, each layer with a look of its own.',
-                'The first real art was a landscape painting, and it was not there to be used. It was there to pin down the general style and to standardise the lineart and colouring across three people who draw differently — as far as that could be standardised. Ground and props followed the same way: draw a strip of grass six ways, see which one the game wants.',
+                'I was design lead and owned everything behind the player, meaning background art, environment assets, and the tileset. The direction was first set on a reference board where the team pulled in anything that felt right until a world showed up. Three decisions came out of the initial brainstorming: ',
+                {
+                  bullets: [
+                    {
+                      lead: 'Levels and Layers:',
+                      text: 'The course required twelve levels, so the map was split into four layers of three, each layer with its own light and palette to achieve the levels structure while still feeling kind of like an open world.',
+                    },
+                    {
+                      lead: 'Nature and Fantasy:',
+                      text: 'We wanted a fantasy genre, but limited more narrowly to plants and floral themes.',
+                    },
+                    {
+                      lead: 'Standardized Style:',
+                      text: 'Foreground elements like tiles, characters, and props were set to a consistent style of distinctive lineart and brighter colors.',
+                    },
+                  ],
+                },
               ],
               media: {
                 src: lwBoard,
                 fit: true,
-                caption: 'Reference board — what we pulled from before any of the art existed.',
+                caption: 'Reference and brainstorming board',
               },
               gallery: [
                 {
                   src: lwSketch,
                   fit: true,
-                  caption: 'Landscape attempt 1, with the notes that redirected it: more cavern, less vegetation, add fungal elements.',
+                  caption: 'First landscape art attempt',
                 },
                 {
                   src: lwGrass,
                   fit: true,
-                  caption: 'Ground and prop passes — grass strips, checkpoint acorns, hazards.',
-                },
-              ],
-              facts: [
-                {
-                  title: 'It came out above ground',
-                  text: 'The first landscape read as forest, not cave. The notes on it are my own: go underground, cut the vegetation back, let fungus take over.',
-                },
-                {
-                  title: 'Style only half-standardised',
-                  text: 'I paint; both character designers work in cartoon lineart. We agreed on lineart weight and a colouring approach, and it still only got us part of the way.',
-                },
-                {
-                  title: 'Variations, not a system',
-                  text: 'Six versions of a grass strip is six drawings. Nothing here could be recombined yet — that problem is the whole rest of this page.',
+                  caption: 'Initial environmental asset concept art, experimenting with the style and palette of the world',
                 },
               ],
             },
@@ -1757,40 +1757,27 @@ export const projects = [
               heading: 'Concept art and the environment kit',
               imagesFirst: true,
               body: [
-                'With the direction fixed, the next pass was the actual vocabulary of the world: what a rock looks like, what a tree trunk looks like, how a mushroom is drawn so it reads as ours. I built it out as labelled sheets — plants, grasses, pebbles, rocks, trunks — plus a full-colour painting of the overworld village to prove the palette worked at scale.',
+                'With the direction fixed, we began initial concept art, where I designed assets of plants, rocks, and interactable elements of the world. I built it out as labelled sheets to practice more of the lineart style and set the direction for environmental art, plus a full-colour painting of the overworld village to prove the palette worked at scale.',
+                'Through these early practices, we immediately identified some design issues. Some of the environmental assets looked great on the concept art sheet, but when placed in their actual sizing in the world, they were too detailed to see clearly. Thus, later assets were drawn with much less rendering and detail, thicker lineart, and clearer silhouettes to ultimately achieve a more readable and consistent style.',
               ],
               gallery: [
                 {
                   src: lwEnvir,
                   fit: true,
-                  caption: 'The environment kit — plants, grasses, pebbles, rocks, trunks, each drawn once.',
+                  caption: 'The environmental assets',
                 },
                 {
                   src: lwConcept,
                   fit: true,
-                  caption: 'Concept sheet — mushroom studies, the overworld village, and the first ground and wall attempts.',
-                },
-              ],
-              facts: [
-                {
-                  title: 'Too detailed',
-                  text: 'Concept-level detail is fine for one painting and impossible across sixteen backgrounds and a full tileset.',
-                },
-                {
-                  title: 'Nothing repeated',
-                  text: 'Every piece was drawn once and reusable nowhere. Hand-drawn assets do not tile, and every new area meant new art.',
-                },
-                {
-                  title: 'The scale did not work',
-                  text: 'Good as a bible for the world, unusable as a production pipeline. Everything after this point is about making the art repeatable.',
+                  caption: 'Some early concept and designs',
                 },
               ],
             },
             {
               heading: 'Backgrounds: four paintings, sixteen backgrounds',
               body: [
-                'Sixteen hand-painted backgrounds was not a realistic scope. Reusing one background everywhere was worse — the reason to descend another layer is to see something new.',
-                'So I painted four compositions instead of sixteen: a wide corridor, two squares, and a tall nexus for each layer’s landing zone. Then I re-graded every set with curves into that layer’s ramp and accessorised with a few zone-specific props. Switch layers below — the composition never moves.',
+                'Since we wanted 4 layers with 3 levels each, sixteen hand-painted backgrounds was not a realistic scope. However, reusing only a few background drawings everywhere also did not work as it reduced the exploration and immersion of the descent. We didn\'t want for the player to finally reach the next level only to be met with the exact same scenery.',
+                'Instead, I painted four general compositions instead of sixteen. This set includes a wider background, two square compositions, and a tall nexus for each layer’s landing zone. Then I re-graded every set with curves into that layer’s ramp and accessorised with a few zone-specific props. This significantly reduced the workload while still maintaining visual variety.',
               ],
               // the ZoneStudy panel (ZoneStudy.jsx): four layouts held
               // fixed while the grade changes under them, which is the
@@ -1798,10 +1785,10 @@ export const projects = [
               zones: {
                 label: 'The four layers',
                 panels: [
-                  { id: 'banner', label: 'Wide — corridor' },
-                  { id: 'cave', label: 'Square — cavern' },
-                  { id: 'grove', label: 'Square — grove' },
-                  { id: 'nexus', label: 'Tall — nexus' },
+                  { id: 'banner', label: 'Wide corridor' },
+                  { id: 'cave', label: 'Square cavern' },
+                  { id: 'grove', label: 'Square grove' },
+                  { id: 'nexus', label: 'Tall nexus' },
                 ],
                 items: [
                   // ramps sampled off the finished paintings rather than
@@ -1817,7 +1804,7 @@ export const projects = [
                     name: 'Overgrown',
                     tone: '#399450',
                     wipe: '#5F7048',
-                    note: 'The first layer down, and the only one still lit like the surface — warm green light coming through a lot of rock.',
+                    note: 'The first layer down, and the only one still lit like the surface, warm green light coming through a lot of rock.',
                     palette: ['#0F3728', '#1A5E45', '#2A765A', '#399450', '#68BA7A', '#9ED190'],
                     art: { banner: lwOgBanner, cave: lwOgCave, grove: lwOgGrove, nexus: lwOgNexus },
                   },
@@ -1826,7 +1813,7 @@ export const projects = [
                     name: 'Intermittent',
                     tone: '#297072',
                     wipe: '#3F6F6B',
-                    note: 'Where the green starts draining out. The same compositions cooled into teal — the first hint that you are heading somewhere colder.',
+                    note: 'Where the green starts draining out. The same compositions cooled into teal, the first hint that you are heading somewhere colder.',
                     palette: ['#06131C', '#1C325B', '#297072', '#54A18F', '#73D0BD', '#8AFEF7'],
                     art: { banner: lwInBanner, cave: lwInCave, grove: lwInGrove, nexus: lwInNexus },
                   },
@@ -1835,7 +1822,7 @@ export const projects = [
                     name: 'Crystal Cove',
                     tone: '#9E4FBC',
                     wipe: '#6A5580',
-                    note: 'The furthest the grade moves from the source paintings — a full rotation into violet, with the mid-tones lifted so the rock glows.',
+                    note: 'The furthest the grade moves from the source paintings, a full rotation into violet, with the mid-tones lifted so the rock glows.',
                     palette: ['#1E0C25', '#422267', '#9E4FBC', '#7DA9DD', '#48539A', '#1F224E'],
                     art: { banner: lwCrBanner, cave: lwCrCave, grove: lwCrGrove, nexus: lwCrNexus },
                   },
@@ -1854,21 +1841,21 @@ export const projects = [
             {
               heading: 'Tilesets: one rock, one grass stamp',
               body: [
-                'Tilesets were unfamiliar territory and took more iterations than anything else I made. The first was too detailed and turned to noise the moment it repeated. The second was clean but read as cartoon against painterly backgrounds. The third finally matched them — and then disappeared into them.',
-                'The fix was the background trick applied to ground.',
+                'Tilesets were unfamiliar territory and took more iterations than anything else I made. The first was too detailed and looked very messy once it was largely repeated across the screen. The second was clean but read too cartoonish against the painted backgrounds.',
+                'The final iteration finally looked good detail and contrast wise, but the original grass + rock combo broke the color scheme in some of the zones. The fix was the background trick applied to ground.',
               ],
               facts: [
                 {
                   title: 'One base block',
-                  text: 'A single neutral rock tile, flat enough in colour to sit under any of the four ramps.',
+                  text: 'A single neutral rock tile was designed to be flat enough in colour to sit under any of the four color gradings.',
                 },
                 {
                   title: 'A grass stamp',
-                  text: 'One overlay laid over the base, so ground reads as ground before it reads as a zone.',
+                  text: 'The rock and grass are separate so the grass can layer over Ilex\'s foot to give a sense of depth.',
                 },
                 {
                   title: 'Four grades',
-                  text: 'The same curve pass as the backgrounds — one tileset, four zones, no redraws.',
+                  text: 'The grass stamps were also adjusted with curves so the tileset palette work with the backgrounds without needing full redraws.',
                 },
               ],
               tiles: {
@@ -1899,7 +1886,7 @@ export const projects = [
               points: [
                 {
                   icon: 'platform',
-                  text: 'What scaled here scaled because it was built once and graded, never redrawn — sixteen backgrounds and four tilesets out of one small set of paintings.',
+                  text: 'What scaled here scaled because it was built once and graded, never redrawn, sixteen backgrounds and four tilesets out of one small set of paintings.',
                 },
                 {
                   icon: 'scope',
@@ -1919,12 +1906,12 @@ export const projects = [
         {
           heading: 'Challenges & Takeaways',
           body: [
-            'This was the largest project any of us had built from scratch — 87 files and 35,000 lines across a single semester — and the biggest lessons were about scope and process as much as any one line of code.',
+            'This was the largest project any of us had built from scratch, 87 files and 35,000 lines across a single semester, and the biggest lessons were about scope and process as much as any one line of code.',
           ],
           points: [
             {
               icon: 'scope',
-              text: 'Scope, scope, scope — we built the most ambitious game in the course, and a one-semester timeline isn’t built for a project this size.',
+              text: 'Scope, scope, scope. We built the most ambitious game in the course, and a one-semester timeline isn’t built for a project this size.',
             },
             {
               icon: 'performance',
@@ -1932,7 +1919,7 @@ export const projects = [
             },
             {
               icon: 'identity',
-              text: 'We designed and scrapped entire systems — passive abilities, attack iterations, whole levels — because we hadn’t locked down the game’s identity before building around it.',
+              text: 'We designed and scrapped entire systems (passive abilities, attack iterations, whole levels) because we hadn’t locked down the game’s identity before building around it.',
             },
             {
               icon: 'team',
@@ -1943,9 +1930,9 @@ export const projects = [
         {
           heading: 'Outcome',
           body: [
-            'Little Wonder shipped as the largest-scope game in the course and was recognized as the most polished game at the Game Design Showcase. The most repeated piece of playtester feedback was about how good movement felt — dash, jump, and the rest read as tight and responsive, which was exactly the bar we set in that first prototype.',
+            'Little Wonder shipped as the largest-scope game in the course and was recognized as the most polished game at the Game Design Showcase. The most repeated piece of playtester feedback was about how good movement felt, since dash, jump, and the rest read as tight and responsive, which was exactly the bar we set in that first prototype.',
           ],
-          media: { caption: 'Gameplay capture — recording coming soon.' },
+          media: { caption: 'Gameplay capture, recording coming soon.' },
         },
       ],
     },
@@ -1973,19 +1960,14 @@ export const projects = [
         { label: 'Category', value: 'Information retrieval, Full-Stack' },
         { label: 'My role', value: 'Retrieval and ranking' },
         { label: 'Timeline', value: 'Spring 2026' },
-        {
-          label: 'Skills',
-          value:
-            'Python, scikit-learn, Flask, TF-IDF, latent semantic analysis, truncated SVD, cosine ranking, sentence embeddings, RAG, query rewriting',
-        },
-        { label: 'Team', value: 'Rhea Agrawal, Sanika Sharma, Enaika Kishnani, and me' },
+        { label: 'Skills', value: 'Python, scikit-learn, Flask, NLP, semantic search, RAG' },
+        { label: 'Teammates', value: 'Rhea Agrawal, Sanika Sharma, Enaika Kishnani' },
       ],
       sections: [
         {
           heading: 'Overview',
           body: [
-            'Dishcovery is a search and recommendation system for restaurants, driven by what reviewers actually wrote rather than by star averages. A plain sentence such as “Nashville quiet cheap lunch” returns ten ranked restaurants, each shown with the reasons it placed.',
-            'A star average aggregates every reason anyone liked a place, so it says nothing about whether a room is quiet, which dish is worth ordering, or whether the price holds up. Those details sit in the review text, which makes this an information retrieval problem over unstructured language rather than a filtering problem over a database.',
+            'Dishcovery is a search and recommendation system for restaurants, driven by what reviewers actually wrote rather than by star averages. An average aggregates every reason anyone liked a place, so it says nothing about whether the room is quiet, which dish is worth ordering, or whether the price holds up. Those details live in the review text, which makes this an information retrieval problem over unstructured language rather than a filtering problem over a database.',
           ],
           factsLabel: 'Data',
           facts: [
@@ -2012,9 +1994,6 @@ export const projects = [
         },
         {
           heading: 'Anatomy of a search',
-          body: [
-            'A request runs through query parsing, ranking, filtering and two optional model calls before anything reaches the page. The React and TypeScript frontend stays deliberately thin, since every ranking decision happens in Flask.',
-          ],
           // the isometric pile (StackDiagram.jsx); one plate per tool,
           // grouped by layer, request path in the default card
           stack: {
@@ -2031,7 +2010,7 @@ export const projects = [
             groups: [
               {
                 name: 'Frontend',
-                tone: '#9a8266',
+                tone: '#efc7c2',
                 tools: [
                   { name: 'React and TypeScript', note: 'search bar, filters, result cards' },
                   { name: 'Tailwind', note: 'styling and layout' },
@@ -2040,7 +2019,7 @@ export const projects = [
               },
               {
                 name: 'Flask API',
-                tone: '#6f6353',
+                tone: '#e8b894',
                 tools: [
                   { name: '/api/search', note: 'pure retrieval, no model calls' },
                   { name: '/api/rag-search', note: 'retrieval wrapped in a rewrite and a summary' },
@@ -2049,7 +2028,7 @@ export const projects = [
               },
               {
                 name: 'Retrieval core',
-                tone: '#4a5450',
+                tone: '#bfd3c1',
                 tools: [
                   { name: 'Query preprocessing', note: 'city extraction, filler removal, fuzzy repair' },
                   { name: 'TF-IDF vectorizer', note: 'unigrams and bigrams over four restaurant fields' },
@@ -2060,7 +2039,7 @@ export const projects = [
               },
               {
                 name: 'LLM layer',
-                tone: '#2c3a4a',
+                tone: '#68a691',
                 tools: [
                   { name: 'Query rewriter', note: 'a sentence becomes search terms before retrieval runs' },
                   { name: 'Overview writer', note: 'two or three sentences across the top five' },
@@ -2073,46 +2052,41 @@ export const projects = [
         {
           heading: 'The search and recommendation model',
           body: [
-            'Retrieval is a vector space model. Each restaurant is a row in a term document matrix, each query is projected into the same space, and results are ranked by descending cosine similarity. The model was rebuilt across four iterations, each one addressing a failure mode the previous iteration exposed.',
+            'The final system is a vector space model. Every restaurant becomes a row of TF-IDF weighted review text, compressed into a hundred latent dimensions per city, and every query lands in that same space to be ranked. Four iterations got there, each one answering a failure the last exposed.',
+            'Ranking uses cosine similarity, which compares the direction of two vectors rather than their length. A restaurant with thousands of reviews has a much longer document than a small place with a dozen, and any measure sensitive to magnitude would hand it an advantage for being popular rather than for being a better match. Cosine similarity normalizes that away, so a small business competes on what its reviews actually say.',
           ],
           subs: [
             {
               title: 'TF-IDF weighting over a term document matrix',
-              deck: 'Documents are vectorized with scikit-learn TfidfVectorizer and scored by cosine similarity against the query vector.',
+              deck: 'Weights each word by how distinctive it is to a restaurant, then recommends the restaurants whose reviews best match the search.',
               bullets: [
-                'An n-gram range of one to two captures multiword concepts such as late night and dim sum, a minimum document frequency of two drops terms appearing in a single restaurant, and sublinear term frequency scaling keeps heavily repeated terms from dominating a long document.',
-                'Cosine normalizes for document length, so a restaurant with three hundred reviews does not outrank a smaller one purely on term mass.',
-                'Restaurant text is split into weighted fields, reviews, categories and cuisine, ambience, and practical attributes, so the relative importance of each signal is tunable. Ambience terms parsed from Yelp attributes are repeated to give a small field real weight against the review field.',
-                'This baseline handled single term queries such as sushi and degraded on compositional queries such as fancy formal sushi, which is the query class the system targets.',
+                'Reviews become weighted keyword vectors, compared to the query by cosine similarity. Specific searches like ramen or brunch work well.',
+                'Relying on exact keywords, it misses ideas worded differently. A search for fancy never reaches a restaurant whose reviews only say upscale.',
               ],
             },
             {
               title: 'Latent semantic analysis through truncated SVD',
-              deck: 'Truncated SVD reduces the sparse TF-IDF matrix to one hundred latent dimensions, fitted independently per city.',
+              deck: 'Compresses the keyword space into a smaller semantic space, so words that appear in similar contexts sit closer together.',
               bullets: [
-                'Dimensionality reduction addresses vocabulary mismatch. A query for upscale reaches restaurants whose reviews say classy or refined, because the decomposition groups co-occurring terms into shared concepts rather than requiring exact term overlap.',
-                'Measured cosine similarity on the top results rose from roughly 0.06 to 0.11 under TF-IDF alone to roughly 0.55 to 0.83 under TF-IDF with SVD, with a corresponding gain in judged relevance.',
-                'Fitting one decomposition per city keeps latent dimensions tied to local vocabulary and keeps each matrix small enough to hold in memory.',
-                'A thirty thousand feature cap paired with the minimum document frequency cut index build time with no observed change in the top ten.',
+                'Upscale, refined, and classy are no longer separate terms but one shared concept, which lifts descriptive queries.',
+                'Top result similarity rose from roughly 0.06 to 0.11 up to roughly 0.55 to 0.83, with a matching gain in judged relevance.',
+                'Semantic matching improves, but the learned concepts are less interpretable than plain keywords.',
               ],
             },
             {
-              title: 'Dense retrieval evaluated against the sparse baseline',
-              deck: 'Two embedding based retrievers were implemented and measured against the TF-IDF and SVD model.',
+              title: 'Dense retrieval evaluation',
+              deck: 'We evaluated embedding based retrievers, GloVe and Sentence BERT, against the sparse baseline.',
               bullets: [
-                'The first used GloVe vectors pooled with TF-IDF weights. The second used Sentence BERT on all-MiniLM-L6-v2 to encode each field.',
-                'Both scored the four fields separately and fused the per field cosines late, with weights favouring ambience, rather than encoding one concatenated document.',
-                'Both produced smoother rankings on subjective vibe queries, both were substantially slower to index, and neither supported attribution of a score back to interpretable features.',
-                'The sparse model stayed in production on explainability and latency. The dense paths remain in the codebase behind a model type switch.',
+                'They capture broader meaning, but blurred distinctions users cared about, treating related cuisines as interchangeable.',
+                'Restaurant search leans on exact cuisines, dishes, and amenities, so TF-IDF with LSA ranked better while staying faster and easier to explain.',
               ],
             },
             {
               title: 'Ranking explainability from the latent space',
-              deck: 'Every score is returned with the latent dimensions that produced it, so a ranking can be inspected rather than trusted.',
+              deck: 'Every score comes back with the latent dimensions that produced it, so a ranking can be inspected rather than trusted.',
               bullets: [
-                'For the query, the strongest activated dimensions are read out of the SVD components and labelled by their heaviest loading terms.',
-                'For a single result, the per dimension products of query and document coordinates are split into the dimensions that contributed positively and negatively, and surfaced on the card as a “Why this result” panel.',
-                'Dimensions whose top terms are all generic are dropped before display. Corpus wide terms such as food, place and service are filtered out and the next informative dimension takes the slot.',
+                'The strongest dimensions are labelled by their heaviest terms, then split into what pushed a result up and what pulled it down.',
+                'Dimensions whose top terms are all generic are dropped, so corpus wide words like food and service never fill the slot.',
               ],
             },
           ],
@@ -2148,14 +2122,6 @@ export const projects = [
                 'The output is capped at one to two sentences and requested lazily, which bounds both token cost and added latency to the cards a user actually inspects.',
               ],
             },
-            {
-              title: 'Generation is never on the critical path',
-              deck: 'Ranking does not depend on the model being available.',
-              bullets: [
-                'The pure retrieval endpoint makes no model calls at all, and the RAG endpoints degrade to it when no API key is present or a call fails.',
-                'A failed generation removes the summary and the explanation, and returns the same ranked list.',
-              ],
-            },
           ],
         },
         {
@@ -2163,75 +2129,64 @@ export const projects = [
           body: [
             'A number of failures were not ranking failures. They came from query text the vectorizer could not use, or from constraints that are factual and should never have been treated as semantic signal.',
           ],
-          subs: [
+          factsCols: 2,
+          facts: [
             {
               title: 'Query specific preprocessing',
-              deck: 'Beyond the shared normalization pipeline, a query needs terms removed that a document does not.',
-              bullets: [
-                'The city name is extracted from the query and stripped from the term stream, since it selects which index to search rather than contributing to the score.',
-                'Beyond standard English stop words, a query specific list removes intent filler such as want and looking, which carries no discriminative weight but does shift the query vector.',
-              ],
+              text: 'The city name is pulled out of the query and dropped from the term stream, since it picks the index rather than the score. Intent filler like want and looking goes too, because it shifts the query vector without adding meaning.',
             },
             {
-              title: 'Fuzzy matching for out of vocabulary terms',
-              deck: 'Query terms absent from the TF-IDF vocabulary are mapped to their nearest in vocabulary neighbour.',
-              bullets: [
-                'Matching uses difflib similarity ratios at a 0.75 cutoff, so romantik resolves to romantic while a genuinely unrelated term is left untouched rather than forced onto a wrong match.',
-                'Repair has to run before projection. An unmatched typo is not a near miss in the latent space, it is noise distributed across all one hundred dimensions.',
-              ],
+              title: 'Fuzzy matching for unknown terms',
+              text: 'Terms missing from the vocabulary map to their nearest neighbour at a 0.75 difflib cutoff, so romantik resolves to romantic. Repair runs before projection, since an unmatched typo becomes noise across all hundred dimensions.',
             },
             {
               title: 'Hard constraints outside the vector space',
-              deck: 'Temporal constraints are enforced against structured data instead of matched as text.',
-              bullets: [
-                'Late night was originally a soft lexical signal, which let a restaurant closing at 6 pm rank second on the query “Tampa late night ramen”.',
-                'It is now a hard filter defined as 10 pm to 3 am and evaluated against opening hours, so every result on that query closes at or after 10 pm.',
-                'Brunch and similar time words follow the same path, resolving to an hours predicate rather than a term match.',
-              ],
+              text: 'Late night was once a soft lexical signal, which let a restaurant closing at 6 pm rank second on Tampa late night ramen. It is now a filter on opening hours, and brunch resolves the same way.',
             },
             {
               title: 'Faceted filtering and deduplication',
-              deck: 'Post ranking refinements that never refire a search.',
-              bullets: [
-                'Price and rating are applied as client side facets over the returned set, so narrowing is instant and the price range is inclusive at both bounds.',
-                'Duplicate restaurant names collapse before the final cut, so a chain with several locations does not occupy the whole result list.',
-              ],
+              text: 'Price and rating narrow the returned set on the client, so refining never refires a search. Duplicate restaurant names collapse before the final cut, keeping one chain from filling the list.',
             },
           ],
         },
         {
           heading: 'Cutting retrieval latency',
           body: [
-            'The first working build refit a vectorizer on every query, which put index construction inside the request path. Almost all of that cost was repeated work, and it was moved out of the request or removed.',
+            'The first working build refit a vectorizer on every query and called the language model on every card, which put index construction and network waits inside the request path. Almost all of that cost was repeated or unwanted work, and it was moved out of the request or made optional.',
           ],
           facts: [
             {
-              title: 'Index fitted once at boot',
-              text: 'Each city corpus is vectorized and decomposed at startup and held in memory, so a query costs one projection and one matrix multiply rather than a full fit.',
+              title: 'TF-IDF and SVD precomputed offline',
+              text: 'Each city corpus is vectorized and decomposed ahead of the request, then pickled under a hash of its business ids and dimension count and reloaded into memory at boot. A query costs one projection and one matrix multiply instead of a full fit.',
             },
             {
-              title: 'Persisted index cache',
-              text: 'Fitted vectorizers and document matrices are pickled under a hash of their business ids and dimension count, gzipped, and reloaded on the next boot instead of rebuilt.',
+              title: 'Per city caching',
+              text: 'A scored ranking is held per city on both sides, so switching cities and coming back reads a cached result set rather than recomputing a ranking that was already scored.',
             },
             {
-              title: 'Vectorized embedding construction',
-              text: 'The GloVe path moved from a per document loop to a single sparse multiply against a vocabulary embedding matrix built once, which removed most of that model’s index time.',
-            },
-            {
-              title: 'Heap based top-k selection',
-              text: 'Deduplication runs in a dictionary and the final ten come off a heap, so no request sorts the full city score vector.',
-            },
-            {
-              title: 'Cached result sets per city',
-              text: 'Results are cached client side, so switching between cities and back does not recompute a ranking that was already scored.',
+              title: 'Language model calls on demand',
+              text: 'Retrieval never waits on generation. The pure search endpoint makes no model calls, and summaries are requested only for the cards a user opens, which keeps token cost and added latency proportional to what is actually read.',
             },
           ],
         },
         {
-          heading: 'What I would change',
+          heading: 'Takeaways',
           body: [
-            'Candidate generation and constraint filtering are too far apart. Hours, price and rating are applied after the top ten is cut, so a narrow query can rank ten results and then hide most of them, with nothing reaching further down the ranked list to refill. Pushing the structured predicates into candidate selection would preserve recall at a fixed k.',
-            'The field weighted dense retriever was the stronger model on subjective queries and lost on interpretability alone. Given a way to attribute a sentence embedding score back to individual fields, that decision likely reverses.',
+            'Most of what I learned came from comparing iterations rather than from the one that shipped.',
+          ],
+          facts: [
+            {
+              title: 'More advanced models are not always better',
+              text: 'Dense embedding models like Sentence BERT captured broader semantic meaning, but TF-IDF with LSA produced more relevant recommendations, because cuisine names, dishes, and amenities often require precise keyword matching.',
+            },
+            {
+              title: 'Normalize similarity, not document length',
+              text: 'Cosine similarity compares the direction of document vectors rather than their magnitude, which stops restaurants with hundreds of reviews from automatically outranking smaller businesses simply for containing more text.',
+            },
+            {
+              title: 'Explainability builds trust',
+              text: 'Recommendations are more useful when users understand why they were made. Exposing the keywords or latent concepts behind a result makes retrieval systems easier to interpret, debug, and improve.',
+            },
           ],
         },
       ],

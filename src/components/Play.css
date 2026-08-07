@@ -25,13 +25,78 @@
   padding-bottom: calc(var(--section-y) * 0.8);
 }
 
+/* ----- the way back to the knock --------------------------------
+   The scroll trigger fires once and only re-arms after the scene has
+   left the viewport entirely, so anyone who scrolled in past the
+   middle band has seen the aftermath and not the event. This is the
+   way back to it: a glyph the size of the labels, tucked under the
+   cat's bottom left corner and sitting on the same row as the labels,
+   so it joins the row of small type rather than floating on open
+   paper. No word next to it — the mark is the whole affordance.
+
+   Vertically it lands where a label would: the caption band is
+   --cap-h deep with 11px of lead, so the middle of the type sits
+   ~28px up from the bottom of the row, and the glyph is centred
+   there. It follows the cat onto the upper shelf in the narrow
+   layout for the same reason the cat is there. */
+.play-replay {
+  position: absolute;
+  left: calc(2 * 1cqw);
+  --row: calc(var(--rows) - 1);
+  bottom: calc(var(--cap-h) - 28px + var(--row) * var(--row-h));
+  /* the mark stays small; the padding is the part you have to hit */
+  margin: -7px;
+  padding: 7px;
+  color: var(--ink-faint);
+  /* out of the way until the knock has landed, and unreachable while
+     it is — see the tabIndex/aria-hidden pair in Play.jsx */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease-set), color var(--dur) ease;
+}
+.play-replay.is-ready {
+  opacity: 1;
+  pointer-events: auto;
+}
+.play-replay:hover,
+.play-replay:focus-visible {
+  color: var(--espresso);
+}
+.play-replay svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* one unhurried turn, the direction the glyph already points */
+  transition: rotate 0.7s var(--ease-set);
+}
+.play-replay:hover svg,
+.play-replay:focus-visible svg {
+  rotate: -360deg;
+}
+/* nothing to replay: the scene is handed over already spilled */
+@media (prefers-reduced-motion: reduce) {
+  .play-replay {
+    display: none;
+  }
+}
+
 .bag-scene {
   position: relative;
   container-type: inline-size;
 
-  --cat-w: 32;            /* the drawing's width, in scene-width % */
-  --shelf-x: 17.5;        /* where the rule starts — the tote's left edge */
-  --stage-h: clamp(144px, 2.125vw + 131.2px, 178px); /* shelf up to the top of the air */
+  --cat-w: 37;            /* the drawing's width, in scene-width % */
+  --shelf-x: 20.2;        /* where the rule starts — the tote's left edge */
+  /* Shelf up to the top of the air. The cat stands taller than this and
+     overflows the scene box on purpose, into the gap under the section
+     head — so the stage is what holds its head off the heading, and it
+     grows with --cat-w. Both numbers were scaled together when the
+     drawing was set a size up; --shelf-x and MOUTH_X in Play.jsx are
+     fractions of the drawing's width and were scaled with it too. */
+  --stage-h: clamp(166px, 2.44vw + 151px, 205px);
   --cap-h: 34px;          /* shelf down to the baseline of the label */
   --row-h: calc(var(--stage-h) + var(--cap-h));
   --rows: 1;
@@ -388,9 +453,9 @@
 @media (max-width: 760px) {
   .bag-scene {
     --rows: 2;
-    --cat-w: 52;
-    --shelf-x: 28;
-    --stage-h: clamp(96px, 24vw, 132px);
+    --cat-w: 58;
+    --shelf-x: 31.2;
+    --stage-h: clamp(104px, 26vw, 143px);
     --cap-h: 30px;
   }
   .bag-item {

@@ -90,23 +90,29 @@ const imgMap = {
 /* The bag's mouth, in scene-width percent. Both numbers are read off
    the last frame of the knock — the tote's opening sits at ~0.76 of
    the drawing's width — so they track --cat-w in the stylesheet. */
-const MOUTH_X = 24;
-const MOUTH_X_MOB = 39.5;
+const MOUTH_X = 28.1;
+const MOUTH_X_MOB = 44.1;
 
+/* Objects are set a size down from where they started and the cat a
+   size up: the knock is the event this section is built around, and at
+   the old ratio the drawing read as a label beside five specimens
+   rather than as the thing that put them there. The shelf run still
+   ends where it did (95 of the scene's width) — the objects gave back
+   width, not the composition. */
 const LAYOUT = [
   // Stories — first out, and the one that lands nearest the tote. Flat
   // on its face and the widest silhouette of the five, so it carries
   // more weight than its number suggests and is set a size below it
-  { x: 32, s: 9.3, ar: 0.835, r: -2.4, fy: -7, mob: { x: 50, s: 19.5, r: -2.4, fy: -11, row: 1 } },
+  { x: 37, s: 8.1, ar: 0.835, r: -2.4, fy: -8.1, mob: { x: 55.8, s: 17, r: -2.4, fy: -12.3, row: 1 } },
   // Drink making — the smallest thing on the shelf by some way. Its
   // label is the longest, which is why it gets the widest gap after it
-  { x: 46.5, s: 5, ar: 1.277, r: 1.8, fy: -7, mob: { x: 74, s: 10, r: 1.8, fy: -11, row: 1 } },
-  { x: 60, s: 8, ar: 0.912, r: -1.8, fy: -7, mob: { x: 2, s: 21, r: -1.8, fy: -45, row: 0 } },
-  { x: 72.5, s: 6.6, ar: 1.157, r: 2.6, fy: -7, mob: { x: 33, s: 17, r: 2.6, fy: -45, row: 0 } },
+  { x: 50.3, s: 4.35, ar: 1.277, r: 1.8, fy: -8.1, mob: { x: 77, s: 8.7, r: 1.8, fy: -12.3, row: 1 } },
+  { x: 63.2, s: 7, ar: 0.912, r: -1.8, fy: -8.1, mob: { x: 2, s: 18.3, r: -1.8, fy: -50, row: 0 } },
+  { x: 74.7, s: 5.75, ar: 1.157, r: 2.6, fy: -8.1, mob: { x: 33.9, s: 14.8, r: 2.6, fy: -50, row: 0 } },
   // Art — the sketchbook ends the shelf, the largest thing on it. It
   // is also the object that used to vanish into the paper, which the
   // contact shadow fixes
-  { x: 85, s: 10.2, ar: 0.889, hg: 0.23, r: -1.4, fy: -7, mob: { x: 62, s: 24, r: -1.4, fy: -45, row: 0 } },
+  { x: 86.4, s: 8.9, ar: 0.889, hg: 0.23, r: -1.4, fy: -8.1, mob: { x: 65.1, s: 20.9, r: -1.4, fy: -50, row: 0 } },
 ];
 
 // how many shelves the mobile layout needs — drives the extra rule
@@ -187,6 +193,7 @@ export default function Play() {
     phaseRef.current = phase;
   }, [phase]);
   const resetTimerRef = useRef(null);
+  const [run, setRun] = useState(0); // bumped to re-arm the clock on replay
   const framePool = useRef(null); // decoded frames, kept alive (see below)
   const btnRefs = useRef([]); // to return focus after a mini-page closes
   const objRefs = useRef([]); // the hover wash — where the iris starts
@@ -221,6 +228,19 @@ export default function Play() {
     );
   };
 
+  /* Replay. The scroll trigger is a one-shot per visit and the rewind
+     only happens once the scene is fully out of sight, so someone who
+     arrived mid-knock has no way back to it — this is that way. It
+     puts the objects back in the bag and restarts the clock; `run`
+     re-arms the effect for the case where the knock is still playing. */
+  const replay = () => {
+    clearTimeout(resetTimerRef.current);
+    setFrame(0);
+    setSpilled(false);
+    setPhase('playing');
+    setRun((n) => n + 1);
+  };
+
   /* Playback. One rAF-driven clock rather than a chain of setTimeouts:
      the frame is a function of elapsed time, so a stalled main thread
      costs a frame instead of pushing everything after it late — and a
@@ -241,7 +261,7 @@ export default function Play() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [phase]);
+  }, [phase, run]);
 
   useEffect(() => {
     const scene = sceneRef.current;
@@ -325,6 +345,23 @@ export default function Play() {
             height="702"
             alt="A drawn black cat knocking over a tote bag"
           />
+
+          {/* Held out of reach until the knock has landed — offered
+              mid-fall it would read as a way to interrupt it. */}
+          <button
+            type="button"
+            className={`play-replay ${phase === 'done' ? 'is-ready' : ''}`}
+            onClick={replay}
+            tabIndex={phase === 'done' ? 0 : -1}
+            aria-hidden={phase !== 'done'}
+            aria-label="Replay the cat knocking over the tote"
+            title="Replay"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path d="M2.34 10a6 6 0 1 0 1.42-6.24L0.67 6.67" />
+              <polyline points="0.67 2.67 0.67 6.67 4.67 6.67" />
+            </svg>
+          </button>
 
           {/* the shelf everything lands on. Drawn rather than simply
               present: it arrives with the spill, left to right. */}

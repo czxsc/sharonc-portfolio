@@ -20,7 +20,7 @@ const GAP = 13;
 const GAP_HOT = 30;
 const PAD = 22;
 const PLATE_H = 150; // projected diamond height, keeps the pile centered
-const SCENE_H = 440;
+const SCENE_H = 520;
 // matches the plate's transform transition, so a pick is only ever
 // taken from a pile that has stopped moving
 const SETTLE = 520;
@@ -82,6 +82,10 @@ export default function StackDiagram({ stack }) {
   };
 
   const group = hot != null ? stack.groups[hot] : null;
+  // longest list the card can ever hold, used to reserve its height
+  const reserve = [stack.flow, ...stack.groups.map((g) => g.tools)].reduce((a, l) =>
+    l.length > a.length ? l : a,
+  );
 
   return (
     <div
@@ -139,9 +143,30 @@ export default function StackDiagram({ stack }) {
           .reverse()}
       </div>
 
-      {/* detail card */}
+      {/* detail card. The box used to grow by ~150px whenever a group
+          with more tools than the last one was picked, which read as
+          the whole diagram lurching. So the card reserves the tallest
+          list it will ever hold: a hidden copy of it shares the body's
+          grid cell, setting a floor no real state can exceed. Measured
+          from the content rather than guessed, so it stays right when
+          the copy changes. */}
       <aside className="sd-card" aria-live="polite">
         <p className="sd-label">The architecture</p>
+        <div className="sd-card-stack">
+          <div className="sd-card-body sd-card-ghost" aria-hidden="true">
+            {/* the default head, which is the tallest (a two-line title
+                and a hint), over the longest list any state can show */}
+            <h3>{stack.title}</h3>
+            <p className="sd-hint">{stack.hint}</p>
+            <ul>
+              {reserve.map((t) => (
+                <li key={t.name}>
+                  <strong>{t.name}</strong>
+                  <span>{t.note}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         {group ? (
           <div className="sd-card-body" key={group.name} style={{ '--c': group.tone }}>
             <h3>{group.name}</h3>
@@ -171,6 +196,7 @@ export default function StackDiagram({ stack }) {
             </ul>
           </div>
         )}
+        </div>
       </aside>
     </div>
   );

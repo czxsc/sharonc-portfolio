@@ -612,10 +612,19 @@ function Section({ s }) {
       <h2>{s.heading}</h2>
       {/* a body entry is normally a paragraph; an object with `list` is a
           short weighed-options aside that has to sit between two
-          paragraphs rather than after all of them */}
-      {s.body.map((p, i) =>
+          paragraphs rather than after all of them, and one with
+          `bullets` is a plain scan list of decisions with a bold lead */}
+      {(s.body ?? []).map((p, i) =>
         typeof p === 'string' ? (
           <p key={i}>{p}</p>
+        ) : p.bullets ? (
+          <ul className="pp-body-list" key={i}>
+            {p.bullets.map((b) => (
+              <li key={b.lead}>
+                <strong>{b.lead}</strong> {b.text}
+              </li>
+            ))}
+          </ul>
         ) : (
           <dl className="pp-weigh" key={i}>
             {p.list.map((it) => (
@@ -666,7 +675,7 @@ function Section({ s }) {
            three columns are one thing (the data) rather than findings */
         <div className="pp-facts-block">
           {s.factsLabel && <span className="pp-facts-label">{s.factsLabel}</span>}
-          <div className="pp-facts">
+          <div className={`pp-facts${s.factsCols === 2 ? ' pp-facts--2' : ''}`}>
             {s.facts.map((f) => (
               <div className="pp-fact" key={f.title}>
                 <h3>{f.title}</h3>
