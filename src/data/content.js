@@ -291,13 +291,13 @@ export const projects = [
           heading: 'Problem: Two ground stations',
           body: [
             'Mission Planner is a free, open-source ground control station software, and is the de facto ground station for ArduPilot teams. So even with our team\'s custom Ground Control Station flying the plane autonomously, hardware setup kept us still tethered to Mission Planner. Every test flight required pre-flight configuration in one tool then migrating to the other. However, when this year’s competition rules changed to include setup into the 45-minute mission window, this workflow became a significant problem that has to change.',
-            'Through surveying the team, I identified four key limitations of depending on Mission Planner for hardware setup:',
+            'Surveying the team, I identified four key limitations of depending on Mission Planner for hardware setup:',
           ],
           points: [
             { icon: 'freeze', text: 'Older, clunkier software that often crashes and freezes' },
             { icon: 'platform', text: 'Windows-only compatibility on a largely-Mac team' },
-            { icon: 'guide', text: 'Guidance lived in forum threads and online docs, not the tool itself' },
-            { icon: 'clock', text: 'Switching between platforms is timely, with setup now on the clock' },
+            { icon: 'guide', text: 'Guidance is scattered across forums and online docs' },
+            { icon: 'clock', text: 'Switching platforms is too slow with setup on the clock' },
           ],
           compare: {
             // the MP asset is pre-trimmed to content (no title bar or
@@ -321,17 +321,17 @@ export const projects = [
               text: 'Limited to the setup tasks our team uses: Accelerometer, large-vehicle compass, radio, servo outputs, and flight modes.',
             },
             {
-              title: 'A window, not a sidebar',
+              title: 'A separate window',
               text: 'Hardware setup happens before flight, so its in a separate draggable modal instead of crowding flight-critical telemetry on the main display.',
             },
             {
-              title: 'Guidance built in',
+              title: 'Built in guidance',
               text: 'A dedicated Guide tab and per-step prompts replace the need to switch between online documentation and the GCS. ',
             },
           ],
         },
         {
-          heading: 'Implementation: One command’s round trip',
+          heading: 'Implementation',
           body: [
             'The GCS frontend is a Svelte single-page app, and the backend is a Flask REST API that MAVProxy hosts on a background thread. Preflight adds a layer to each: a five-tab setup window in the UI, five Flask blueprints behind it, and a new MAVProxy module that owns the MAVLink communication. The boundaries are strict: nothing above dpk.py knows MAVLink exists, and nothing below the Flask views knows there’s a UI.',
             'Live feedback rides a single polling loop. Every 500 ms the app asks each status endpoint, writes the answers into Svelte stores, and the tabs re-render reactively. This way, step prompts and progress update in real time while a calibration runs on the plane. The full architecture is shows below.',
@@ -710,42 +710,26 @@ export const projects = [
           ],
         },
         {
-          heading: 'Engineering decisions',
+          heading: 'Challenges',
           body: [
-            'Three choices shaped the build more than any feature.',
-          ],
-          facts: [
-            {
-              title: 'A state machine, not a wrapper',
-              text: 'dpk.py doesn’t fire commands and hope. It holds each calibration as explicit state, updated only by what the autopilot reports back so the UI only reflects what the plane said.',
-            },
-            {
-              title: 'Polling over push',
-              text: 'One 500 ms GET loop rides the existing telemetry poller instead of introducing websockets. It’s trivially debuggable at a windy flight line, and a dropped response just means the next tick catches up.',
-            },
-            {
-              title: 'Validate on the ground',
-              text: 'The Flask layer rejects bad input before it becomes a radio packet: exactly six flight modes, servo functions checked against a canonical map, PWM ranges pinned with min ≤ trim ≤ max.',
-            },
-          ],
-        },
-        {
-          heading: 'Challenges: Three learning curves',
-          body: [
-            'Preflight was my first full project inside such a large team-scale codebase, and nearly every layer of it was new to me. There was plenty of new skills I learned along the way, both new technical tools and strong engineering practices.',
+            'Preflight was my first major project within a large, long-lived codebase. Almost every layer of the system was new to me, from the technologies it used to the engineering practices behind it. Building the feature meant learning not only new tools, but also how to navigate and contribute to a mature software project.',
           ],
           subs: [
             {
               title: 'A codebase with history',
-              text: 'The GCS is the accumulated work of many generations of CUAIR members. I spent the first month just reading and trying to understand the project structure before writing a line.',
+              text: 'The GCS has been developed over many years by multiple generations of CUAIR members. Before making meaningful changes, I spent my first month reading the codebase, understanding its architecture, and learning how the different components fit together.',
             },
             {
               title: 'Learning unfamiliar tools',
-              text: 'I hadn’t touched Svelte or MAVLink before so the beginning was definitely a steep learning curve. I picked up Svelte’s reactive stores by tracing the GCS’s existing tabs, and MAVLink by extensively reading MAVLink and ArduPilot docs.',
+              text: 'I started the project with no experience using Svelte or MAVLink. I learned Svelte by tracing existing GCS components, while I built my understanding of MAVLink by working through the MAVLink and ArduPilot documentation alongside the existing implementation.',
             },
             {
               title: 'Figuring out the polling loop',
-              text: 'Calibration is a conversation, you send commands out but also need to listen for status updates and flight controller values too. Understanding that packet flow well enough to design the polling loop and state machine took the longest.',
+              text: 'Calibration is a conversation, you send commands out but also need to listen for status updates and flight controller values too. Understanding that packet flow well enough to design the polling loop and state machine was the most technically challenging part of the project for me.',
+            },
+            {
+              title: 'Validating on the ground',
+              text: 'Every command ultimately becomes a radio packet sent to a real aircraft, so input validation was critical. I implemented validation in the Flask backend to reject invalid requests before they reached the vehicle, enforcing constraints such as exactly six flight modes, valid servo function assignments from a canonical mapping, and PWM values satisfying min ≤ trim ≤ max.',
             },
           ],
         },
@@ -756,16 +740,16 @@ export const projects = [
           ],
           facts: [
             {
-              title: '10–15 minutes → under 3',
-              text: 'Full pre-flight hardware setup now happens inside our GCS — comfortably inside the competition’s 45-minute mission window, with no tool-switching.',
+              title: 'Reduced Setup Time',
+              text: 'Pre-flight hardware setup now happens entirely within our GCS, reducing setup time from 10–15 minutes to under 3 and fitting comfortably within the competition\'s 45-minute mission window.',
             },
             {
-              title: 'Two semesters → three months',
-              text: 'New members used to shadow for most of a year before running setup alone. With the guided flows, they now lead ground tests solo within a semester.',
+              title: 'Made learning convenient',
+              text: 'Instructions are included in the window so members no longer need to reference external documentation while working. This makes setup more convenience and easier for newer members to pick up. ',
             },
             {
-              title: 'One ground station, any laptop',
-              text: 'Our GCS runs on macOS and Windows alike, so Mission Planner is no longer required equipment, coming out only for rare edge cases.',
+              title: 'Removed platform barriers',
+              text: 'Our GCS runs on macOS and Windows alike, so Mission Planner is no longer necessary except for rare edge cases.',
             },
           ],
         },
