@@ -588,7 +588,8 @@ export default function ProjectPage({
 /* one case-study section: heading, body copy, then whichever optional
    blocks the data provides (designBoard / points / subs / facts /
    stack / flow / archMap / cursorTrail / zones / tiles / compare /
-   media / gallery).
+   media / gallery). `media` may be a list, for full-width panels that
+   stack rather than pair up the way a gallery does.
 
    `imagesFirst` lifts media + gallery to just under the body. The early
    sections read "here is what we made -> here is the work -> here is
@@ -597,7 +598,9 @@ export default function ProjectPage({
 function Section({ s }) {
   const pictures = (
     <>
-      {s.media && <Media media={s.media} className="pp-panel" alt="" />}
+      {[].concat(s.media ?? []).map((m) => (
+        <Media key={m.video ?? m.src} media={m} className="pp-panel" alt="" />
+      ))}
       {s.gallery && (
         <div className="pp-gallery">
           {s.gallery.map((g) => (
@@ -804,33 +807,68 @@ function PassCopy({ pass }) {
    was, why it changed, what the change bought) rather than to label a
    picture. The Fragment is load-bearing: `.pp-section > p` is a
    direct-child selector, so wrapping the two in a div would drop the
-   paragraph out of the body type. */
+   paragraph out of the body type.
+
+   A side may be a recording (`video`, with `src` as its poster) instead
+   of a still: both sides then play together under one Pause / Play,
+   the same rules as Walkthrough. They don't loop on their own — the
+   shorter one holds its last frame until the longer one finishes, and
+   both restart together, so every pass lines up like the first. A side
+   with neither is a placeholder panel holding the slot open. */
 function Compare({ cmp }) {
+  const sides = [cmp.before, cmp.after];
+  const hasVideo = sides.some((c) => c.video);
+  const [playing, toggle] = useLoopToggle();
+  const ref = useInViewPlayback(playing);
   return (
     <>
       <PassCopy pass={cmp} />
       <figure
+        ref={hasVideo ? ref : undefined}
         className={`pp-compare ${cmp.natural ? 'is-natural' : ''} ${
           cmp.framed ? 'is-framed' : ''
-        }`}
+        } ${hasVideo ? 'pp-video' : ''}`}
       >
         <div className="pp-compare-grid">
-          {[cmp.before, cmp.after].map((c) => (
+          {sides.map((c) => (
             <div className="pp-compare-item" key={c.label}>
               <span className="pp-compare-label">{c.label}</span>
-              <img
-                src={c.src}
-                alt=""
-                loading="lazy"
-                style={{
-                  objectPosition: c.position,
-                  objectFit: c.fit ? 'contain' : undefined,
-                }}
-              />
+              {c.video ? (
+                <video
+                  src={c.video}
+                  poster={c.src}
+                  muted
+                  playsInline
+                  preload="metadata"
+                  aria-label={c.label}
+                  onClick={toggle}
+                />
+              ) : c.src ? (
+                <img
+                  src={c.src}
+                  alt=""
+                  loading="lazy"
+                  style={{
+                    objectPosition: c.position,
+                    objectFit: c.fit ? 'contain' : undefined,
+                  }}
+                />
+              ) : (
+                <div className="pp-media-ph">media — coming soon</div>
+              )}
             </div>
           ))}
         </div>
-        {cmp.caption && <figcaption>{cmp.caption}</figcaption>}
+        {(cmp.caption || hasVideo) && (
+          <figcaption>
+            {cmp.caption && <span>{cmp.caption}</span>}
+            {hasVideo && (
+              <button type="button" className="pp-video-toggle" onClick={toggle}>
+                {playing ? 'Pause' : 'Play'}
+              </button>
+            )}
+          </figcaption>
+        )}
       </figure>
     </>
   );
@@ -865,6 +903,7 @@ function Points({ points }) {
    media.fit shows the whole image at its own ratio instead of the
    21:9 crop (for screenshots that crop badly) */
 function Media({ media, className, alt, figRef }) {
+  if (media.video) return <Walkthrough media={media} className={className} />;
   return (
     <figure
       ref={figRef}
@@ -883,4 +922,94 @@ function Media({ media, className, alt, figRef }) {
       {media.caption && <figcaption>{media.caption}</figcaption>}
     </figure>
   );
+}
+
+/* a recorded walkthrough (media.video, with media.src as its poster):
+   muted and looping like a GIF, but it only runs while it's on screen,
+   and never starts by itself under reduced motion. The Pause / Play
+   in the caption row is the way to stop it — anything that moves for
+   longer than a few seconds needs one — and clicking the video does
+   the same. `playing` tracks what the reader asked for; whether it is
+   actually running at the moment also depends on it being in view. */
+function Walkthrough({ media, className }) {
+  const [playing, toggle] = useLoopToggle();
+  const ref = useInViewPlayback(playing);
+
+  return (
+    <figure
+      ref={ref}
+      className={`pp-media pp-video ${className} ${media.fit ? 'is-fit' : ''}`}
+    >
+      <video
+        src={media.video}
+        poster={media.src}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label={media.label ?? media.caption}
+        onClick={toggle}
+      />
+      <figcaption>
+        {media.caption && <span>{media.caption}</span>}
+        <button type="button" className="pp-video-toggle" onClick={toggle}>
+          {playing ? 'Pause' : 'Play'}
+        </button>
+      </figcaption>
+    </figure>
+  );
+}
+
+/* what the reader asked for: running, unless they prefer reduced
+   motion, in which case nothing starts until they press Play */
+function useLoopToggle() {
+  const [playing, setPlaying] = useState(
+    () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+  return [playing, () => setPlaying((p) => !p)];
+}
+
+/* runs every <video> inside the returned ref's element while it is on
+   screen and `playing` is set, and holds them paused otherwise.
+
+   Videos without `loop` are a set: one that finishes early waits on
+   its last frame, and once every one has ended they all restart from
+   the top together. Resuming skips the ones already waiting, since
+   play() on an ended video would restart it alone. */
+function useInViewPlayback(playing) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const box = ref.current;
+    if (!box) return;
+    const videos = [...box.querySelectorAll('video')];
+    if (!playing) {
+      videos.forEach((v) => v.pause());
+      return;
+    }
+    let inView = false;
+    const run = () =>
+      videos.forEach((v) => !v.ended && v.play().catch(() => {}));
+    const onEnded = () => {
+      if (!videos.every((v) => v.ended)) return;
+      videos.forEach((v) => {
+        v.currentTime = 0;
+      });
+      if (inView) run();
+    };
+    videos.forEach((v) => v.addEventListener('ended', onEnded));
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        if (inView) run();
+        else videos.forEach((v) => v.pause());
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(box);
+    return () => {
+      io.disconnect();
+      videos.forEach((v) => v.removeEventListener('ended', onEnded));
+    };
+  }, [playing]);
+  return ref;
 }

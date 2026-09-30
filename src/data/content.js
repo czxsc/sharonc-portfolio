@@ -15,9 +15,11 @@ import dpkFlightModesImg from '../assets/projects/preflight/flightmodes.webp';
 import littleWonderImg from '../assets/projects/little-wonder/cover.webp';
 import pokeleetDashboardImg from '../assets/projects/pokeleet/cover.webp';
 import pokeleetCollectionImg from '../assets/projects/pokeleet/collection.webp';
-import pokeleetGachaImg from '../assets/projects/pokeleet/gacha.webp';
+import pokeleetAddProblemVideo from '../assets/projects/pokeleet/walkthrough-add-problem.mp4';
+import pokeleetAddProblemPoster from '../assets/projects/pokeleet/walkthrough-add-problem.webp';
+import pokeleetPullBeforeVideo from '../assets/projects/pokeleet/gacha-pull-before.mp4';
+import pokeleetPullAfterVideo from '../assets/projects/pokeleet/gacha-pull-after.mp4';
 import pokeleetDetailImg from '../assets/projects/pokeleet/detail.webp';
-import pokeleetRecallImg from '../assets/projects/pokeleet/recall.webp';
 import concertRoseImg from '../assets/hobby/music/concerts/rose.webp';
 import concertTwiceImg from '../assets/hobby/music/concerts/twice.webp';
 import concertSunkisImg from '../assets/hobby/music/concerts/sunkis.webp';
@@ -887,7 +889,7 @@ export const projects = [
     index: '03',
     name: 'Portfolio',
     slug: 'portfolio',
-    category: 'Frontend · Design',
+    category: 'Design',
     year: '2026',
     blurb: 'Personal portfolio site to learn about me and my work.',
     tech: ['React', 'Vite', 'Motion', 'CSS'],
@@ -1284,7 +1286,7 @@ export const projects = [
     index: '04',
     name: 'Little Wonder',
     slug: 'little-wonder',
-    category: 'Game Design',
+    category: 'Design',
     year: '2025',
     blurb: 'Platformer action game set in a fantasy acorn world',
     tech: ['Java'],
@@ -2180,7 +2182,7 @@ export const projects = [
     index: '06',
     name: 'PokeLeet',
     slug: 'pokeleet',
-    category: 'Frontend · Game Design',
+    category: 'Design',
     year: '2026',
     blurb: 'Gamified, pokemon-themed Leetcode tracker.',
     tech: ['React', 'Vite', 'CSS'],
@@ -2191,73 +2193,166 @@ export const projects = [
       status: 'Developing',
       subtitle: 'A Pokémon-themed tracker that turns Leetcode into a collect-a-thon.',
       intro:
-        'PokéLeet is an experiment in motivation design: solving a problem pays out in shards, shards summon Pokémon, and the collection is the thing you are actually working toward. It runs on my own Neetcode 150 folder, so the progress it shows is progress I really made. The frontend loop is playable end to end — the parts underneath it are still being built.',
-      links: [{ label: 'GitHub', href: '#' }],
+        'PokéLeet is an experiment in motivation design: solving a problem pays out in shards, shards summon Pokémon, and the collection is the thing you are actually working toward. Underneath the game is an honest study log — every problem saved with its tags and accepted code — and the game on top can only ever reward that work, never stand in for it. The whole loop is playable in the browser demo; the full version runs locally, with a small browser extension for timed study sessions.',
+      links: [
+        { label: 'Demo', href: 'https://czxsc.github.io/Leetcode-Pokemon/' },
+        { label: 'GitHub', href: 'https://github.com/czxsc/Leetcode-Pokemon' },
+      ],
       meta: [
         { label: 'Category', value: 'Frontend, Game Design' },
         { label: 'My role', value: 'Design & engineering' },
         { label: 'Timeline', value: '2026 — in progress' },
-        { label: 'Skills', value: 'React, Vite, game economy design, pixel-art UI' },
+        { label: 'Skills', value: 'React, Vite, browser extensions, game economy design, pixel-art UI' },
       ],
       sections: [
         {
-          heading: 'Motivation: The payoff is months away',
+          heading: 'Problem: The payoff is months away',
           body: [
             'Interview prep has a brutal feedback curve. The work is daily and the reward — an offer, eventually, maybe — sits months out with nothing in between. A checklist of solved problems is an honest record of that and a terrible motivator: it only ever counts up, and the number stops meaning anything around thirty.',
             'Collection games solved this decades ago. They front-load the feeling of progress: something visible arrives every session, the good outcomes are rare enough to matter, and there is a shelf that keeps filling. I wanted that shape wrapped around the grind I was already doing, so I built the tracker I would actually open.',
           ],
         },
         {
-          heading: 'The loop: Solve, summon, build a team',
+          heading: 'Design goals',
           body: [
-            'A solved problem pays shards by difficulty — 150 easy, 300 medium, 600 hard. Shards go into the gacha, which draws at 60/25/10/5 across common, rare, epic and legendary, with pity counters so a dry streak is bounded rather than infinite. Duplicates are not dead weight: three copies evolve a Pokémon, and a copy of something that cannot evolve becomes five levels instead.',
-            'What you collect feeds back into the tracker. Six of them make a team, the team has a fighting power, and that power is level × rarity summed and then scaled by how much you have actually solved. Sending the team into the Meadow earns coins, coins buy candy and evolution stones in the shop, and those raise power again. Two currencies keep the two halves honest — shards only come from studying, coins only from the game.',
-            'Solving is not the only way in. A daily Active Recall quiz pulls ten questions from a bank of Python syntax, Big-O drills, and pseudocode recall of problems already solved, paying 25 shards a correct answer. It exists because rereading a solution felt like studying without being studying; being asked what Kadane’s keeps, cold, does not.',
+            'Three rules came before any feature. Most of the design decisions further down are places where an earlier version broke one of them.',
           ],
-          imagesFirst: true,
-          gallery: [
-            { src: pokeleetGachaImg, fit: true, caption: 'The Gacha Lab — draw costs, pity counters, published pull rates, and a pinned target.' },
-            { src: pokeleetCollectionImg, fit: true, caption: 'Collection and active team — rarity-tinted cards, level bars, and the fighting power they add up to.' },
-          ],
-          facts: [
+          subs: [
             {
-              title: 'The tracker reads real files',
-              text: 'The dashboard globs my Neetcode 150 folder at build time and matches each solution file to a problem, so a problem ticks off because the code for it exists — not because I clicked a box.',
-            },
-            {
-              title: 'Rarity has to track difficulty',
-              text: 'The moment a reward feels arbitrary the loop stops working. Hard problems pay four times an easy one, and the roster is graded so the Pokémon people actually want sit in the tiers that are hard to reach.',
+              title: 'Reward has to track effort',
+              deck: 'The moment a reward feels arbitrary, the loop stops working.',
+              bullets: [
+                'A hard problem pays four times an easy one, and the roster is graded so the Pokémon people actually want sit in the tiers that are hard to reach.',
+                'Pity counters put a ceiling on a dry streak, so a bad run of luck never cancels out a good week of work.',
+              ],
             },
             {
               title: 'The game can never study for you',
-              text: 'Idle combat pays coins, which only buy levels. Every shard — the only currency that summons anything new — comes from a problem or a recall quiz.',
+              deck: 'Shards, the only currency that summons anything new, come from studying and nothing else.',
+              bullets: [
+                'Solved problems, recall quizzes, quests and time on LeetCode pay shards. The game pays coins, which can level a team or tilt a summon but never make one.',
+                'Every reward hangs off a real signal — a logged solution, a correct answer, a minute on a problem — rather than time spent in the app.',
+              ],
+            },
+            {
+              title: 'The tracker has to stand on its own',
+              deck: 'Strip the Pokémon away and what is left should still be worth keeping.',
+              bullets: [
+                'Each problem is logged with its difficulty, tags, link and accepted code, and the code is written out to a solutions folder sorted by tag.',
+                'Progress is plain JSON on disk with daily backups, so the record outlasts any one browser.',
+              ],
             },
           ],
         },
         {
-          heading: 'Sprites: Keeping 897 Pokémon on style',
+          heading: 'Key features',
           body: [
-            'The whole thing is pixel art, which meant the one visual decision I could not make by drawing was the most important one: every Pokémon on screen comes from pokemondb.net/sprites, and their sprite sets are not consistent across generations. Official animated sprites stop after Gen 5. Everything later exists only as stills, in a smoother, rounder house style that sits badly next to pixels.',
-            'So the sprite URL is a small resolver rather than a template. It asks for the best available in a fixed order, and each Pokémon renders at the highest rung it can reach: the Gen 5 Black/White · Black 2 White 2 animated GIF first, because a sprite that breathes is worth more than one that matches; then the Gen 8 Sword/Shield still, which is at least sprite-shaped; then, if the request 404s, the HOME render as a last resort. Anything that fails all three falls back to a type-coloured disc with the Pokémon’s initial — never a broken image. Shinies follow the same ladder on a parallel path, and Mega and Gigantamax forms take their own routes, since those only ever existed as ORAS dex art and Sword/Shield stills.',
-            'Two details make the mix hold together. The resolver walks down the chain on the image’s own error event, so a missing sprite costs one failed request and no layout shift. And image-rendering: pixelated is applied only to the Gen 1–5 animated sprites — the ones drawn on a real pixel grid, where the browser’s smoothing is what would ruin them. The later stills are left to scale normally, because sharpening art that was never pixel art just makes it look broken.',
+            'The loop is small — solve, summon, build a team, study with it — and six parts carry it.',
           ],
+          facts: [
+            {
+              title: 'Adding solved problems',
+              text: 'Log a solve with its difficulty, tags, link and accepted code, then claim its shards: 150 easy, 300 medium, 600 hard. The code is also saved to a folder sorted by tag, so the library doubles as study notes.',
+            },
+            {
+              title: 'Summoning',
+              text: 'Shards buy draws at 400 a pull, landing common, rare, epic or legendary at 60 / 30 / 7 / 3, with a 5% shiny chance. Pity guarantees an epic within 15 draws and a legendary within 40, and duplicates build toward evolution instead of going to waste.',
+            },
+            {
+              title: 'Quests',
+              text: 'Daily quests step up as they are claimed — solve one problem, then three, then five — alongside an Active Recall quiz on Python idioms, Big-O and pseudocode. Six chapters of one-time progression quests run underneath, each opening once the last is cleared.',
+            },
+            {
+              title: 'Team and shop',
+              text: 'Six Pokémon make the active team that fights during Focus sessions. The coins it wins buy candy for EXP, Mega and Gigantamax stones, and items that shape the next summon.',
+            },
+            {
+              title: 'Pokédex',
+              text: 'All 897 Pokémon from eight generations, owned ones in colour and the rest as silhouettes, with shiny, Mega and Gigantamax forms tracked on their own. Sprites fall back from the animated Gen 5 GIF to a Sword/Shield still to the HOME render, so none of them ever shows a broken image.',
+            },
+            {
+              title: 'Focus session',
+              text: 'Deploy the team and LeetCode opens, with a timer that runs only while it is the active tab. The team battles wild Pokémon for coins, shards and EXP for exactly that much study time.',
+            },
+          ],
+          // recorded by scripts/record-pokeleet.mjs + render-walkthrough.py
           media: {
-            src: pokeleetDetailImg,
-            fit: true,
-            caption: 'A detail card: the Gen 1 animated sprite at size, with evolution state and form stones underneath.',
+            video: pokeleetAddProblemVideo,
+            src: pokeleetAddProblemPoster,
+            caption: 'Logging a solve — title, tags and the accepted solution, then the shards it pays out.',
           },
+          gallery: [
+            { src: pokeleetCollectionImg, fit: true, caption: 'Collection and active team — rarity-tinted cards, level bars, and the fighting power they add up to.' },
+            { src: pokeleetDetailImg, fit: true, caption: 'A detail card: the Gen 1 animated sprite at size, with evolution state and form stones underneath.' },
+          ],
         },
         {
-          heading: 'Where it stands',
+          heading: 'Design decisions',
           body: [
-            'The frontend is the part that works. It is a React + Vite app of about four thousand lines, with all game state in one store and a 897-entry roster hand-tagged with types, rarity, generation, evolution target, and which Mega or Gigantamax forms exist. The economy, gacha, quests, recall, team, shop, and Meadow all run; the save lives in the browser.',
-            'What is missing is everything behind it. There is no account and no server, so a save is one browser deep, and the Leetcode connection is still a folder on my disk rather than a real sync. Both are the next things I want to build — and the reason this page is short: right now the interesting claims are about the design of the loop, not the engineering under it.',
+            'The first playable version worked, but three parts of it broke the goals above: one by making the payoff feel flat, two by letting the game pay out for something other than studying. Each was rebuilt.',
           ],
-          media: {
-            src: pokeleetRecallImg,
-            fit: true,
-            caption: 'Active Recall — ten mixed questions a day, 25 shards a correct answer.',
-          },
+          /* problem / solution copy renders through PassCopy. The shop
+             and focus pairs are placeholders until the screenshots
+             exist; the summon pair is the before/after recording. */
+          compare: [
+            {
+              label: 'Summoning',
+              title: 'Making the pull the payoff',
+              problem:
+                'A pull is what every solved problem is spent on, and the first version resolved it in under two seconds: the ball shook, flashed, and the results faded in. Hours of work cashed out with no build-up, and nothing told a common from a legendary until the card was already on screen.',
+              solution:
+                'The pull now has a shape. The ball charges — spinning, growing, throwing sparks — inside an aura tinted to the best rarity in the draw, so the tell arrives before the reveal. Then it waits for a tap, so opening it is the player’s move rather than the timer’s. It bursts into a framed window, the cards pop in one after another, and a legendary gets a golden burst of its own.',
+              before: { video: pokeleetPullBeforeVideo, label: 'Before · Shake and fade' },
+              after: { video: pokeleetPullAfterVideo, label: 'After · Charge, tap, reveal' },
+            },
+            {
+              label: 'Shop',
+              title: 'One grid, and nothing that skips the summon',
+              problem:
+                'The old shop was a stack of rows, and the first one, Rare Candy, carried its own grid of every Pokémon you owned to pick who to feed, beside a preview panel that only applied to that one item. The picker grew with the collection and pushed everything else down. The shop also sold an Evolution Copy, which let coins buy the duplicates only summoning is meant to hand out.',
+              solution:
+                'Every item is now a card in one grid. Items that target a Pokémon open a small “feed to” picker on Buy, with search, the team listed first, and anyone who can’t use it greyed out with the reason. The Evolution Copy is gone. In its place are items that shape a summon without replacing it — a Rate Booster, Great and Ultra Balls that fix the next draw’s rarity, and a Generation Ticket — so coins have something to aim at that still needs shards to use.',
+              before: { label: 'Before · Picker in the list' },
+              after: { label: 'After · One grid' },
+            },
+            {
+              label: 'Battling',
+              title: 'From idle auto-battler to study timer',
+              problem:
+                'The Meadow was an idle auto-battler: set the team patrolling and it fought wild Pokémon for coins for as long as the app stayed open, carrying on across every page. It was the one part of the game that paid out for not studying — leaving a tab open was enough to earn.',
+              solution:
+                'Battling is now a Focus session. Deploy Team opens LeetCode and starts a timer that only runs while LeetCode is the active browser tab, as reported by a small companion extension. Switch away and it pauses; five minutes paused, or three hours in, and the session ends. The team fights for exactly the study time banked, so coins now measure time spent on problems. The extension can only see leetcode.com and localhost addresses, and stores and sends nothing.',
+              before: { label: 'Before · The Meadow' },
+              after: { label: 'After · Focus session' },
+            },
+          ],
+        },
+        {
+          heading: 'Improvements & limitations',
+          body: [
+            'Everything in the loop works today: a React + Vite app of about six thousand lines, an 897-entry roster hand-tagged with types, rarity, generation, evolutions and forms, and a small local server that saves progress to JSON with revision checks and daily backups. What it doesn’t do yet is mostly about trust and reach.',
+            {
+              bullets: [
+                {
+                  lead: 'It runs on one machine.',
+                  text: 'Progress lives in a data folder next to the code, with no account or sync, so moving computers means exporting a backup by hand. The online demo saves to the browser only.',
+                },
+                {
+                  lead: 'Solves are self-reported.',
+                  text: 'A problem pays out because it was logged, not because LeetCode accepted it. Reading accepted submissions from LeetCode directly would make every shard verifiable.',
+                },
+                {
+                  lead: 'Focus knows the tab, not the person.',
+                  text: 'The timer runs whenever LeetCode is the active tab, even if nobody is at the desk. The pause and three-hour limits bound it; idle detection would close the gap.',
+                },
+                {
+                  lead: 'Focus needs a Chromium browser.',
+                  text: 'Sessions depend on an unpacked extension, so Firefox and Safari run everything except them, and the demo can’t run them at all.',
+                },
+              ],
+            },
+            'The first two are what I want to build next: an account-backed save and a LeetCode sync, which would turn PokéLeet from a tool I run into one someone else could.',
+          ],
         },
       ],
     },
