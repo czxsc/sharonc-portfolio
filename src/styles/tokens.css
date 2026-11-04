@@ -159,6 +159,7 @@
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);        /* paper settling — the default */
   --ease-set: cubic-bezier(0.16, 1, 0.3, 1);     /* type rising out of its baseline */
   --ease-rule: cubic-bezier(0.65, 0, 0.35, 1);   /* a line being drawn, both ends eased */
+  --ease-glide: cubic-bezier(0.45, 0, 0.15, 1);  /* something carried across the page — soft start, long settle */
   --ease-exit: cubic-bezier(0.55, 0, 0.85, 0.35); /* leaving — accelerate away */
 
   --dur-quick: 0.18s;  /* hover/press feedback */

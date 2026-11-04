@@ -88,13 +88,17 @@ def main(cap, stem, poster_at=0.0):
     span = m['ended'] - t0
     cam = Camera(m['events'], t0, m['viewport'])
     scale = m['dsf']
+    # a take can ask for its own shape (the two-window focus take is wider)
+    out_w, out_h = OUT_W, OUT_H
+    if 'out' in m:
+        out_w, out_h = m['out']['width'], m['out']['height']
 
     n = int(span * FPS)
     fade = int(LOOP_FADE * FPS)
     os.makedirs(os.path.dirname(stem) or '.', exist_ok=True)
     enc = subprocess.Popen([
         ffmpeg_exe(), '-y', '-loglevel', 'error',
-        '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{OUT_W}x{OUT_H}', '-r', str(FPS), '-i', '-',
+        '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{out_w}x{out_h}', '-r', str(FPS), '-i', '-',
         '-c:v', 'libx264', '-preset', 'slow', '-crf', str(CRF), '-tune', 'animation',
         '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an', stem + '.mp4',
     ], stdin=subprocess.PIPE)
@@ -114,7 +118,7 @@ def main(cap, stem, poster_at=0.0):
         t = k / FPS
         while src_i + 1 < len(frames) and frames[src_i + 1]['ts'] - t0 <= t:
             src_i += 1
-        out = source(src_i).resize((OUT_W, OUT_H), Image.LANCZOS, box=cam.box(t, scale))
+        out = source(src_i).resize((out_w, out_h), Image.LANCZOS, box=cam.box(t, scale))
         if first is None:
             first = out
         if k == poster_k:

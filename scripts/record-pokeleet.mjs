@@ -1,44 +1,111 @@
 /* Walkthrough recordings for the PokeLeet case page.
  *
- * Drives the PokeLeet demo build the way a person would — a drawn cursor
- * that eases between targets, turns into a hand over anything clickable,
- * and presses on click — and captures every repaint through the CDP
- * screencast. Nothing here zooms: the script only logs where the
- * camera *should* look (`cam(...)`) next to the frames, and
- * render-walkthrough.py does the framing afterwards, so a camera move can
- * be retimed without driving the app again.
+ * Drives the PokeLeet app the way a person would: a drawn cursor that
+ * eases between targets, turns into a hand over anything clickable, and
+ * presses on click. Every repaint is captured through the CDP screencast.
+ * Nothing here zooms: the script only logs where the camera *should* look
+ * (`cam(...)`) next to the frames, and render-walkthrough.py does the
+ * framing afterwards, so a camera move can be retimed without driving the
+ * app again.
  *
- * The demo build keeps its save in localStorage, so a recording never
- * touches a real data/ folder, and every run starts from the same seeded
- * library. Math.random is swapped for a seeded one so the gacha pull is
- * the same pull every time (SEED below picks it).
+ * Keep camera moves to two to four per take. A move earns its place by
+ * revealing something the current framing can't show, so several fields
+ * inside one dialog share one framing rather than each getting a pan.
+ *
+ * Records the local working tree (not the deployed site), against a
+ * scratch data folder, so a take never touches the real data/ and can show
+ * work that hasn't shipped. Each take reseeds that folder through the API,
+ * and Math.random is seeded so a take plays the same way every time.
  *
  * Usage, from the repo root:
  *
- *   (cd ../Leetcode-Pokemon && npx vite --mode demo --port 5199 --strictPort)
+ *   (cd ../Leetcode-Pokemon && POKELEET_DATA_DIR=/tmp/pl-data npx vite --port 5199 --strictPort)
  *   npm i --no-save playwright
- *   node scripts/record-pokeleet.mjs add-problem /tmp/rec/add-problem
- *   node scripts/record-pokeleet.mjs gacha /tmp/rec/gacha
- *   python3 scripts/render-walkthrough.py /tmp/rec/add-problem src/assets/projects/pokeleet/walkthrough-add-problem 17
- *   python3 scripts/render-walkthrough.py /tmp/rec/gacha src/assets/projects/pokeleet/walkthrough-gacha 13.5
+ *   node scripts/record-pokeleet.mjs log /tmp/rec/log
+ *   python3 scripts/render-walkthrough.py /tmp/rec/log src/assets/projects/pokeleet/feature-log 20
+ *
+ * Takes: log, summon, upgrade, focus.
+ *
+ * `focus` needs two browser windows on screen at once, which a screencast
+ * of one page can't see. So it builds them on a stage page: PokeLeet runs
+ * for real in an iframe on the left, and the right window is a drawn tab
+ * strip over real screenshots of LeetCode and another site. The Tracker
+ * extension can't run there, so the stage plays its part, sending the same
+ * { leetcode, since } messages as extension/bridge.js when a tab changes.
+ * The timer, the pause and the battle are all the app's own response.
  */
 import { chromium } from 'playwright';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const URL = process.env.POKELEET_URL || 'http://localhost:5199/Leetcode-Pokemon/';
-/* The app draws a fixed 1280x800 screen and scales it to fit the window.
-   The screencast only ever delivers CSS pixels (a device scale factor is
-   ignored), so the 2x capture comes from a window twice the size, which
-   the app fills by re-rasterizing at scale(2). Scenario coordinates stay
-   in the app's own 1280x800 units; S converts at the mouse. */
-const VIEWPORT = { width: 1280, height: 800 };
-const S = 2;
-// 40 pulls one of every tier and a shiny: luckier than the odds, but
-// it's the pull that shows what the rarity tints mean
+const APP = process.env.POKELEET_URL || 'http://localhost:5199/';
 const SEED = Number(process.env.SEED || 40);
 
+/* The app draws a fixed 1280x800 screen and scales it to fit the window.
+   The screencast only ever delivers CSS pixels (a device scale factor is
+   ignored), so the sharp capture comes from a larger window, which the app
+   fills by re-rasterizing. Scenario coordinates stay in viewport units; S
+   converts at the mouse. The focus take overrides both for its stage. */
+let VIEWPORT = { width: 1280, height: 800 };
+let S = 2;
+
 const [scenarioName, outDir] = process.argv.slice(2);
+
+/* ---------- the save each take starts from ---------- */
+const today = new Date().toISOString().slice(0, 10);
+const daysAgo = (n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+const ROSTER = [
+  ['charizard', 34], ['gengar', 28], ['lucario', 31], ['greninja', 26], ['snorlax', 22], ['dragapult', 24],
+  ['pikachu', 18], ['eevee', 12], ['squirtle', 14], ['bulbasaur', 15], ['magikarp', 6], ['caterpie', 4],
+  ['togepi', 9], ['psyduck', 11], ['jigglypuff', 10], ['mudkip', 13], ['ralts', 8], ['riolu', 12],
+  ['decidueye', 19], ['cinderace', 21], ['sylveon', 17], ['mimikyu', 16], ['corviknight', 20], ['umbreon', 23],
+];
+function progress(over = {}) {
+  const owned = ROSTER.map(([sp, level], i) => ({
+    iid: `m${i}`, sp, level, exp: 0, shiny: false, form: null, unlocked: {}, copies: 0,
+  }));
+  return {
+    onboarded: true, trainer: { name: 'Sharon' }, createdAt: daysAgo(40), preferredLanguage: 'python',
+    shards: 4200, coins: 18400, megaStones: 1, gmaxStones: 0,
+    items: { rateBooster: 1, greatBall: 2, ultraBall: 1, genTicket: 0 },
+    owned, team: owned.slice(0, 6).map((o) => o.iid),
+    quests: {}, recallBest: 0, recallToday: false, recallShardsToday: 0,
+    pity: 12, epicPity: 6, totalPulls: 58,
+    guaranteedLegendary: null, guaranteedEpic: null, legendaryTargetPity: 0, epicTargetPityCount: 0,
+    stats: { evolutions: 3, pityHits: 1, recalls: 4, perfectDays: 1, lastPerfectDay: null },
+    achievements: {},
+    meadow: { coinsToday: 0, kills: 0, studyToday: 0, studyTotal: 0 },
+    lastDay: today, v: 6, ...over,
+  };
+}
+const STUB = 'class Solution:\n    def solve(self, nums):\n        return nums\n';
+const solved = (i, title, difficulty, tags, days, slug) => ({
+  id: `seed-${i}`, title, difficulty, tags, language: 'python', code: STUB,
+  url: `https://leetcode.com/problems/${slug}/`,
+  createdAt: `${daysAgo(days)}T12:00:0${i}.000Z`, solvedAt: daysAgo(days), claimed: true, claimedAt: daysAgo(days),
+});
+const library = () => ({
+  customTags: [],
+  problems: [
+    solved(1, 'Two Sum', 'Easy', ['arrays', 'hash-table'], 20, 'two-sum'),
+    solved(2, 'Valid Parentheses', 'Easy', ['stack', 'strings'], 16, 'valid-parentheses'),
+    solved(3, 'Number of Islands', 'Medium', ['graphs', 'dfs', 'bfs'], 11, 'number-of-islands'),
+    solved(4, 'Merge Intervals', 'Medium', ['arrays', 'intervals', 'sorting'], 7, 'merge-intervals'),
+    solved(5, 'Longest Substring Without Repeating Characters', 'Medium', ['sliding-window', 'hash-table', 'strings'], 4, 'longest-substring-without-repeating-characters'),
+    solved(6, 'Climbing Stairs', 'Easy', ['dp', 'math'], 2, 'climbing-stairs'),
+  ],
+});
+async function seed(over) {
+  const cur = await (await fetch(`${APP}api/data`)).json();
+  const put = async (doc, rev, data) => {
+    const r = await fetch(`${APP}api/${doc}`, {
+      method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ rev, data }),
+    });
+    if (!r.ok) throw new Error(`seeding ${doc}: ${r.status} ${await r.text()}`);
+  };
+  await put('progress', cur.progress?.rev ?? 0, progress(over));
+  await put('library', cur.library?.rev ?? 0, library());
+}
 
 /* ---------- the drawn cursor ----------
    Two shapes drawn at the app's scale, so the camera's zoom enlarges them
@@ -66,6 +133,18 @@ const CURSOR_SVG = {
 };
 
 function cursorInit({ svgs, scale }) {
+  /* Inside the stage's iframe there's no cursor of its own: mouse events
+     over an iframe never reach the page around it, so it hands them up. */
+  if (window.top !== window) {
+    const up = (fn) => (ev) => {
+      const r = window.frameElement?.getBoundingClientRect();
+      if (r) window.top.__cursor?.[fn](ev.clientX + r.left, ev.clientY + r.top);
+    };
+    addEventListener('mousemove', up('move'), true);
+    addEventListener('mousedown', up('down'), true);
+    addEventListener('mouseup', up('up'), true);
+    return;
+  }
   addEventListener('DOMContentLoaded', () => {
     const el = document.createElement('div');
     el.id = '__cursor';
@@ -84,17 +163,29 @@ function cursorInit({ svgs, scale }) {
     el.dataset.k = 'arrow';
     let x = -100, y = -100;
     const place = () => { el.style.transform = `translate(${x}px, ${y}px)`; };
-    const pointerAt = () => {
-      const t = document.elementFromPoint(x, y);
+    const clickable = (t) => {
       if (!t) return false;
-      const c = getComputedStyle(t).cursor;
+      const c = t.ownerDocument.defaultView.getComputedStyle(t).cursor;
       if (c === 'pointer') return true;
       const b = t.closest('button, a[href], select, [role=button], label');
       return !!b && !b.disabled && c !== 'not-allowed' && c !== 'text';
     };
-    addEventListener('mousemove', (ev) => { x = ev.clientX; y = ev.clientY; place(); }, true);
-    addEventListener('mousedown', () => el.classList.add('down'), true);
-    addEventListener('mouseup', () => el.classList.remove('down'), true);
+    const pointerAt = () => {
+      const t = document.elementFromPoint(x, y);
+      if (t?.tagName === 'IFRAME') {
+        const r = t.getBoundingClientRect();
+        return clickable(t.contentDocument?.elementFromPoint(x - r.left, y - r.top));
+      }
+      return clickable(t);
+    };
+    window.__cursor = {
+      move(nx, ny) { x = nx; y = ny; place(); },
+      down() { el.classList.add('down'); },
+      up() { el.classList.remove('down'); },
+    };
+    addEventListener('mousemove', (ev) => window.__cursor.move(ev.clientX, ev.clientY), true);
+    addEventListener('mousedown', () => window.__cursor.down(), true);
+    addEventListener('mouseup', () => window.__cursor.up(), true);
     // re-read every frame: a modal opening under a still cursor changes
     // what's beneath it without a mousemove
     const tick = () => { el.dataset.k = pointerAt() ? 'hand' : 'arrow'; requestAnimationFrame(tick); };
@@ -132,6 +223,8 @@ function director(page, events) {
     if (typeof target.x === 'number') return { x: target.x * S, y: target.y * S };
     const loc = typeof target === 'string' ? page.locator(target).first() : target;
     await loc.waitFor({ state: 'visible' });
+    // tall dialogs scroll, and a target below the fold isn't a click away
+    await loc.scrollIntoViewIfNeeded();
     const b = await loc.boundingBox();
     return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
   }
@@ -198,97 +291,255 @@ function director(page, events) {
   return d;
 }
 
+/* ---------- the focus take's stage ---------- */
+const WINDOW_CHROME = 78;
+const STAGE = { width: 1760, height: 840, scale: 1.5 };
+const LEFT_W = 1760; // the app's own window, in real px: 1.375x its 1280x800 screen
+const APP_H = 1100;
+
+function stageHtml() {
+  const tab = (id, icon, title, on) => `
+    <div class="tab ${on ? 'on' : ''}" id="tab-${id}" data-tab="${id}" role="button">
+      <span class="ico">${icon}</span><span class="ttl">${title}</span>
+      <span class="x" data-close="${id}" role="button">×</span>
+    </div>`;
+  return `<!doctype html><meta charset="utf-8"><title>stage</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; }
+    html, body { height: 100%; background: #e9e6df; overflow: hidden; font: 26px/1 "Segoe UI", system-ui, sans-serif; color: #1b1b1b; }
+    .stage { display: flex; gap: 28px; align-items: center; justify-content: center; height: 100%; }
+    .win { border-radius: 18px; overflow: hidden; background: #fff; box-shadow: 0 0 0 2px rgba(27,27,27,.1), 0 18px 44px rgba(27,27,27,.14); flex: none; }
+    .chrome { height: ${WINDOW_CHROME}px; background: #dfdcd5; display: flex; flex-direction: column; }
+    .tabs { display: flex; gap: 4px; height: 44px; padding: 8px 12px 0; }
+    .tab { display: flex; align-items: center; gap: 10px; padding: 0 14px; min-width: 0; flex: 0 1 300px; height: 36px; border-radius: 10px 10px 0 0; font-size: 19px; color: #57524c; cursor: pointer; }
+    #tab-lc { animation: tab-in .22s ease-out; }
+    @keyframes tab-in { from { flex-basis: 0; opacity: 0; } }
+    .tab.on { background: #f7f5f1; color: #1b1b1b; }
+    .tab:not(.on):hover { background: #d3cfc7; }
+    .ico { width: 20px; height: 20px; border-radius: 50%; flex: none; display: grid; place-items: center; font: 700 13px/1 Georgia, serif; }
+    .ico > span { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; }
+    .ttl { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; }
+    .x { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 19px; color: #8c867d; cursor: pointer; }
+    .x:hover { background: #c9c5bc; color: #1b1b1b; }
+    .bar { flex: 1; background: #f7f5f1; display: flex; align-items: center; padding: 0 16px; }
+    .url { flex: 1; height: 24px; border-radius: 12px; background: #ebe8e2; padding: 0 14px; font-size: 16px; display: flex; align-items: center; color: #57524c; }
+    iframe { display: block; border: 0; width: ${LEFT_W}px; height: ${APP_H}px; }
+    .page { width: 796px; height: ${APP_H}px; overflow: hidden; background: #fff; }
+    .page img { display: none; width: 100%; }
+    .page img.on { display: block; }
+  </style>
+  <div class="stage">
+    <div class="win"><div class="chrome">
+      <div class="tabs">${tab('app', '<span style="background:linear-gradient(#e4645c 47%,#2b2b2b 47% 55%,#fff 55%)"></span>', 'PokéLeet', true)}</div>
+      <div class="bar"><div class="url">localhost:5173</div></div>
+    </div><iframe id="app" src="/"></iframe></div>
+    <div class="win" id="other"><div class="chrome">
+      <div class="tabs" id="other-tabs">
+        ${tab('wiki', '<span style="color:#1b1b1b;background:#fff;box-shadow:0 0 0 1px #c9c5bc">W</span>', 'Pikachu - Wikipedia', true)}
+      </div>
+      <div class="bar"><div class="url" id="url">en.wikipedia.org/wiki/Pikachu</div></div>
+    </div><div class="page"><img id="page-wiki" class="on" src="/__wiki.png" alt=""><img id="page-lc" src="/__lc.png" alt=""></div></div>
+  </div>
+  <script>
+    const URLS = { wiki: 'en.wikipedia.org/wiki/Pikachu', lc: 'leetcode.com/problemset' };
+    const LC_TAB = ${JSON.stringify(tab('lc', '<span style="color:#fff;background:#f89f1b">L</span>', 'Problems - LeetCode', false))};
+    const report = () => {
+      const on = document.querySelector('#other .tab.on');
+      document.getElementById('app').contentWindow.__tracker?.(on?.dataset.tab === 'lc');
+    };
+    function show(id) {
+      document.querySelectorAll('#other .tab').forEach((t) => t.classList.toggle('on', t.dataset.tab === id));
+      document.querySelectorAll('.page img').forEach((i) => i.classList.toggle('on', i.id === 'page-' + id));
+      document.getElementById('url').textContent = URLS[id];
+      report();
+    }
+    document.addEventListener('click', (ev) => {
+      const close = ev.target.closest('#other [data-close]');
+      if (close) {
+        document.getElementById('tab-' + close.dataset.close).remove();
+        show('wiki');
+        return;
+      }
+      const tab = ev.target.closest('#other .tab');
+      if (tab) show(tab.dataset.tab);
+    });
+    /* What the extension does on "open" when no LeetCode tab exists: a new
+       tab on the problem list, active straight away. The page takes a beat
+       to paint, so it reads as a tab opening rather than a picture swapping. */
+    addEventListener('message', (ev) => {
+      if (!ev.data?.__openLeetCode) return;
+      document.getElementById('other-tabs').insertAdjacentHTML('beforeend', LC_TAB);
+      const page = document.getElementById('page-lc');
+      page.style.visibility = 'hidden';
+      show('lc');
+      setTimeout(() => { page.style.visibility = ''; }, 550);
+    });
+  </script>`;
+}
+
+// The app's half of extension/bridge.js, installed inside the stage's iframe.
+function trackerStub(version) {
+  if (window.top === window) return;
+  const post = (m) => window.postMessage({ source: 'pokeleet-tracker', ...m }, location.origin);
+  let cur = { leetcode: false, since: Date.now() };
+  window.__tracker = (leetcode) => {
+    if (leetcode === cur.leetcode) return;
+    cur = { leetcode, since: Date.now() };
+    post({ type: 'state', ...cur });
+  };
+  addEventListener('message', (ev) => {
+    const m = ev.data;
+    if (ev.source !== window || !m || m.source !== 'pokeleet-app') return;
+    if (m.type === 'hello') {
+      post({ type: 'hello', version });
+      post({ type: 'state', ...cur });
+    } else if (m.type === 'get') {
+      post({ type: 'state', ...cur });
+    } else if (m.type === 'open') {
+      window.parent.postMessage({ __openLeetCode: true }, '*');
+    }
+  });
+}
+
 /* ---------- scenarios ---------- */
 const SOLUTION = `class Solution:
-    def productExceptSelf(self, nums: List[int]) -> List[int]:
-        out = [1] * len(nums)
-        left = 1
-        for i in range(len(nums)):
-            out[i] = left
-            left *= nums[i]
-        right = 1
-        for i in reversed(range(len(nums))):
-            out[i] *= right
-            right *= nums[i]
-        return out
+    def longestIncreasingPath(self, matrix: List[List[int]]) -> int:
+        rows, cols = len(matrix), len(matrix[0])
+
+        @cache
+        def dfs(r, c):
+            best = 1
+            for dr, dc in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and matrix[nr][nc] > matrix[r][c]:
+                    best = max(best, 1 + dfs(nr, nc))
+            return best
+
+        return max(dfs(r, c) for r in range(rows) for c in range(cols))
 `;
 
 const SCENARIOS = {
-  async 'add-problem'(page, d) {
-    d.cam(1);
-    await d.hold(1100);
-    // in on the list header while the cursor heads for New Problem
-    d.cam(1.6, 700, 250, 1300);
-    await d.click('button:has-text("+ New Problem")', { after: 500 });
+  /* A Hard problem with a long list of topics, so the difficulty visibly
+     moves off its Medium default and tags light up all over the grid. The
+     link goes in without a paste event, which would look it up on its own,
+     so the press of Find is what visibly causes the fill. */
+  log: {
+    seed: { shards: 1200 },
+    async run(page, d) {
+      d.cam(1);
+      await d.hold(1000);
+      await d.click('button:has-text("+ New Problem")', { after: 450 });
 
-    // the editor's top half: title and difficulty
-    d.cam(1.75, 610, 230, 1000);
-    await d.hold(450);
-    await d.type('Product of Array Except Self');
-    await d.hold(250);
-    await d.click('.seg-btn.medium', { after: 250 });
-    await d.click('.field input[placeholder^="https://"]', { after: 200 });
-    await d.paste('https://leetcode.com/problems/product-of-array-except-self/');
-    await d.hold(450);
+      // move 1: in on the editor, which holds for every field in it
+      await d.camOn('.modal', { pad: 1.06, max: 1.55, ms: 1000 });
+      await d.hold(650);
+      await d.click('.field input[placeholder^="https://"]', { after: 280 });
+      await d.paste('https://leetcode.com/problems/longest-increasing-path-in-a-matrix/');
+      await d.hold(700);
+      await d.click('.modal button:has-text("Find")', { after: 0 });
+      await page.locator('text=/Found #329/').waitFor({ timeout: 15000 });
+      await d.hold(2200);
+      await d.click('textarea.code-input', { after: 250 });
+      await d.paste(SOLUTION);
+      await d.hold(900);
+      await d.click('.modal button.btn.green', { after: 600 });
 
-    d.cam(1.75, 580, 360, 1000);
-    await d.click('.tag-toggle:has-text("Arrays")', { after: 300 });
-    await d.click('.tag-toggle:has-text("Two Pointers")', { after: 250 });
+      // move 2: to the new row and the shards it's worth
+      const row = page.locator('.prow.open').first();
+      await row.waitFor();
+      await d.camOn(row, { pad: 1.5, max: 1.5, ms: 1100 });
+      await d.hold(800);
+      await d.click('.prow.open .coin', { after: 500 });
 
-    // down to the solution box
-    d.cam(1.55, 610, 540, 1100);
-    await d.click('textarea.code-input', { after: 250 });
-    await d.paste(SOLUTION);
-    await d.hold(700);
-    await d.click('.modal button.btn.green', { after: 700 });
-
-    // the new row opens at the top of the list with its reward
-    d.cam(1.45, 610, 360, 1200);
-    await d.hold(600);
-    await d.click('.prow.open .coin', { after: 600 });
-    // back out so the shard total in the header is in frame
-    d.cam(1, 640, 400, 1400);
-    await d.moveTo({ x: 1040, y: 330 }, { ms: 1100 });
-    await d.hold(1800);
+      // move 3: back out, so the new shard total is in frame
+      d.cam(1, 640, 400, 1300);
+      await d.moveTo({ x: 1100, y: 170 }, { ms: 1100 });
+      await d.hold(1900);
+    },
   },
 
-  async gacha(page, d) {
-    d.cam(1);
-    await d.hold(900);
-    await d.click('nav button:has-text("Gacha"), button:has-text("Gacha")', { after: 700 });
+  /* A target at 95 of its 100-draw guarantee lands on the fifth card of a
+     x5 draw, so the legendary is the last one to turn up. */
+  summon: {
+    rng: 41, // draws the target as the only legendary of the five
+    seed: { guaranteedLegendary: 'rayquaza', legendaryTargetPity: 95, shards: 4200 },
+    async run(page, d) {
+      d.cam(1);
+      await d.hold(800);
+      await d.click('button:has-text("Summon")', { after: 700 });
+      await d.hold(500);
+      await d.click('button:has-text("x5 Draw")', { after: 0 });
 
-    // the right rail: pick a legendary to chase
-    d.cam(1.65, 1030, 470, 1200);
-    await d.hold(300);
-    await d.click('button.iconbtn:has-text("Choose")', { after: 150 });
-    // the picker opens tall (every legendary), so frame its search box,
-    // then the whole modal once the search has shrunk it
-    await d.camOn('.modal input', { pad: 1.4, max: 1.8, ms: 900 });
-    await d.hold(300);
-    await d.type('rayq', { base: 110 });
-    await d.camOn('.modal', { ms: 800 });
-    await d.hold(600);
-    await d.click('.modal button[title="Rayquaza"]', { after: 600 });
+      // no camera moves: the reveal's frame is part of the effect, and any
+      // zoom tall enough to help crops its border
+      await d.moveTo('.bigball-wrap', { ms: 1000, dx: 14, dy: 18 });
+      await page.locator('.bigball-wrap.tappable').waitFor();
+      await d.hold(650);
+      await d.click('.bigball-wrap.tappable', { dx: 14, dy: 18, after: 0 });
 
-    d.cam(1.7, 1080, 560, 1000);
-    await d.hold(900);
+      const cards = page.locator('.gacha-result').first().locator('..');
+      await cards.waitFor({ timeout: 8000 });
+      // what this seed drew, for picking one where the target is the only legendary
+      console.log('drew:', (await cards.innerText()).replace(/\s+/g, ' '));
+      await d.moveTo({ x: 640, y: 610 }, { ms: 1100 });
+      await d.hold(4600);
+      await d.click('button.btn.lav:has-text("Continue")', { after: 400 });
+      await d.hold(1300);
+    },
+  },
 
-    // summon
-    d.cam(1.5, 900, 260, 1100);
-    await d.click('button:has-text("x5 Draw")', { after: 0 });
-    // over to the ball while it shakes, then in on the cards
-    await d.camOn('.bigball-wrap', { pad: 3.2, max: 1.7, ms: 900 });
-    await d.moveTo({ x: 700, y: 610 }, { ms: 1000 });
-    const cards = page.locator('.gacha-result').first().locator('..');
-    await cards.waitFor();
-    await d.camOn(cards, { pad: 1.25, ms: 800 });
-    await d.hold(900);
-    // drift toward Continue while the cards sit, then take it
-    await d.moveTo('button.btn.lav:has-text("Continue")', { dx: 70, dy: 34, ms: 1300 });
-    await d.hold(1500);
-    await d.click('button.btn.lav:has-text("Continue")', { after: 500 });
-    d.cam(1, 640, 400, 1200);
-    await d.hold(1400);
+  /* Starts with no stones, so the one in the bag is the one just bought. A
+     Mega Stone is a two-step upgrade, bought in the shop and then spent on a
+     Pokémon's own card, which is the part worth seeing. */
+  upgrade: {
+    seed: { megaStones: 0 },
+    async run(page, d) {
+      d.cam(1);
+      await d.hold(800);
+      await d.click('button:has-text("Shop")', { after: 900 });
+      await d.click('.chip-card:has-text("Mega Stone") button', { after: 400 });
+      await page.locator('text=/added to your bag/i').first().waitFor({ timeout: 4000 });
+      await d.hold(1300);
+      await d.click('button:has-text("Team")', { after: 900 });
+      await d.click('.team-chip:has-text("Charizard")', { after: 450 });
+
+      // move 1: in on the card, which holds through the evolution
+      await d.camOn('.modal', { pad: 1.08, max: 1.6, ms: 1000 });
+      await d.hold(1000);
+      await d.click('.modal button:has-text("Use Mega Stone")', { after: 0 });
+      await page.locator('text=/Mega Evolution unlocked/i').first().waitFor({ timeout: 12000 });
+      await d.moveTo({ x: 1090, y: 700 }, { ms: 1000 });
+      await d.hold(3200);
+    },
+  },
+
+  focus: {
+    stage: true,
+    async run(page, d) {
+      const app = page.frameLocator('#app');
+      // no camera moves: the whole point is seeing both windows at once
+      d.cam(1, STAGE.width / 2, STAGE.height / 2, 1);
+      await d.hold(900);
+      await d.click(app.locator('button:has-text("Focus")').first(), { after: 1000 });
+      await app.locator('text=/Tracker connected/i').first().waitFor({ timeout: 5000 });
+      await d.hold(500);
+      // LeetCode isn't open yet: deploying is what opens its tab
+      await d.click(app.locator('button:has-text("Deploy Team")').first(), { after: 300 });
+      await page.locator('#tab-lc').waitFor({ timeout: 5000 });
+      await app.locator('.study-clock').first().waitFor({ timeout: 8000 });
+      await d.hold(6800);
+
+      await d.click('#tab-wiki', { after: 200 });
+      await app.locator('.paused-notice').first().waitFor({ timeout: 5000 });
+      await d.hold(3400);
+
+      await d.click('#tab-lc', { after: 200 });
+      await d.hold(4000);
+
+      await d.click('#tab-lc .x', { after: 200 });
+      await app.locator('.paused-notice').first().waitFor({ timeout: 5000 });
+      await d.hold(3600);
+    },
   },
 };
 
@@ -300,18 +551,57 @@ if (!scenario || !outDir) {
 }
 await rm(outDir, { recursive: true, force: true });
 await mkdir(join(outDir, 'frames'), { recursive: true });
+await seed(scenario.seed);
 
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
+
+/* Real pages for the drawn window to show. Captured at a desktop width
+   and scaled down, so they read as the sites they are. */
+async function sitePictures() {
+  const ctx = await browser.newContext({
+    viewport: { width: 1040, height: 1437 },
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36 Edg/155.0.0.0',
+  });
+  const page = await ctx.newPage();
+  const shot = async (url) => {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForTimeout(6000);
+    // site-wide banners date the recording and pull focus from the page
+    await page.addStyleTag({ content: '#siteNotice, #centralNotice { display: none !important; }' });
+    await page.waitForTimeout(300);
+    return page.screenshot();
+  };
+  const pictures = {
+    lc: await shot('https://leetcode.com/problemset/'),
+    wiki: await shot('https://en.wikipedia.org/wiki/Pikachu'),
+  };
+  await ctx.close();
+  return pictures;
+}
+
+if (scenario.stage) {
+  VIEWPORT = { width: STAGE.width, height: STAGE.height };
+  S = STAGE.scale;
+}
 const ctx = await browser.newContext({
   viewport: { width: VIEWPORT.width * S, height: VIEWPORT.height * S }, deviceScaleFactor: 1,
 });
-await ctx.addInitScript(() => localStorage.setItem('pokeleet:demo:welcome-seen', '1'));
-await ctx.addInitScript(seededRandom, SEED);
+await ctx.addInitScript(seededRandom, scenario.rng ?? SEED);
 await ctx.addInitScript(cursorInit, { svgs: CURSOR_SVG, scale: S });
+if (scenario.stage) {
+  const pictures = await sitePictures();
+  // the app refuses a Tracker older than the copy in its repo, so claim that one
+  const manifest = await (await fetch(`${APP}extension/manifest.json`)).json();
+  await ctx.addInitScript(trackerStub, manifest.version);
+  await ctx.route(`${APP}__stage`, (r) => r.fulfill({ contentType: 'text/html', body: stageHtml() }));
+  await ctx.route(`${APP}__lc.png`, (r) => r.fulfill({ contentType: 'image/png', body: pictures.lc }));
+  await ctx.route(`${APP}__wiki.png`, (r) => r.fulfill({ contentType: 'image/png', body: pictures.wiki }));
+}
 const page = await ctx.newPage();
-await page.goto(URL);
+page.on('pageerror', (e) => console.error('pageerror:', e.message));
+await page.goto(scenario.stage ? `${APP}__stage` : APP);
 await page.waitForLoadState('networkidle');
-await page.waitForTimeout(1200);   // sprites decoded, fit() settled
+await page.waitForTimeout(1500);   // sprites decoded, fit() settled
 
 const events = [];
 const frames = [];
@@ -332,7 +622,7 @@ await cdp.send('Page.startScreencast', {
 });
 const started = Date.now() / 1000;
 try {
-  await scenario(page, d);
+  await scenario.run(page, d);
 } catch (err) {
   // leave the screen that broke the run next to its frames
   await page.screenshot({ path: join(outDir, 'failed.png') });
@@ -344,8 +634,11 @@ await cdp.send('Page.stopScreencast');
 await Promise.all(writes);
 await browser.close();
 
+const moves = events.filter((e) => e.type === 'cam').length - 1;
 await writeFile(join(outDir, 'manifest.json'), JSON.stringify({
   viewport: VIEWPORT, dsf: S, started, ended, frames, events,
+  // an optional output size for takes that aren't the app's own 16:10
+  ...(scenario.stage ? { out: { width: 1600, height: 764 } } : {}),
 }, null, 1));
 const span = ended - started;
-console.log(`${scenarioName}: ${frames.length} frames over ${span.toFixed(1)}s (${(frames.length / span).toFixed(1)} fps avg)`);
+console.log(`${scenarioName}: ${frames.length} frames over ${span.toFixed(1)}s (${(frames.length / span).toFixed(1)} fps avg), ${moves} camera moves`);

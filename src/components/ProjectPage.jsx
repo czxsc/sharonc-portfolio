@@ -11,6 +11,9 @@ import ZoneStudy from './ZoneStudy.jsx';
 import DesignBoard from './DesignBoard.jsx';
 import CursorTrail from './CursorTrail.jsx';
 import SetType from './SetType.jsx';
+import Walkthrough from './Walkthrough.jsx';
+import { StoryBody, StoryRail } from './CaseStory.jsx';
+import { useInViewPlayback, useLoopToggle } from '../hooks/useVideoPlayback.js';
 import './ProjectPage.css';
 
 /* ------------------------------------------------------------------
@@ -444,7 +447,7 @@ export default function ProjectPage({
         {/* key remounts the article per project so the entrance rise
             replays when paging with the arrows */}
         <article
-          className={`pp-page ${dir ? 'is-paged' : ''}`}
+          className={`pp-page ${dir ? 'is-paged' : ''} ${page.story ? 'is-story' : ''}`}
           key={project.slug}
         >
           <div className="pp-topbar">
@@ -511,6 +514,13 @@ export default function ProjectPage({
             </div>
           </div>
 
+          {/* projects with a page.story get the visual-first layout
+              (CaseStory.jsx): a rail beside the column, and the story in
+              place of the intro and sections. The wrappers do nothing
+              for the others. */}
+          <div className={page.story ? 'pp-story' : undefined}>
+          {page.story && <StoryRail story={page.story} scrollRef={scrollRef} />}
+          <div className="pp-main">
           <header className="pp-head">
             <div className="pp-head-text">
               <SetType as="h1" lines={project.name} />
@@ -521,35 +531,20 @@ export default function ProjectPage({
             </span>
           </header>
 
-          {/* page.hero can override the crop: { fit: true } shows the
-              whole image, { position: 'top' } keeps the top edge */}
+          {/* every hero shows the whole image at its own ratio, capped
+              to one shared height, so no case study opens on a crop.
+              page.hero can still opt back into the 21:9 band with
+              { fit: false } (plus { position } to steer that crop) */}
           <Media
-            media={{ src: project.image, ...page.hero }}
+            media={{ src: project.image, fit: true, ...page.hero }}
             className="pp-hero"
             alt={`${project.name} preview`}
             figRef={heroRef}
           />
 
           <div className="pp-intro">
-            <p>{page.intro}</p>
-            {page.links?.length > 0 && (
-              <div className="pp-links">
-                {page.links.map((l) => (
-                  <a
-                    key={l.label}
-                    className="pp-chip"
-                    href={l.href}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {l.label}
-                    <svg viewBox="0 0 12 12" aria-hidden="true">
-                      <path d="M3.5 8.5 8.5 3.5M4.5 3.5h4v4" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </a>
-                ))}
-              </div>
-            )}
+            {page.intro && <p>{page.intro}</p>}
+            {page.links?.length > 0 && <Links links={page.links} />}
           </div>
 
           <dl className="pp-meta">
@@ -561,7 +556,9 @@ export default function ProjectPage({
             ))}
           </dl>
 
-          {page.sections.map((s) => (
+          {page.story && <StoryBody story={page.story} />}
+
+          {page.sections?.map((s) => (
             <Section s={s} key={s.heading} />
           ))}
 
@@ -578,10 +575,33 @@ export default function ProjectPage({
           {page.sectionsAfter?.map((s) => (
             <Section s={s} key={s.heading} />
           ))}
+          </div>
+          </div>
         </article>
       </div>
     </div>,
     document.body
+  );
+}
+
+function Links({ links }) {
+  return (
+    <div className="pp-links">
+      {links.map((l) => (
+        <a
+          key={l.label}
+          className="pp-chip"
+          href={l.href}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {l.label}
+          <svg viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M3.5 8.5 8.5 3.5M4.5 3.5h4v4" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
+      ))}
+    </div>
   );
 }
 
@@ -922,94 +942,4 @@ function Media({ media, className, alt, figRef }) {
       {media.caption && <figcaption>{media.caption}</figcaption>}
     </figure>
   );
-}
-
-/* a recorded walkthrough (media.video, with media.src as its poster):
-   muted and looping like a GIF, but it only runs while it's on screen,
-   and never starts by itself under reduced motion. The Pause / Play
-   in the caption row is the way to stop it — anything that moves for
-   longer than a few seconds needs one — and clicking the video does
-   the same. `playing` tracks what the reader asked for; whether it is
-   actually running at the moment also depends on it being in view. */
-function Walkthrough({ media, className }) {
-  const [playing, toggle] = useLoopToggle();
-  const ref = useInViewPlayback(playing);
-
-  return (
-    <figure
-      ref={ref}
-      className={`pp-media pp-video ${className} ${media.fit ? 'is-fit' : ''}`}
-    >
-      <video
-        src={media.video}
-        poster={media.src}
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        aria-label={media.label ?? media.caption}
-        onClick={toggle}
-      />
-      <figcaption>
-        {media.caption && <span>{media.caption}</span>}
-        <button type="button" className="pp-video-toggle" onClick={toggle}>
-          {playing ? 'Pause' : 'Play'}
-        </button>
-      </figcaption>
-    </figure>
-  );
-}
-
-/* what the reader asked for: running, unless they prefer reduced
-   motion, in which case nothing starts until they press Play */
-function useLoopToggle() {
-  const [playing, setPlaying] = useState(
-    () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  );
-  return [playing, () => setPlaying((p) => !p)];
-}
-
-/* runs every <video> inside the returned ref's element while it is on
-   screen and `playing` is set, and holds them paused otherwise.
-
-   Videos without `loop` are a set: one that finishes early waits on
-   its last frame, and once every one has ended they all restart from
-   the top together. Resuming skips the ones already waiting, since
-   play() on an ended video would restart it alone. */
-function useInViewPlayback(playing) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const box = ref.current;
-    if (!box) return;
-    const videos = [...box.querySelectorAll('video')];
-    if (!playing) {
-      videos.forEach((v) => v.pause());
-      return;
-    }
-    let inView = false;
-    const run = () =>
-      videos.forEach((v) => !v.ended && v.play().catch(() => {}));
-    const onEnded = () => {
-      if (!videos.every((v) => v.ended)) return;
-      videos.forEach((v) => {
-        v.currentTime = 0;
-      });
-      if (inView) run();
-    };
-    videos.forEach((v) => v.addEventListener('ended', onEnded));
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        inView = entry.isIntersecting;
-        if (inView) run();
-        else videos.forEach((v) => v.pause());
-      },
-      { threshold: 0.35 }
-    );
-    io.observe(box);
-    return () => {
-      io.disconnect();
-      videos.forEach((v) => v.removeEventListener('ended', onEnded));
-    };
-  }, [playing]);
-  return ref;
 }

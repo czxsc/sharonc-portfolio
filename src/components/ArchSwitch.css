@@ -1,0 +1,238 @@
+/* ============================================================
+   ArchSwitch — the two-sided architecture diagram. Flat boxes and
+   hairline arrows on an inset ground, so it sits with the screenshots
+   around it rather than reading as a pasted-in chart, and a round
+   arrow hanging in the margin beside it.
+   ============================================================ */
+
+/* ---------- the words ----------
+   Stacked in one grid cell, so the taller version holds the height whichever
+   is showing. The old words clear with the arrows, and the new ones arrive as
+   the gathered boxes take their new label, so the two say the same thing at
+   the same moment. Leaving on --ease rather than --ease-exit, for the reason
+   ProjectPage.css gives: on an accelerating curve type doesn't leave, it
+   blinks. */
+.ar-stack {
+  display: grid;
+}
+.ar-pane {
+  grid-area: 1 / 1;
+  min-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition:
+    opacity 0.26s var(--ease),
+    transform 0s linear 0.26s,
+    visibility 0s linear 0.26s;
+}
+.ar-pane.is-on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.7s var(--ease) 0.66s,
+    transform 0.8s var(--ease) 0.66s,
+    visibility 0s linear 0s;
+}
+.ar-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- the panel ---------- */
+.ar-stage {
+  position: relative;
+  margin-top: var(--sp-4);
+}
+.af {
+  margin: 0;
+  padding: var(--sp-4);
+  background: var(--paper-2);
+  border-radius: var(--radius-lg);
+}
+.af-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* Opaque stroke, because the boxes pile up on the way across: a see-through
+   one would darken with each box that landed on top of it. */
+.af-box {
+  fill: var(--card);
+  stroke: color-mix(in srgb, var(--ink) 22%, var(--paper-2));
+  stroke-width: 1;
+}
+/* beyond the system being drawn: the visitor's browser, LeetCode itself, the
+   extension and the API from the web app's point of view */
+.af-box.is-dashed {
+  fill: none;
+  stroke-dasharray: 4 4;
+}
+.af-title {
+  font-family: var(--grot);
+  font-size: 16px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+.af-sub {
+  font-family: var(--mono);
+  font-size: 12px;
+  fill: var(--ink-soft);
+}
+.af-edge {
+  fill: none;
+  stroke: var(--espresso);
+  stroke-width: 1.25;
+}
+.af-head {
+  fill: none;
+  stroke: var(--espresso);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.af-edge-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  fill: var(--espresso);
+}
+.af-legend {
+  margin-top: var(--sp-3);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+/* the drawing's words, for assistive tech at any width */
+.af-steps {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- the arrow ----------
+   Same round button as the project arrows and it fills the same way, but a
+   full arrow rather than a chevron, and it stays where it is so the two sides
+   can be flicked between without moving the mouse. It turns to point back the
+   way you came. */
+.ar-go {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 20px);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  transition: color var(--dur) var(--ease);
+}
+.ar-go-ring {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    transform var(--dur-quick) var(--ease);
+}
+.ar-go:active .ar-go-ring {
+  transform: scale(0.94);
+}
+.ar-go-ring svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.9s var(--ease-glide);
+}
+.ar.is-back .ar-go-ring svg {
+  transform: rotate(180deg);
+}
+.ar-go:hover,
+.ar-go:focus-visible {
+  color: var(--ink);
+}
+.ar-go:hover .ar-go-ring,
+.ar-go:focus-visible .ar-go-ring {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.ar-go-label {
+  animation: ar-label-in 0.5s var(--ease) both;
+}
+@keyframes ar-label-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* No margin to hang in once the rail has moved to the top of the page, so the
+   arrow takes its own row under the panel, at the side it points to. */
+@media (max-width: 1259px) {
+  .ar-go {
+    position: static;
+    transform: none;
+    flex-direction: row-reverse;
+    gap: 12px;
+    width: fit-content;
+    margin: var(--sp-3) 0 0 auto;
+  }
+}
+
+/* under this the boxes' labels are too small to read, so the written version
+   takes over rather than asking anyone to pinch */
+@media (max-width: 700px) {
+  .af-map,
+  .af-legend {
+    display: none;
+  }
+  .af-steps {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding-left: 1.3em;
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-pane,
+  .ar-pane.is-on {
+    transform: none;
+    transition: none;
+  }
+  .ar-go-ring svg {
+    transition: none;
+  }
+  .ar-go-label {
+    animation: none;
+  }
+}

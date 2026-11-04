@@ -1,0 +1,522 @@
+/* ============================================================
+   CaseStory — the visual-first case study layout. The page's
+   structure lives in a rail out at the window's edge, which leaves
+   the whole column to the content: words and pictures share one
+   width, and the pictures do most of the talking.
+   ============================================================ */
+
+/* The column tops out at 960px at any window size. The page's max-width is
+   that plus whichever side padding applies, since the padding counts toward
+   it: the rail's reserved margin below, or the usual gutter under 1260px. */
+.pp-page.is-story {
+  max-width: calc(960px + 2 * var(--gutter));
+}
+.pp-main {
+  min-width: 0;
+}
+
+/* the hero takes the column rather than the capped, centred size the
+   other case studies give it */
+.pp-story .pp-hero.is-fit img {
+  width: 100%;
+  max-height: none;
+}
+
+/* with no intro paragraph here, the links are the first thing under the hero */
+.pp-story .pp-intro {
+  margin-top: var(--sp-4);
+}
+.pp-story .pp-links {
+  margin-top: 0;
+}
+.pp-story .pp-meta {
+  margin-top: var(--sp-4);
+}
+
+/* ---------- the rail ---------- */
+.st-rail {
+  animation: pp-in 0.6s var(--ease) both;
+  animation-delay: 0.3s;
+}
+.st-rail ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.st-rail-list {
+  position: relative; /* the travelling dot is placed against this box */
+}
+/* the marker itself, one dot for the whole rail; StoryRail moves it */
+.st-rail-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--espresso);
+  pointer-events: none;
+  /* moved every frame while it travels, so it gets a layer of its own rather
+     than repainting the rail each time */
+  will-change: transform;
+}
+.st-rail-list > ol > li + li {
+  margin-top: 12px;
+}
+.st-rail-sub {
+  margin-top: 4px !important;
+}
+.st-rail-link {
+  display: block;
+  padding: 4px 0 4px 14px;
+  font-size: var(--fs-small);
+  line-height: 1.35;
+  white-space: nowrap;
+  /* a step above --ink-faint, which is under 4.5:1 on paper at this size */
+  color: color-mix(in srgb, var(--ink-soft) 85%, var(--paper));
+  transition: color var(--dur) var(--ease);
+}
+.st-rail-sub .st-rail-link {
+  padding-left: 26px;
+  font-size: 0.82rem;
+}
+/* a group's name darkens while the reader is anywhere inside it, so the
+   rail says which part of the page this is even from a sub-item */
+.st-rail li.is-current > .st-rail-link,
+.st-rail-link:hover,
+.st-rail-link:focus-visible,
+.st-rail-link.is-active {
+  color: var(--ink);
+}
+
+/* Out at the window's edge, centred top to bottom. It's fixed rather than a
+   column of the page, and the page's padding is what keeps the two apart: the
+   rail ends about 140px in, so 220px leaves it 80px of air even at the
+   narrowest window this applies to. The padding is on both sides so the
+   column stays centred. Under this width there's no margin left to sit in. */
+@media (min-width: 1260px) {
+  .pp-page.is-story {
+    max-width: calc(960px + 2 * 220px);
+    padding-inline: 220px;
+  }
+  .st-rail {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 28px;
+    display: flex;
+    align-items: center;
+    pointer-events: none; /* the tall box shouldn't block anything */
+  }
+  .st-rail-list {
+    pointer-events: auto;
+  }
+}
+
+/* ---------- groups ---------- */
+.st-group {
+  margin-top: var(--sp-6);
+}
+/* the sticky topbar sits over the top of the column, so a jump has to
+   land clear of it */
+.st-anchor {
+  scroll-margin-top: 104px;
+}
+.st-anchor:focus {
+  outline: none;
+}
+.st-eyebrow {
+  margin-bottom: 10px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--espresso);
+}
+.st-title {
+  font-size: var(--fs-h3);
+  text-wrap: balance;
+}
+.st-text {
+  margin-top: var(--sp-3);
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* divides the runs of improvements: a hairline and a small label, since
+   the blocks under it have the headings */
+.st-part {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.st-part + .st-block {
+  margin-top: var(--sp-4);
+}
+
+.st-block {
+  margin-top: var(--sp-5);
+}
+.st-block-title {
+  font-size: clamp(1.3rem, 0.45vw + 1.05rem, 1.6rem);
+  font-weight: 600;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.st-block-title + .st-text {
+  margin-top: 10px;
+}
+
+/* the picture sits close under its words, so each pair reads as a unit
+   and the larger gap above marks where the next one starts */
+.st-block > .pp-media,
+.st-block > .st-trio,
+.st-block > .st-compare,
+.st-block > .st-columns {
+  margin-top: var(--sp-4);
+}
+.st-video video {
+  height: auto;
+}
+
+/* ---------- playback ----------
+   The recordings run without any visible controls. Clicking one still
+   stops it, and the toggle stays in the page for anyone on a keyboard or a
+   screen reader. It only appears when it's focused, or under reduced motion,
+   where nothing starts by itself and it's the only way to press play. */
+.st-block .pp-video,
+.st-compare {
+  position: relative;
+}
+.st-block .pp-video figcaption {
+  display: block;
+  margin: 0;
+}
+.st-block .pp-video-toggle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+}
+.st-block .pp-video-toggle:focus-visible {
+  right: 12px;
+  bottom: 12px;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-block .pp-video-toggle {
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+}
+
+/* ---------- three icon cards ---------- */
+.st-trio {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+}
+/* A whole multiple of the 32px sprite, so every pixel stays square. The art
+   sits inside its canvas with some air around it, so the negative margin is
+   what lines its left edge up with the text underneath.
+
+   The bob is a few pixels over a few seconds, just enough that these aren't
+   the one still thing on a page of moving recordings. Each starts at its own
+   point in the cycle, so a row doesn't rise and fall in unison. */
+.st-trio-icon {
+  display: block;
+  width: 96px;
+  height: 96px;
+  margin-left: -10px;
+  image-rendering: pixelated;
+  animation: st-bob 3.4s ease-in-out infinite alternate;
+}
+.st-trio li:nth-child(2) .st-trio-icon {
+  animation-delay: -1.3s;
+}
+.st-trio li:nth-child(3) .st-trio-icon {
+  animation-delay: -2.5s;
+}
+@keyframes st-bob {
+  from {
+    transform: translateY(2px);
+  }
+  to {
+    transform: translateY(-3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-trio-icon {
+    animation: none;
+  }
+}
+.st-trio h3 {
+  margin-top: 10px;
+  font-family: var(--grot);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.st-trio p {
+  margin-top: 4px;
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* ---------- side by side ---------- */
+.st-tag {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.st-compare-side:last-of-type .st-tag {
+  color: var(--espresso);
+}
+.st-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+  align-items: start;
+}
+.st-compare img,
+.st-compare video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-soft);
+  background: var(--paper-2);
+}
+.st-compare video {
+  cursor: var(--cur-tap), pointer;
+}
+
+/* ---------- tech stack ---------- */
+.st-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.st-column {
+  padding: 16px 12px 12px;
+  border-radius: var(--radius-lg);
+  background: var(--paper-2);
+}
+.st-column h4 {
+  margin: 0 4px 12px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--espresso);
+}
+.st-column ul {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.st-column li {
+  padding: 11px 14px 12px;
+  border-radius: var(--radius);
+  background: var(--card);
+}
+.st-column strong {
+  display: block;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.st-column span {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+/* ---------- reflections ----------
+   The one place the words stay on a shorter measure, since this is the bit to
+   actually read. That leaves the corner open for something small to close the
+   page on, sat on the last line. */
+.st-closing {
+  display: grid;
+  grid-template-columns: minmax(0, 68ch) auto;
+  justify-content: space-between;
+  align-items: end;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+.st-closer {
+  display: block;
+}
+.st-closer img {
+  display: block;
+  width: 200px;
+  height: auto;
+  image-rendering: pixelated;
+}
+.st-reflections {
+  list-style: none;
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+}
+.st-reflections li {
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--ink);
+}
+.st-reflections h3 {
+  font-size: clamp(1.2rem, 0.3vw + 1.05rem, 1.4rem);
+  font-weight: 600;
+  line-height: 1.3;
+}
+.st-reflections p {
+  margin-top: 8px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+/* ---------- close ----------
+   leaves with the blocks it arrived alongside (see ProjectPage.css) */
+.pp.is-closing .st-rail {
+  animation:
+    pp-out-fade 0.26s var(--ease) both,
+    pp-out-drift 0.3s var(--ease-exit) both;
+}
+
+/* ---------- no margin to sit in: the rail runs across the top ----------
+   Sub-items stay behind. A strip of the main parts is enough to move around
+   with, and sixteen links across a narrow screen is a scroller nobody would
+   use. The bar and the strip stack into one solid band, since the controls
+   cross the whole width here and text would otherwise run behind them. */
+@media (max-width: 1259px) {
+  .pp-page.is-story {
+    padding-top: 0;
+  }
+  .pp-page.is-story .pp-topbar {
+    top: 0;
+    flex-wrap: nowrap;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 10px var(--gutter);
+    background: var(--paper);
+  }
+  .pp-page.is-story .pp-topbar-end {
+    width: auto;
+  }
+  .st-rail {
+    position: sticky;
+    top: 70px;
+    z-index: 4;
+    margin: 0 calc(var(--gutter) * -1);
+    padding: 8px var(--gutter);
+    background: var(--paper);
+    border-bottom: 1px solid var(--line-soft);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .st-rail-list {
+    width: max-content;
+  }
+  .st-rail-list > ol {
+    display: flex;
+    gap: var(--sp-3);
+  }
+  .st-rail-list > ol > li + li {
+    margin-top: 0;
+  }
+  .st-rail-sub,
+  .st-rail-dot {
+    display: none;
+  }
+  .st-rail-link {
+    padding: 4px 0;
+  }
+  .st-rail li.is-current > .st-rail-link {
+    font-weight: 600;
+  }
+  .st-anchor {
+    scroll-margin-top: 130px;
+  }
+}
+
+@media (max-width: 800px) {
+  .st-columns {
+    grid-template-columns: 1fr;
+  }
+  /* no room beside the words, so it runs along under them at half size, which
+     keeps every pixel of the sprite square */
+  .st-closing {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .st-closer {
+    justify-self: end;
+  }
+  .st-closer img {
+    width: 100px;
+  }
+}
+
+/* The cards turn into rows rather than three stacked banners, with the icon
+   beside the words. */
+@media (max-width: 700px) {
+  .st-trio {
+    grid-template-columns: 1fr;
+  }
+  .st-trio li {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    column-gap: var(--sp-3);
+    align-items: start;
+  }
+  .st-trio-icon {
+    grid-row: span 2;
+    width: 64px;
+    height: 64px;
+    margin-left: 0;
+  }
+  .st-trio h3 {
+    margin-top: 0;
+  }
+  .st-compare {
+    grid-template-columns: 1fr;
+  }
+}

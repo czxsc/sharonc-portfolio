@@ -13,13 +13,35 @@ import dpkRadioImg from '../assets/projects/preflight/radio.webp';
 import dpkServosImg from '../assets/projects/preflight/servos.webp';
 import dpkFlightModesImg from '../assets/projects/preflight/flightmodes.webp';
 import littleWonderImg from '../assets/projects/little-wonder/cover.webp';
-import pokeleetDashboardImg from '../assets/projects/pokeleet/cover.webp';
-import pokeleetCollectionImg from '../assets/projects/pokeleet/collection.webp';
-import pokeleetAddProblemVideo from '../assets/projects/pokeleet/walkthrough-add-problem.mp4';
-import pokeleetAddProblemPoster from '../assets/projects/pokeleet/walkthrough-add-problem.webp';
+import pokeleetCoverImg from '../assets/projects/pokeleet/cover-dashboard.webp';
+import pokeleetIconJournal from '../assets/projects/pokeleet/icons/journal.png';
+import pokeleetIconPokeBall from '../assets/projects/pokeleet/icons/poke-ball.png';
+import pokeleetIconFocusBand from '../assets/projects/pokeleet/icons/focus-band.png';
+import pokeleetIconChapters from '../assets/projects/pokeleet/icons/chapters.png';
+import pokeleetIconRadar from '../assets/projects/pokeleet/icons/radar.png';
+import pokeleetIconMasterBall from '../assets/projects/pokeleet/icons/master-ball.png';
+import pokeleetRunGif from '../assets/projects/pokeleet/run-pikachu.gif';
+import pokeleetRunStill from '../assets/projects/pokeleet/run-pikachu-still.png';
+import pokeleetLogVideo from '../assets/projects/pokeleet/feature-log.mp4';
+import pokeleetLogPoster from '../assets/projects/pokeleet/feature-log.webp';
+import pokeleetSummonVideo from '../assets/projects/pokeleet/feature-summon.mp4';
+import pokeleetSummonPoster from '../assets/projects/pokeleet/feature-summon.webp';
+import pokeleetUpgradeVideo from '../assets/projects/pokeleet/feature-upgrade.mp4';
+import pokeleetUpgradePoster from '../assets/projects/pokeleet/feature-upgrade.webp';
+import pokeleetFocusVideo from '../assets/projects/pokeleet/feature-focus.mp4';
+import pokeleetFocusPoster from '../assets/projects/pokeleet/feature-focus.webp';
+import pokeleetRecallImg from '../assets/projects/pokeleet/recall-decks.webp';
+import pokeleetQuestsImg from '../assets/projects/pokeleet/quests-daily.webp';
 import pokeleetPullBeforeVideo from '../assets/projects/pokeleet/gacha-pull-before.mp4';
 import pokeleetPullAfterVideo from '../assets/projects/pokeleet/gacha-pull-after.mp4';
-import pokeleetDetailImg from '../assets/projects/pokeleet/detail.webp';
+import pokeleetSpritesBeforeImg from '../assets/projects/pokeleet/sprites-before.webp';
+import pokeleetSpritesAfterImg from '../assets/projects/pokeleet/sprites-after.webp';
+import pokeleetShopBeforeImg from '../assets/projects/pokeleet/shop-before.webp';
+import pokeleetShopAfterImg from '../assets/projects/pokeleet/shop-after.webp';
+import pokeleetBattleBeforeImg from '../assets/projects/pokeleet/battle-before.webp';
+import pokeleetBattleAfterImg from '../assets/projects/pokeleet/battle-after.webp';
+import pokeleetQuizBeforeImg from '../assets/projects/pokeleet/quiz-before.webp';
+import pokeleetQuizAfterImg from '../assets/projects/pokeleet/quiz-after.webp';
 import concertRoseImg from '../assets/hobby/music/concerts/rose.webp';
 import concertTwiceImg from '../assets/hobby/music/concerts/twice.webp';
 import concertSunkisImg from '../assets/hobby/music/concerts/sunkis.webp';
@@ -248,6 +270,9 @@ export const experience = [
    - links:    external chips, e.g. [{ label: 'GitHub', href }]
    - meta:     labeled rows — Category / My role / Timeline / Skills
                (+ Team only where it was a team project)
+   - story:    the visual-first layout, used in place of intro + sections
+               (data shape in CaseStory.jsx). A project moves to it just by
+               defining this; the rest of these fields still apply.
    - sections: [{ heading, body: [paragraphs], facts?: [{title, text}],
                   points?: [{icon, text}], stack?, flow?,
                   compare?: { before, after: {src, label}, caption,
@@ -762,9 +787,9 @@ export const projects = [
     index: '02',
     name: 'Artificer',
     slug: 'artificer',
-    category: 'ML · Full-Stack',
+    category: 'Machine Learning · Full-Stack',
     year: '2026',
-    blurb: 'ML powered app to scan artworks and learn their history.',
+    blurb: 'Machine learning powered app to scan artworks and learn their history.',
     tech: ['React', 'TypeScript', 'Claude API'],
     image: artificerImg,
     tone: ['var(--tone-b1)', 'var(--tone-b2)'],
@@ -773,13 +798,13 @@ export const projects = [
       status: 'Developing',
       subtitle: 'Point your camera at a painting; get its story.',
       intro:
-        'Artificer is an ML-powered app that identifies artworks from a photo and unpacks their history, technique, and context. I’m building it end to end — from the recognition pipeline to an interface that reads like a well-set gallery label.',
+        'Artificer is a machine learning-powered app that identifies artworks from a photo and unpacks their history, technique, and context. I’m building it end to end — from the recognition pipeline to an interface that reads like a well-set gallery label.',
       links: [{ label: 'GitHub', href: '#' }],
       meta: [
         { label: 'Category', value: 'Machine Learning, RAG, Full-Stack' },
         { label: 'My role', value: 'Design & engineering' },
         { label: 'Timeline', value: '2026 — in progress' },
-        { label: 'Skills', value: 'Evaluating ML Models, RAG, LLM, React, Javascript' },
+        { label: 'Skills', value: 'Evaluating Machine Learning Models, RAG, LLM, React, Javascript' },
       ],
       sections: [
         {
@@ -1196,7 +1221,7 @@ export const projects = [
               problem:
                 'The original project index simply paired project titles with a single image. Because project names alone rarely communicate what a project actually does, visitors had to click into case studies just to understand basic context or tech stacks, and search through to find the relevant projects they were looking for.',
               solution:
-                'I expanded the project list to display domain tags and tech stacks on hover, giving visitors instant technical context. Additionally, I added a filtering system by field, ML versus full stack, allowing readers to quickly sort through projects relevant to their specific domain without leaving the main index.',
+                'I expanded the project list to display domain tags and tech stacks on hover, giving visitors instant technical context. Additionally, I added a filtering system by field, machine learning versus full stack, allowing readers to quickly sort through projects relevant to their specific domain without leaving the main index.',
               before: { src: workBeforeImg, label: 'Before · Titles and a photo' },
               after: { src: workAfterImg, label: 'After · Field, stack and sorting' },
             },
@@ -1927,7 +1952,7 @@ export const projects = [
     index: '05',
     name: 'Dishcovery',
     slug: 'dishcovery',
-    category: 'ML · Full-Stack',
+    category: 'Machine Learning · Full-Stack',
     year: '2026',
     blurb: 'Restaurant recommendations from food, ambiance, and price queries.',
     tech: ['Python', 'scikit-learn', 'React', 'LLM'],
@@ -2186,172 +2211,372 @@ export const projects = [
     year: '2026',
     blurb: 'Gamified, pokemon-themed Leetcode tracker.',
     tech: ['React', 'Vite', 'CSS'],
-    image: pokeleetDashboardImg,
+    image: pokeleetCoverImg,
     tone: ['var(--tone-f1)', 'var(--tone-f2)'],
     href: '#work',
     page: {
-      status: 'Developing',
-      subtitle: 'A Pokémon-themed tracker that turns Leetcode into a collect-a-thon.',
-      intro:
-        'PokéLeet is an experiment in motivation design: solving a problem pays out in shards, shards summon Pokémon, and the collection is the thing you are actually working toward. Underneath the game is an honest study log — every problem saved with its tags and accepted code — and the game on top can only ever reward that work, never stand in for it. The whole loop is playable in the browser demo; the full version runs locally, with a small browser extension for timed study sessions.',
+      status: 'Live',
+      subtitle: 'A LeetCode tracker that pays you in Pokémon.',
       links: [
-        { label: 'Demo', href: 'https://czxsc.github.io/Leetcode-Pokemon/' },
+        { label: 'Live app', href: 'https://pokeleet.sharonchen.dev/' },
         { label: 'GitHub', href: 'https://github.com/czxsc/Leetcode-Pokemon' },
       ],
       meta: [
-        { label: 'Category', value: 'Frontend, Game Design' },
+        { label: 'Category', value: 'Full-Stack, Game Design' },
         { label: 'My role', value: 'Design & engineering' },
-        { label: 'Timeline', value: '2026 — in progress' },
-        { label: 'Skills', value: 'React, Vite, browser extensions, game economy design, pixel-art UI' },
+        { label: 'Timeline', value: 'Since June 2026' },
+        { label: 'Skills', value: 'React, TypeScript, Hono, AWS, browser extensions' },
       ],
-      sections: [
+      // recordings: scripts/record-pokeleet.mjs + render-walkthrough.py
+      story: [
         {
-          heading: 'Problem: The payoff is months away',
-          body: [
-            'Interview prep has a brutal feedback curve. The work is daily and the reward — an offer, eventually, maybe — sits months out with nothing in between. A checklist of solved problems is an honest record of that and a terrible motivator: it only ever counts up, and the number stops meaning anything around thirty.',
-            'Collection games solved this decades ago. They front-load the feeling of progress: something visible arrives every session, the good outcomes are rare enough to matter, and there is a shelf that keeps filling. I wanted that shape wrapped around the grind I was already doing, so I built the tracker I would actually open.',
-          ],
-        },
-        {
-          heading: 'Design goals',
-          body: [
-            'Three rules came before any feature. Most of the design decisions further down are places where an earlier version broke one of them.',
-          ],
-          subs: [
+          id: 'overview',
+          label: 'Overview',
+          eyebrow: 'Overview',
+          title: 'Studying I actually want to come back to',
+          text: 'I wanted something to keep me motivated through LeetCode, so I built it around what already keeps me playing games, which is collecting, rewards, and a team to care about. Every problem I solve now turns into progress in a Pokémon game.',
+          blocks: [
             {
-              title: 'Reward has to track effort',
-              deck: 'The moment a reward feels arbitrary, the loop stops working.',
-              bullets: [
-                'A hard problem pays four times an easy one, and the roster is graded so the Pokémon people actually want sit in the tiers that are hard to reach.',
-                'Pity counters put a ceiling on a dry streak, so a bad run of luck never cancels out a good week of work.',
-              ],
-            },
-            {
-              title: 'The game can never study for you',
-              deck: 'Shards, the only currency that summons anything new, come from studying and nothing else.',
-              bullets: [
-                'Solved problems, recall quizzes, quests and time on LeetCode pay shards. The game pays coins, which can level a team or tilt a summon but never make one.',
-                'Every reward hangs off a real signal — a logged solution, a correct answer, a minute on a problem — rather than time spent in the app.',
-              ],
-            },
-            {
-              title: 'The tracker has to stand on its own',
-              deck: 'Strip the Pokémon away and what is left should still be worth keeping.',
-              bullets: [
-                'Each problem is logged with its difficulty, tags, link and accepted code, and the code is written out to a solutions folder sorted by tag.',
-                'Progress is plain JSON on disk with daily backups, so the record outlasts any one browser.',
+              kind: 'trio',
+              items: [
+                {
+                  icon: pokeleetIconJournal,
+                  title: 'Log problems',
+                  text: 'Keep every problem and solution in one place.',
+                },
+                {
+                  icon: pokeleetIconPokeBall,
+                  title: 'Collect Pokémon',
+                  text: 'Turn solved problems into something worth chasing.',
+                },
+                {
+                  icon: pokeleetIconFocusBand,
+                  title: 'Put them to use',
+                  text: 'Give the team a job, so it’s more than a shelf.',
+                },
               ],
             },
           ],
         },
         {
-          heading: 'Key features',
-          body: [
-            'The loop is small — solve, summon, build a team, study with it — and six parts carry it.',
-          ],
-          facts: [
+          id: 'features',
+          label: 'Features',
+          eyebrow: 'Features',
+          title: 'How it works',
+          blocks: [
             {
-              title: 'Adding solved problems',
-              text: 'Log a solve with its difficulty, tags, link and accepted code, then claim its shards: 150 easy, 300 medium, 600 hard. The code is also saved to a folder sorted by tag, so the library doubles as study notes.',
+              kind: 'video',
+              id: 'log',
+              nav: 'Log problems',
+              title: 'Log your problems',
+              text: 'Paste a LeetCode link, press Find, and the title, difficulty, and tags fill in on their own. Add your solution, then claim the shards it earned. Harder problems pay more.',
+              video: pokeleetLogVideo,
+              poster: pokeleetLogPoster,
+              alt: 'Pasting a LeetCode link and pressing Find fills in a Hard problem and its tags, then saving it pays out 600 shards.',
             },
             {
-              title: 'Summoning',
-              text: 'Shards buy draws at 400 a pull, landing common, rare, epic or legendary at 60 / 30 / 7 / 3, with a 5% shiny chance. Pity guarantees an epic within 15 draws and a legendary within 40, and duplicates build toward evolution instead of going to waste.',
+              kind: 'video',
+              id: 'collect',
+              nav: 'Collect',
+              title: 'Collect your Pokémon',
+              text: 'Shards pay for summons across a roster of 897 Pokémon. Set a legendary as your target and it’s guaranteed within 100 draws.',
+              video: pokeleetSummonVideo,
+              poster: pokeleetSummonPoster,
+              alt: 'A five-card summon where the fifth card is Rayquaza, the chosen legendary target.',
             },
             {
-              title: 'Quests',
-              text: 'Daily quests step up as they are claimed — solve one problem, then three, then five — alongside an Active Recall quiz on Python idioms, Big-O and pseudocode. Six chapters of one-time progression quests run underneath, each opening once the last is cleared.',
+              kind: 'video',
+              id: 'upgrade',
+              nav: 'Upgrade',
+              title: 'Upgrade your team',
+              text: 'Coins buy items in the shop. Here a Mega Stone unlocks Charizard’s Mega Evolution from its card on the team.',
+              video: pokeleetUpgradeVideo,
+              poster: pokeleetUpgradePoster,
+              alt: 'Buying a Mega Stone in the shop, then using it on Charizard’s card to turn it into Mega Charizard X.',
             },
             {
-              title: 'Team and shop',
-              text: 'Six Pokémon make the active team that fights during Focus sessions. The coins it wins buy candy for EXP, Mega and Gigantamax stones, and items that shape the next summon.',
+              kind: 'pair',
+              id: 'earn',
+              nav: 'Earn more',
+              title: 'Earn more with recall and quests',
+              text: 'Recall quizzes on Big-O, language features, and library syntax pay 50 shards per correct answer, up to 1,000 a day. Daily quests step up as you claim them, so there’s always a next reward in reach.',
+              items: [
+                {
+                  src: pokeleetRecallImg,
+                  alt: 'The Active Recall screen, with quiz decks for time complexity, language, data structures, syntax, and twists.',
+                },
+                {
+                  src: pokeleetQuestsImg,
+                  alt: 'The daily quests list, with progress bars and shard rewards to claim.',
+                },
+              ],
             },
             {
-              title: 'Pokédex',
-              text: 'All 897 Pokémon from eight generations, owned ones in colour and the rest as silhouettes, with shiny, Mega and Gigantamax forms tracked on their own. Sprites fall back from the animated Gen 5 GIF to a Sword/Shield still to the HOME render, so none of them ever shows a broken image.',
+              kind: 'video',
+              id: 'focus',
+              nav: 'Study timer',
+              title: 'Pokémon fight alongside you',
+              text: 'Deploy your team and they battle for as long as LeetCode is your active tab. Switch away or close it and the timer pauses, so rewards only count real study time.',
+              video: pokeleetFocusVideo,
+              poster: pokeleetFocusPoster,
+              ratio: '1600 / 764',
+              alt: 'PokéLeet beside a browser window. Deploying the team opens LeetCode in a new tab and starts the study timer, which pauses on switching to another tab or closing LeetCode.',
             },
-            {
-              title: 'Focus session',
-              text: 'Deploy the team and LeetCode opens, with a timer that runs only while it is the active tab. The team battles wild Pokémon for coins, shards and EXP for exactly that much study time.',
-            },
-          ],
-          // recorded by scripts/record-pokeleet.mjs + render-walkthrough.py
-          media: {
-            video: pokeleetAddProblemVideo,
-            src: pokeleetAddProblemPoster,
-            caption: 'Logging a solve — title, tags and the accepted solution, then the shards it pays out.',
-          },
-          gallery: [
-            { src: pokeleetCollectionImg, fit: true, caption: 'Collection and active team — rarity-tinted cards, level bars, and the fighting power they add up to.' },
-            { src: pokeleetDetailImg, fit: true, caption: 'A detail card: the Gen 1 animated sprite at size, with evolution state and form stones underneath.' },
           ],
         },
         {
-          heading: 'Design decisions',
-          body: [
-            'The first playable version worked, but three parts of it broke the goals above: one by making the payoff feel flat, two by letting the game pay out for something other than studying. Each was rebuilt.',
-          ],
-          /* problem / solution copy renders through PassCopy. The shop
-             and focus pairs are placeholders until the screenshots
-             exist; the summon pair is the before/after recording. */
-          compare: [
+          id: 'implementation',
+          label: 'Implementation',
+          eyebrow: 'Implementation',
+          title: 'How it’s built',
+          text: 'One React app and one typed API run locally or on AWS. Only where the data lives changes.',
+          blocks: [
             {
-              label: 'Summoning',
-              title: 'Making the pull the payoff',
-              problem:
-                'A pull is what every solved problem is spent on, and the first version resolved it in under two seconds: the ball shook, flashed, and the results faded in. Hours of work cashed out with no build-up, and nothing told a common from a legendary until the card was already on screen.',
-              solution:
-                'The pull now has a shape. The ball charges — spinning, growing, throwing sparks — inside an aura tinted to the best rarity in the draw, so the tell arrives before the reveal. Then it waits for a tap, so opening it is the player’s move rather than the timer’s. It bursts into a framed window, the cards pop in one after another, and a legendary gets a golden burst of its own.',
+              kind: 'columns',
+              id: 'stack',
+              nav: 'Tech stack',
+              title: 'Tech stack',
+              columns: [
+                {
+                  title: 'Frontend',
+                  items: [
+                    { name: 'React 19', note: 'One folder per screen' },
+                    { name: 'TypeScript', note: 'Game rules, state, and API' },
+                    { name: 'Vite', note: 'Dev server and builds' },
+                    { name: 'Hand-written CSS', note: 'Pixel-art theme, no UI kit' },
+                    { name: 'Chromium extension', note: 'Reports the active tab' },
+                  ],
+                },
+                {
+                  title: 'Backend',
+                  items: [
+                    { name: 'Hono', note: 'One typed API, local and cloud' },
+                    { name: 'Zod', note: 'Validates every save' },
+                    { name: 'Drizzle ORM', note: 'Postgres schema and migrations' },
+                    { name: 'DynamoDB', note: 'Game progress' },
+                    { name: 'Aurora PostgreSQL', note: 'Problem library' },
+                  ],
+                },
+                {
+                  title: 'Infrastructure',
+                  items: [
+                    { name: 'CloudFront + S3', note: 'Serves the app' },
+                    { name: 'API Gateway + Lambda', note: 'Runs the API' },
+                    { name: 'Cognito', note: 'Email and Google sign-in' },
+                    { name: 'AWS CDK', note: 'Infrastructure as code' },
+                    { name: 'GitHub Actions', note: 'Runs tests, then deploys main' },
+                  ],
+                },
+              ],
+            },
+            {
+              kind: 'architecture',
+              id: 'architecture',
+              nav: 'Architecture',
+              box: { width: 960, top: 20, height: 350 },
+              views: [
+                {
+                  id: 'frontend',
+                  label: 'Frontend',
+                  title: 'Frontend architecture',
+                  text: 'Screens never change game state directly. They call a small store, which applies a pure rule from game/ and saves the result, so the rules can be unit tested with a seeded random generator and no browser. Unsaved changes stay in the browser until the server confirms them. A small extension reports the active tab for the study timer, and only a visible tab pays out, so two open tabs can’t earn twice.',
+                  alt: 'How the web app’s code is organized',
+                  carry: 'api',
+                  legend: 'Dashed boxes sit outside the web app.',
+                  arch: {
+                    nodes: [
+                      { id: 'screens', x: 8, y: 166, w: 150, h: 76, title: 'Screens', sub: 'features/, app/' },
+                      { id: 'store', x: 214, y: 166, w: 150, h: 76, title: 'Store', sub: 'state/' },
+                      { id: 'rules', x: 424, y: 46, w: 186, h: 76, title: 'Game rules', sub: 'game/, pure TypeScript' },
+                      { id: 'platform', x: 424, y: 166, w: 186, h: 76, title: 'Platform', sub: 'platform/' },
+                      { id: 'tracker', x: 424, y: 286, w: 186, h: 76, title: 'Tracker extension', sub: 'extension/', outside: true },
+                      { id: 'schemas', x: 784, y: 46, w: 168, h: 76, title: 'Schemas', sub: 'shared/' },
+                      { id: 'api', x: 784, y: 166, w: 168, h: 76, title: 'Storage API', sub: 'api/', outside: true },
+                    ],
+                    edges: [
+                      { from: 'screens', to: 'store', d: 'M158 190 H210', label: 'actions', lx: 186, ly: 180 },
+                      { from: 'store', to: 'screens', d: 'M214 218 H162', label: 'state', lx: 186, ly: 236 },
+                      { from: 'store', to: 'rules', d: 'M289 166 V84 H420', label: 'apply rule', lx: 355, ly: 74 },
+                      { from: 'store', to: 'platform', d: 'M364 204 H420', label: 'save', lx: 392, ly: 194 },
+                      { from: 'tracker', to: 'platform', d: 'M517 286 V246', label: 'active tab', lx: 527, ly: 270, anchor: 'start' },
+                      { from: 'platform', to: 'api', d: 'M610 204 H780', label: '/api/*', lx: 695, ly: 194 },
+                      { from: 'rules', to: 'schemas', d: 'M610 84 H780', label: 'uses', lx: 695, ly: 74 },
+                      { from: 'api', to: 'schemas', d: 'M868 166 V126', label: 'validates', lx: 878, ly: 150, anchor: 'start' },
+                    ],
+                  },
+                  steps: [
+                    'Screens call store actions, and the store applies a pure rule from game/.',
+                    'The store saves the result through platform/ and the storage API.',
+                    'The Tracker extension reports the active tab to platform/ for the study timer.',
+                  ],
+                },
+                {
+                  id: 'backend',
+                  label: 'Backend',
+                  title: 'Backend architecture',
+                  text: 'PokéLeet started as a local app on one machine. To let anyone sign in and sync across devices, I added a serverless AWS backend behind the same API, which still runs on JSON files locally. Game progress is one document per user in DynamoDB, and the relational problem library lives in PostgreSQL. Every save names the revision it was based on, so a stale tab can’t overwrite newer data, and the whole thing costs close to nothing when idle.',
+                  alt: 'How a request moves through the deployed app',
+                  carry: 'browser',
+                  legend: 'Solid boxes run on AWS, defined in CDK and deployed by GitHub Actions.',
+                  arch: {
+                    nodes: [
+                      { id: 'browser', x: 8, y: 166, w: 132, h: 76, title: 'Browser', sub: 'React app', outside: true },
+                      { id: 'cloudfront', x: 196, y: 166, w: 140, h: 76, title: 'CloudFront', sub: 'one origin' },
+                      { id: 's3', x: 196, y: 300, w: 140, h: 62, title: 'S3', sub: 'static app' },
+                      { id: 'cognito', x: 392, y: 30, w: 150, h: 76, title: 'Cognito', sub: 'email or Google' },
+                      { id: 'gateway', x: 392, y: 166, w: 150, h: 76, title: 'API Gateway', sub: 'JWT authorizer' },
+                      { id: 'lambda', x: 598, y: 166, w: 130, h: 76, title: 'Lambda', sub: 'Hono API' },
+                      { id: 'dynamo', x: 784, y: 46, w: 168, h: 76, title: 'DynamoDB', sub: 'game progress' },
+                      { id: 'aurora', x: 784, y: 166, w: 168, h: 76, title: 'Aurora PostgreSQL', sub: 'problem library' },
+                      { id: 'leetcode', x: 784, y: 286, w: 168, h: 76, title: 'leetcode.com', sub: 'problem lookup', outside: true },
+                    ],
+                    edges: [
+                      { from: 'browser', to: 'cognito', d: 'M74 166 V68 H388', label: 'sign in, code + PKCE', lx: 232, ly: 58 },
+                      { from: 'browser', to: 'cloudfront', d: 'M140 204 H192' },
+                      { from: 'cloudfront', to: 's3', d: 'M266 242 V296', label: 'static files', lx: 276, ly: 274, anchor: 'start' },
+                      { from: 'cloudfront', to: 'gateway', d: 'M336 204 H388', label: '/api/*', lx: 362, ly: 194 },
+                      { from: 'gateway', to: 'cognito', d: 'M467 166 V110', label: 'checks each token', lx: 477, ly: 142, anchor: 'start' },
+                      { from: 'gateway', to: 'lambda', d: 'M542 204 H594' },
+                      { from: 'lambda', to: 'dynamo', d: 'M728 190 C756 190 752 84 780 84' },
+                      { from: 'lambda', to: 'aurora', d: 'M728 204 H780' },
+                      { from: 'lambda', to: 'leetcode', d: 'M728 218 C756 218 752 324 780 324' },
+                    ],
+                  },
+                  steps: [
+                    'The browser signs in through Cognito with email or Google.',
+                    'CloudFront serves the app from S3 and forwards /api/* to API Gateway, which checks each token.',
+                    'The Hono API on Lambda saves progress to DynamoDB and the problem library to Aurora PostgreSQL.',
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 'improvements',
+          label: 'Improvements',
+          eyebrow: 'Improvements',
+          title: 'Making it feel good to use',
+          text: 'The first version worked. Most of the work since has gone into making it more gratifying and easier to use.',
+          blocks: [
+            { kind: 'part', id: 'visual', nav: 'Visual', title: 'Visual' },
+            {
+              kind: 'compare',
+              title: 'A summon worth waiting for',
+              text: 'The first version shook, flashed, and faded in, so hours of work paid off in a blink. Now the ball charges in the color of your best pull, then waits for you to open it.',
               before: { video: pokeleetPullBeforeVideo, label: 'Before · Shake and fade' },
               after: { video: pokeleetPullAfterVideo, label: 'After · Charge, tap, reveal' },
             },
             {
-              label: 'Shop',
-              title: 'One grid, and nothing that skips the summon',
-              problem:
-                'The old shop was a stack of rows, and the first one, Rare Candy, carried its own grid of every Pokémon you owned to pick who to feed, beside a preview panel that only applied to that one item. The picker grew with the collection and pushed everything else down. The shop also sold an Evolution Copy, which let coins buy the duplicates only summoning is meant to hand out.',
-              solution:
-                'Every item is now a card in one grid. Items that target a Pokémon open a small “feed to” picker on Buy, with search, the team listed first, and anyone who can’t use it greyed out with the reason. The Evolution Copy is gone. In its place are items that shape a summon without replacing it — a Rate Booster, Great and Ultra Balls that fix the next draw’s rarity, and a Generation Ticket — so coins have something to aim at that still needs shards to use.',
-              before: { label: 'Before · Picker in the list' },
-              after: { label: 'After · One grid' },
+              kind: 'compare',
+              title: 'Sprites that belong together',
+              text: 'Newer Pokémon had no matching pixel art, so they fell back to 3D-style renders that looked out of place beside the rest of the team. Moving those to Pokémon Showdown’s sprites made every generation read as one game.',
+              before: {
+                src: pokeleetSpritesBeforeImg,
+                ratio: '588 / 355',
+                label: 'Before · Mixed styles',
+                alt: 'A team where Greninja and Dragapult are small 3D-style renders beside pixel art Pokémon.',
+              },
+              after: {
+                src: pokeleetSpritesAfterImg,
+                ratio: '562 / 380',
+                label: 'After · One style',
+                alt: 'The same team with every Pokémon in matching pixel art.',
+              },
             },
             {
-              label: 'Battling',
-              title: 'From idle auto-battler to study timer',
-              problem:
-                'The Meadow was an idle auto-battler: set the team patrolling and it fought wild Pokémon for coins for as long as the app stayed open, carrying on across every page. It was the one part of the game that paid out for not studying — leaving a tab open was enough to earn.',
-              solution:
-                'Battling is now a Focus session. Deploy Team opens LeetCode and starts a timer that only runs while LeetCode is the active browser tab, as reported by a small companion extension. Switch away and it pauses; five minutes paused, or three hours in, and the session ends. The team fights for exactly the study time banked, so coins now measure time spent on problems. The extension can only see leetcode.com and localhost addresses, and stores and sends nothing.',
-              before: { label: 'Before · The Meadow' },
-              after: { label: 'After · Focus session' },
+              kind: 'compare',
+              title: 'A shop that asks for less',
+              text: 'The old shop made you choose a Pokémon before you could buy anything, even items that had nothing to do with one. Now buying comes first, and a picker only opens when the item needs a target.',
+              before: {
+                src: pokeleetShopBeforeImg,
+                label: 'Before · Recreated mockup',
+                alt: 'Shop items on the left with every price locked, and the team on the right waiting for a selection.',
+              },
+              after: {
+                src: pokeleetShopAfterImg,
+                label: 'After · Picker on purchase',
+                alt: 'Buying a Shiny Candy opens a picker listing the team first.',
+              },
+            },
+            { kind: 'part', id: 'user', nav: 'User focused', title: 'User focused' },
+            {
+              kind: 'compare',
+              title: 'From auto battler to study timer',
+              text: 'Battling started as an auto battler that earned coins for as long as the app stayed open. It rewarded leaving a tab running and sat outside the rest of the game, so it went unused. I replaced it with a study session that only counts time while LeetCode is your active tab, reported by a small browser extension. Coins now measure time spent on problems, and the extension only sees LeetCode and PokéLeet’s own tabs, storing and sending nothing.',
+              before: {
+                src: pokeleetBattleBeforeImg,
+                label: 'Before · Auto battler',
+                alt: 'The Meadow, where the team patrols and fights on its own.',
+              },
+              after: {
+                src: pokeleetBattleAfterImg,
+                label: 'After · Study session',
+                alt: 'A Focus session with the study timer running while the team battles.',
+              },
+            },
+            {
+              kind: 'compare',
+              title: 'A quiz that actually tests recall',
+              text: 'Multiple choice stopped being useful once I knew which answer went with which question. Now you type the answer or edit real code, see the reasoning, and can count your own solution if it works too. Shards cap at 1,000 a day, so the quiz tops up solving instead of replacing it.',
+              before: {
+                src: pokeleetQuizBeforeImg,
+                label: 'Before · Multiple choice',
+                alt: 'A four-option question asking for the Big-O of binary search.',
+              },
+              after: {
+                src: pokeleetQuizAfterImg,
+                label: 'After · Edit real code',
+                alt: 'An edited solution shown beside a model answer, with an explanation and a button to count it as correct.',
+              },
+            },
+            { kind: 'part', id: 'small-wins', nav: 'Small wins', title: 'Small wins' },
+            {
+              kind: 'trio',
+              items: [
+                {
+                  icon: pokeleetIconChapters,
+                  title: 'Long-term quests',
+                  text: 'Six chapters of one-time goals give you something to work toward beyond the dailies.',
+                },
+                {
+                  icon: pokeleetIconRadar,
+                  title: 'Paste a link',
+                  text: 'Logging used to mean adding solution files. Now a link fills in the details through LeetCode’s API.',
+                },
+                {
+                  icon: pokeleetIconMasterBall,
+                  title: 'Pity system',
+                  text: 'An epic within 15 draws and a legendary within 40, so bad luck always has a limit.',
+                },
+              ],
             },
           ],
         },
         {
-          heading: 'Improvements & limitations',
-          body: [
-            'Everything in the loop works today: a React + Vite app of about six thousand lines, an 897-entry roster hand-tagged with types, rarity, generation, evolutions and forms, and a small local server that saves progress to JSON with revision checks and daily backups. What it doesn’t do yet is mostly about trust and reach.',
+          id: 'reflections',
+          label: 'Reflections',
+          eyebrow: 'Reflections',
+          title: 'What I learned',
+          blocks: [
             {
-              bullets: [
+              kind: 'reflections',
+              closer: { gif: pokeleetRunGif, still: pokeleetRunStill, width: 200, height: 146 },
+              items: [
                 {
-                  lead: 'It runs on one machine.',
-                  text: 'Progress lives in a data folder next to the code, with no account or sync, so moving computers means exporting a backup by hand. The online demo saves to the browser only.',
+                  title: 'Consider the details',
+                  text: 'The rewards didn’t change when I rebuilt the summon animation and fixed the sprites, but the game felt far more satisfying. How something feels to use is part of whether it works.',
                 },
                 {
-                  lead: 'Solves are self-reported.',
-                  text: 'A problem pays out because it was logged, not because LeetCode accepted it. Reading accepted submissions from LeetCode directly would make every shard verifiable.',
+                  title: 'Everything needs a purpose',
+                  text: 'The auto battler sat outside the game loop and went unused. Recall stopped helping once I knew all the multiple choice answers. A feature has to keep earning its place after the first week.',
                 },
                 {
-                  lead: 'Focus knows the tab, not the person.',
-                  text: 'The timer runs whenever LeetCode is the active tab, even if nobody is at the desk. The pause and three-hour limits bound it; idle detection would close the gap.',
-                },
-                {
-                  lead: 'Focus needs a Chromium browser.',
-                  text: 'Sessions depend on an unpacked extension, so Firefox and Safari run everything except them, and the demo can’t run them at all.',
+                  title: 'Clean boundaries make big changes small',
+                  text: 'Before adding a backend, I pulled the game rules into pure functions and put storage behind one interface. Going serverless then meant adding stores rather than rewriting the app, and the local version kept working on the same API and tests.',
                 },
               ],
             },
-            'The first two are what I want to build next: an account-backed save and a LeetCode sync, which would turn PokéLeet from a tool I run into one someone else could.',
           ],
         },
       ],
