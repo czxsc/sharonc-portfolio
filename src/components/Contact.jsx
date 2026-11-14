@@ -6,7 +6,7 @@ import './Contact.css';
 const social = [
   { label: 'Email', href: links.email, note: meta.email },
   { label: 'GitHub', href: links.github, note: 'github.com/czxsc' },
-  { label: 'LinkedIn', href: links.linkedin, note: 'in/sharon-chen-692595211' },
+  { label: 'LinkedIn', href: links.linkedin, note: 'in/sharonc-czx' },
   { label: 'Résumé', href: links.resume, note: 'PDF', todo: true },
 ];
 

@@ -21,6 +21,12 @@ import './ArchMap.css';
      edges: [{ from, to }] }
    ------------------------------------------------------------------ */
 
+// a long class name can wrap where its words meet, rather than leave its box
+const breakable = (name) =>
+  name
+    .split(/(?<=[a-z])(?=[A-Z])/)
+    .flatMap((part, i) => (i ? [<wbr key={i} />, part] : [part]));
+
 export default function ArchMap({ map }) {
   const [active, setActive] = useState(null); // node id | null
 
@@ -155,7 +161,7 @@ export default function ArchMap({ map }) {
                 onClick={() => setActive(active === n.id ? null : n.id)}
                 aria-pressed={active === n.id}
               >
-                <span className="am-node-label">{n.label}</span>
+                <span className="am-node-label">{breakable(n.label)}</span>
                 {n.count && <span className="am-node-count">{n.count}</span>}
               </button>
             );

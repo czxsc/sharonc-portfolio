@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import ArchSwitch from './ArchSwitch.jsx';
+import { Zoomable } from './Lightbox.jsx';
 import Walkthrough from './Walkthrough.jsx';
 import { useInViewPlayback, useLoopToggle } from '../hooks/useVideoPlayback.js';
 import './CaseStory.css';
@@ -118,7 +119,8 @@ export function StoryRail({ story, scrollRef }) {
       }
     };
     const tick = (now) => {
-      const dt = Math.min((now - s.last) / 1000, 1 / 30);
+      // not below zero: a frame's timestamp can predate what asked for it
+      const dt = Math.max(0, Math.min((now - s.last) / 1000, 1 / 30));
       s.last = now;
       s.vx += (DOT_PULL * DOT_PULL * (s.tx - s.x) - 2 * DOT_PULL * s.vx) * dt;
       s.vy += (DOT_PULL * DOT_PULL * (s.ty - s.y) - 2 * DOT_PULL * s.vy) * dt;
@@ -142,7 +144,8 @@ export function StoryRail({ story, scrollRef }) {
       const r = link.getBoundingClientRect();
       if (!r.height) return; // a sub-item hidden in the narrow strip
       s.tx = link.closest('.st-rail-sub') ? 12 : 0;
-      s.ty = r.top - l.top + r.height / 2 - 2.5;
+      // on the first line of a heading that wraps, not halfway down it
+      s.ty = r.top - l.top + Math.min(r.height / 2, 13.5) - 2.5;
       if (!animate || !s.placed || reduceMotion()) {
         cancelAnimationFrame(s.raf);
         Object.assign(s, { x: s.tx, y: s.ty, vx: 0, vy: 0, raf: 0, placed: true });
@@ -163,7 +166,8 @@ export function StoryRail({ story, scrollRef }) {
       document.fonts?.ready.then(() => place(false));
     }
     return () => window.removeEventListener('resize', onResize);
-  }, [active]);
+    // groups too: a toggle can change the list under a dot that hasn't moved
+  }, [active, groups]);
   useEffect(() => {
     const s = dotState.current;
     return () => cancelAnimationFrame(s.raf);
@@ -309,25 +313,30 @@ function Trio({ items }) {
 function Pair({ items }) {
   return (
     <div className="st-compare">
-      {items.map((it) => (
-        <img key={it.src} src={it.src} alt={it.alt} loading="lazy" />
+      {items.map((it, i) => (
+        <Zoomable key={it.src} items={items} at={i}>
+          <img src={it.src} alt={it.alt} loading="lazy" />
+        </Zoomable>
       ))}
     </div>
   );
 }
 
 function ScreenPair({ b }) {
+  const sides = [b.before, b.after];
   return (
     <figure className="st-compare">
-      {[b.before, b.after].map((side) => (
+      {sides.map((side, i) => (
         <div className="st-compare-side" key={side.label}>
           <span className="st-tag">{side.label}</span>
-          <img
-            src={side.src}
-            alt={side.alt ?? ''}
-            loading="lazy"
-            style={side.ratio ? { aspectRatio: side.ratio } : undefined}
-          />
+          <Zoomable items={sides} at={i}>
+            <img
+              src={side.src}
+              alt={side.alt ?? ''}
+              loading="lazy"
+              style={side.ratio ? { aspectRatio: side.ratio } : undefined}
+            />
+          </Zoomable>
         </div>
       ))}
     </figure>

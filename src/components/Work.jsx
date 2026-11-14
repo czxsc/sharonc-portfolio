@@ -22,19 +22,12 @@ const DWELL_MS = 110;
 const EASE = 'cubic-bezier(0.4, 0, 0.2, 1)';
 const EASE_SETTLE = 'cubic-bezier(0.16, 1, 0.3, 1)'; // long tail on the scale
 
-/* disciplines worth a filter button — tags shared by 2+ projects
-   (singletons like Autonomous Systems would just re-sort one row) */
-const TAGS = (() => {
-  const counts = new Map();
-  projects.forEach((p) =>
-    p.category.split(' · ').forEach((t) => counts.set(t, (counts.get(t) ?? 0) + 1))
-  );
-  return [...counts.keys()]
-    .filter((t) => counts.get(t) >= 2)
-    .sort((a, b) => counts.get(b) - counts.get(a));
-})();
+/* Broad on purpose, the way someone skims for a kind of work. What a project
+   specifically is lives on its row (`category`), and its `focus` says which of
+   these it answers to. */
+const TAGS = ['SWE', 'ML', 'Design'];
 
-const matches = (i, tag) => projects[i].category.split(' · ').includes(tag);
+const matches = (i, tag) => projects[i].focus.includes(tag);
 
 /* `previewRef` mirrors `shown` for SheetFlip, whose card has to wear
    the same cover the frame is showing or the hand-off would change
@@ -307,7 +300,7 @@ export default function Work({ previewRef, flight = false }) {
             className="work-filters reveal"
             style={{ '--reveal-delay': '0.22s' }}
             role="group"
-            aria-label="Sort projects by discipline"
+            aria-label="Sort projects by focus"
           >
             {TAGS.map((tag) => (
               <button

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { projects } from '../data/content.js';
 import { useOverlayPage } from '../hooks/useOverlayPage.js';
@@ -10,6 +10,7 @@ import ArchMap from './ArchMap.jsx';
 import ZoneStudy from './ZoneStudy.jsx';
 import DesignBoard from './DesignBoard.jsx';
 import CursorTrail from './CursorTrail.jsx';
+import { LightboxProvider, Zoomable } from './Lightbox.jsx';
 import SetType from './SetType.jsx';
 import Walkthrough from './Walkthrough.jsx';
 import { StoryBody, StoryRail } from './CaseStory.jsx';
@@ -310,6 +311,39 @@ const POINT_ICONS = {
   ),
 };
 
+/* A heading written "Problem: Two ground stations" is two things, a small
+   label and a title, so that's how it's set, and the label is what the rail
+   shows. A heading with no colon is just a title. Words only ever come from
+   the heading, and `s.nav` can shorten what the rail says. */
+function splitHeading(heading) {
+  const at = heading.indexOf(': ');
+  return at === -1 ? [null, heading] : [heading.slice(0, at), heading.slice(at + 2)];
+}
+
+const slugify = (text) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+const sectionId = (s) => `s-${slugify(s.heading)}`;
+const passId = (s, pass) => (pass.label ? `${sectionId(s)}-${slugify(pass.label)}` : undefined);
+
+/* What StoryRail reads, for a case study made of plain sections. A section's
+   labelled passes get entries of their own once there's more than one. */
+function railFor(sections) {
+  return sections.map((s) => {
+    const [eyebrow, title] = splitHeading(s.heading);
+    const passes = [...[].concat(s.compare ?? []), ...[].concat(s.cursorTrail ?? [])].filter(
+      (p) => p.label
+    );
+    return {
+      id: sectionId(s),
+      label: s.nav ?? eyebrow ?? title,
+      blocks: passes.length > 1 ? passes.map((p) => ({ id: passId(s, p), nav: p.label })) : [],
+    };
+  });
+}
+
 /* `deep` — this case study was the URL the visitor arrived at, rather
    than a row they clicked. It changes two things and nothing else: it
    opens without the flight (there is no preview frame it grew out of,
@@ -385,6 +419,18 @@ export default function ProjectPage({
   // default); only meaningful for projects that define page.toggle
   const [view, setView] = useState(page.toggle?.options[0]?.id);
 
+  // follows the toggle, since switching it swaps which sections there are
+  const rail = useMemo(
+    () =>
+      page.story ??
+      railFor([
+        ...(page.sections ?? []),
+        ...(page.toggle?.sections[view] ?? []),
+        ...(page.sectionsAfter ?? []),
+      ]),
+    [page, view]
+  );
+
   // the list wraps, so there is always a project in both directions
   const adjacent = (d) => projects[(index + d + projects.length) % projects.length];
   const go = (d) => {
@@ -430,6 +476,7 @@ export default function ProjectPage({
   }, [index]);
 
   return createPortal(
+    <LightboxProvider>
     <div
       className={`pp ${state === 'open' ? 'is-open' : ''} ${
         state === 'closing' ? 'is-closing' : ''
@@ -447,7 +494,7 @@ export default function ProjectPage({
         {/* key remounts the article per project so the entrance rise
             replays when paging with the arrows */}
         <article
-          className={`pp-page ${dir ? 'is-paged' : ''} ${page.story ? 'is-story' : ''}`}
+          className={`pp-page ${dir ? 'is-paged' : ''} ${page.toggle ? 'has-toggle' : ''}`}
           key={project.slug}
         >
           <div className="pp-topbar">
@@ -514,12 +561,11 @@ export default function ProjectPage({
             </div>
           </div>
 
-          {/* projects with a page.story get the visual-first layout
-              (CaseStory.jsx): a rail beside the column, and the story in
-              place of the intro and sections. The wrappers do nothing
-              for the others. */}
-          <div className={page.story ? 'pp-story' : undefined}>
-          {page.story && <StoryRail story={page.story} scrollRef={scrollRef} />}
+          {/* every case study has the rail and the same landing block; what
+              differs is what follows it, a page.story (CaseStory.jsx) or
+              plain sections */}
+          <div className="pp-story">
+          <StoryRail story={rail} scrollRef={scrollRef} />
           <div className="pp-main">
           <header className="pp-head">
             <div className="pp-head-text">
@@ -531,8 +577,8 @@ export default function ProjectPage({
             </span>
           </header>
 
-          {/* every hero shows the whole image at its own ratio, capped
-              to one shared height, so no case study opens on a crop.
+          {/* every hero shows the whole image at its own ratio, the width
+              of the column, so no case study opens on a crop.
               page.hero can still opt back into the 21:9 band with
               { fit: false } (plus { position } to steer that crop) */}
           <Media
@@ -579,7 +625,8 @@ export default function ProjectPage({
           </div>
         </article>
       </div>
-    </div>,
+    </div>
+    </LightboxProvider>,
     document.body
   );
 }
@@ -616,15 +663,36 @@ function Links({ links }) {
    where it fell short", and with pictures pinned to the bottom the
    shortfalls landed before the reader had seen the thing they are about. */
 function Section({ s }) {
+  const [eyebrow, title] = splitHeading(s.heading);
+  // what the viewer steps through, from any one of the images set together
+  const galleryShots = (s.gallery ?? [])
+    .filter((g) => g.src)
+    .map((g) => ({ src: g.src, label: g.caption }));
+  const tileShots = (s.tiles?.items ?? []).map((t) => ({
+    src: t.src,
+    label: t.label,
+    alt: `${t.label} tileset`,
+  }));
   const pictures = (
     <>
-      {[].concat(s.media ?? []).map((m) => (
-        <Media key={m.video ?? m.src} media={m} className="pp-panel" alt="" />
+      {[].concat(s.media ?? []).map((m, i) => (
+        <Media key={m.video ?? m.src ?? i} media={m} className="pp-panel" alt="" />
       ))}
       {s.gallery && (
         <div className="pp-gallery">
           {s.gallery.map((g) => (
-            <Media key={g.caption} media={g} className="pp-panel" alt="" />
+            <Media
+              key={g.caption}
+              media={g}
+              className="pp-panel"
+              alt=""
+              zoom={
+                g.src && {
+                  items: galleryShots,
+                  at: galleryShots.findIndex((x) => x.src === g.src),
+                }
+              }
+            />
           ))}
         </div>
       )}
@@ -632,7 +700,12 @@ function Section({ s }) {
   );
   return (
     <section className="pp-section">
-      <h2>{s.heading}</h2>
+      <header>
+        {eyebrow && <p className="st-eyebrow">{eyebrow}</p>}
+        <h2 id={sectionId(s)} className="st-anchor st-title" tabIndex={-1}>
+          {title}
+        </h2>
+      </header>
       {/* a body entry is normally a paragraph; an object with `list` is a
           short weighed-options aside that has to sit between two
           paragraphs rather than after all of them, and one with
@@ -735,11 +808,11 @@ function Section({ s }) {
           both reads screenshots first, then the marks. */}
       {s.compare &&
         (Array.isArray(s.compare) ? s.compare : [s.compare]).map((cmp) => (
-          <Compare cmp={cmp} key={cmp.before.label} />
+          <Compare cmp={cmp} id={passId(s, cmp)} key={cmp.before.label} />
         ))}
       {s.cursorTrail && (
         <>
-          <PassCopy pass={s.cursorTrail} />
+          <PassCopy pass={s.cursorTrail} id={passId(s, s.cursorTrail)} />
           {/* the pass head above carries the label and title, so the
               figure's own head keeps just the hint */}
           <CursorTrail trail={s.cursorTrail} showTitle={false} />
@@ -757,9 +830,11 @@ function Section({ s }) {
       {s.tiles && (
         <figure className={`pp-tiles ${s.tiles.cutouts ? 'is-cutouts' : ''}`}>
           <ol>
-            {s.tiles.items.map((t) => (
+            {s.tiles.items.map((t, i) => (
               <li key={t.label}>
-                <img src={t.src} alt={`${t.label} tileset`} loading="lazy" />
+                <Zoomable items={tileShots} at={i}>
+                  <img src={t.src} alt={`${t.label} tileset`} loading="lazy" />
+                </Zoomable>
                 <span>{t.label}</span>
               </li>
             ))}
@@ -786,12 +861,12 @@ function Section({ s }) {
    Everything here is a direct child of the section on purpose: the
    paragraphs pick up body type from `.pp-section > p`, so they must not
    be wrapped. */
-function PassCopy({ pass }) {
+function PassCopy({ pass, id }) {
   const { label, title, problem, solution, text } = pass;
   return (
     <>
       {(label || title) && (
-        <div className="pp-pass-head">
+        <div className="pp-pass-head st-anchor" id={id} tabIndex={id ? -1 : undefined}>
           {label && <span className="pp-pass-eyebrow">{label}</span>}
           {title && <h3>{title}</h3>}
         </div>
@@ -835,14 +910,17 @@ function PassCopy({ pass }) {
    shorter one holds its last frame until the longer one finishes, and
    both restart together, so every pass lines up like the first. A side
    with neither is a placeholder panel holding the slot open. */
-function Compare({ cmp }) {
+function Compare({ cmp, id }) {
   const sides = [cmp.before, cmp.after];
   const hasVideo = sides.some((c) => c.video);
+  const shots = sides
+    .filter((c) => c.src && !c.video)
+    .map((c) => ({ src: c.src, label: c.label }));
   const [playing, toggle] = useLoopToggle();
   const ref = useInViewPlayback(playing);
   return (
     <>
-      <PassCopy pass={cmp} />
+      <PassCopy pass={cmp} id={id} />
       <figure
         ref={hasVideo ? ref : undefined}
         className={`pp-compare ${cmp.natural ? 'is-natural' : ''} ${
@@ -864,15 +942,17 @@ function Compare({ cmp }) {
                   onClick={toggle}
                 />
               ) : c.src ? (
-                <img
-                  src={c.src}
-                  alt=""
-                  loading="lazy"
-                  style={{
-                    objectPosition: c.position,
-                    objectFit: c.fit ? 'contain' : undefined,
-                  }}
-                />
+                <Zoomable items={shots} at={shots.findIndex((x) => x.src === c.src)}>
+                  <img
+                    src={c.src}
+                    alt=""
+                    loading="lazy"
+                    style={{
+                      objectPosition: c.position,
+                      objectFit: c.fit ? 'contain' : undefined,
+                    }}
+                  />
+                </Zoomable>
               ) : (
                 <div className="pp-media-ph">media — coming soon</div>
               )}
@@ -922,22 +1002,27 @@ function Points({ points }) {
 /* media panel: real image when given, labeled placeholder otherwise;
    media.fit shows the whole image at its own ratio instead of the
    21:9 crop (for screenshots that crop badly) */
-function Media({ media, className, alt, figRef }) {
+function Media({ media, className, alt, figRef, zoom }) {
   if (media.video) return <Walkthrough media={media} className={className} />;
+  const picture = media.src && (
+    <img
+      src={media.src}
+      alt={alt}
+      loading="lazy"
+      style={media.position ? { objectPosition: media.position } : undefined}
+    />
+  );
   return (
     <figure
       ref={figRef}
       className={`pp-media ${className} ${media.fit ? 'is-fit' : ''}`}
     >
-      {media.src ? (
-        <img
-          src={media.src}
-          alt={alt}
-          loading="lazy"
-          style={media.position ? { objectPosition: media.position } : undefined}
-        />
+      {picture && zoom ? (
+        <Zoomable items={zoom.items} at={zoom.at}>
+          {picture}
+        </Zoomable>
       ) : (
-        <div className="pp-media-ph">media — coming soon</div>
+        picture || <div className="pp-media-ph">media — coming soon</div>
       )}
       {media.caption && <figcaption>{media.caption}</figcaption>}
     </figure>

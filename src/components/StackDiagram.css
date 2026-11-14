@@ -5,12 +5,11 @@
    ============================================================ */
 
 /* The middle column has to hold a 200px square rotated 45°, which
-   projects 283px wide. At the page's 1080px cap the old --sp-5 gutters
-   left it around 160px, so the pile spilled over the card on its
-   right. The rails are trimmed and the scene carries a hard floor. */
+   projects 283px wide, so it carries a hard floor and the side columns
+   give way first as the page's column narrows. */
 .sd {
   display: grid;
-  grid-template-columns: 184px minmax(300px, 1fr) 268px;
+  grid-template-columns: minmax(150px, 184px) minmax(283px, 1fr) minmax(220px, 268px);
   gap: var(--sp-4);
   align-items: center;
   margin-top: var(--sp-4);

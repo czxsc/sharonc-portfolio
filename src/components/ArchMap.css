@@ -10,7 +10,7 @@
   gap: var(--sp-4);
   align-items: start;
   margin-top: var(--sp-4);
-  padding: var(--sp-5);
+  padding: var(--sp-4);
   background: var(--card);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-lg);
@@ -28,9 +28,11 @@
 .am-scene-wrap {
   overflow-x: auto;
 }
+/* wide enough to read, and small enough to fit the page's narrowest column
+   without scrolling; only a phone has to scroll this sideways */
 .am-scene {
   position: relative;
-  min-width: 760px;
+  min-width: 620px;
 }
 
 .am-zone {
@@ -46,8 +48,8 @@
   top: 8px;
   left: 10px;
   font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.14em;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--c) 70%, var(--ink-soft));
 }

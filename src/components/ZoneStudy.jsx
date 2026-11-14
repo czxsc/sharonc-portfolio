@@ -1,3 +1,4 @@
+import { Zoomable } from './Lightbox.jsx';
 import './ZoneStudy.css';
 import { useRef, useState } from 'react';
 
@@ -139,6 +140,15 @@ export default function ZoneStudy({ zones }) {
                 <span className="lwz-veil" aria-hidden="true" />
               </div>
             ))}
+            {/* whichever grade is on show, across all four panels */}
+            <Zoomable
+              className="lwz-zoom"
+              at={i}
+              items={zones.panels.map((panel) => ({
+                src: zone.art[panel.id],
+                label: `${zone.name} · ${panel.label}`,
+              }))}
+            />
             <span className="lwz-cap">{p.label}</span>
           </div>
         ))}

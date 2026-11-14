@@ -2,19 +2,22 @@
    hover previews the matching rows; click sorts them to the top and
    pins the highlight; a second click unpins and restores the
    original order */
+/* The padding is the target: the buttons touch, so there's no dead gap to miss
+   between them, and each is 44px or more tall. The negative margins take that
+   padding back out of the layout, so the words still line up with the page's
+   right edge and the section head doesn't grow. */
 .work-filters {
-  margin-left: auto;
+  margin: -12px -14px -12px auto;
   display: flex;
   align-items: baseline;
   justify-content: flex-end;
   flex-wrap: wrap;
-  gap: 4px 28px;
 }
 .work-filter {
   position: relative;
-  padding: 2px 0;
+  padding: 12px 14px;
   font-family: var(--mono);
-  font-size: 0.64rem;
+  font-size: 0.82rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-soft);
@@ -24,9 +27,9 @@
 .work-filter::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 14px;
+  right: 14px;
+  bottom: 9px;
   height: 1px;
   background: currentColor;
   transform: scaleX(0);
@@ -261,10 +264,11 @@
   transition: none;
 }
 .work-item {
+  --row-gap: clamp(12px, 0.5vw + 9px, 20px);
   width: 100%;
   display: flex;
   align-items: baseline;
-  gap: clamp(12px, 0.5vw + 9px, 20px);
+  gap: var(--row-gap);
   padding: clamp(9px, 0.25vw + 7.5px, 13px) 4px;
   border-bottom: 1px solid var(--line);
   text-align: left;
@@ -290,7 +294,6 @@
   letter-spacing: -0.015em;
   line-height: 1.1;
   margin-right: auto;
-  /* stay on one line; the category label ellipsizes instead */
   white-space: nowrap;
   transition: color var(--dur) var(--ease);
 }
@@ -361,11 +364,30 @@
 /* ---------- responsive: image on top, list below ---------- */
 @media (max-width: 900px) {
   .work-gallery {
-    grid-template-columns: 1fr;
+    /* minmax so a long row can't hold the column wider than the screen */
+    grid-template-columns: minmax(0, 1fr);
     gap: clamp(24px, 5vw, 40px);
   }
   .work-preview {
     order: -1;
+  }
+}
+
+/* Where a row is too narrow for the name and its category side by side, the
+   category drops to its own line under the name, rather than getting cut off.
+   That's a narrow list beside the preview, and a phone. */
+@media (min-width: 901px) and (max-width: 1240px), (max-width: 540px) {
+  .work-item {
+    flex-wrap: wrap;
+    row-gap: 3px;
+  }
+  .work-cat {
+    order: 3;
+    flex: 1 0 100%;
+    /* lines up under the name, past the index and the gap after it */
+    padding-left: calc(2ch + 0.16em + var(--row-gap));
+    white-space: normal;
+    overflow: visible;
   }
 }
 

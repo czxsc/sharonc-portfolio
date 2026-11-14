@@ -5,34 +5,6 @@
    width, and the pictures do most of the talking.
    ============================================================ */
 
-/* The column tops out at 960px at any window size. The page's max-width is
-   that plus whichever side padding applies, since the padding counts toward
-   it: the rail's reserved margin below, or the usual gutter under 1260px. */
-.pp-page.is-story {
-  max-width: calc(960px + 2 * var(--gutter));
-}
-.pp-main {
-  min-width: 0;
-}
-
-/* the hero takes the column rather than the capped, centred size the
-   other case studies give it */
-.pp-story .pp-hero.is-fit img {
-  width: 100%;
-  max-height: none;
-}
-
-/* with no intro paragraph here, the links are the first thing under the hero */
-.pp-story .pp-intro {
-  margin-top: var(--sp-4);
-}
-.pp-story .pp-links {
-  margin-top: 0;
-}
-.pp-story .pp-meta {
-  margin-top: var(--sp-4);
-}
-
 /* ---------- the rail ---------- */
 .st-rail {
   animation: pp-in 0.6s var(--ease) both;
@@ -71,7 +43,6 @@
   padding: 4px 0 4px 14px;
   font-size: var(--fs-small);
   line-height: 1.35;
-  white-space: nowrap;
   /* a step above --ink-faint, which is under 4.5:1 on paper at this size */
   color: color-mix(in srgb, var(--ink-soft) 85%, var(--paper));
   transition: color var(--dur) var(--ease);
@@ -89,15 +60,13 @@
   color: var(--ink);
 }
 
-/* Out at the window's edge, centred top to bottom. It's fixed rather than a
-   column of the page, and the page's padding is what keeps the two apart: the
-   rail ends about 140px in, so 220px leaves it 80px of air even at the
-   narrowest window this applies to. The padding is on both sides so the
-   column stays centred. Under this width there's no margin left to sit in. */
+/* Out at the window's edge, centred top to bottom. The page's padding of 220px
+   (ProjectPage.css) is what keeps it clear of the column. A long heading wraps
+   rather than running at the content, so the width here is the rail's worst
+   case, leaving 58px of air even at the narrowest window this applies to. */
 @media (min-width: 1260px) {
-  .pp-page.is-story {
-    max-width: calc(960px + 2 * 220px);
-    padding-inline: 220px;
+  .st-rail-list {
+    width: 134px;
   }
   .st-rail {
     position: fixed;
@@ -136,6 +105,10 @@
 .st-title {
   font-size: var(--fs-h3);
   text-wrap: balance;
+}
+/* a title split off a heading can start lower case ("attacks & enemy AI") */
+.st-title::first-letter {
+  text-transform: uppercase;
 }
 .st-text {
   margin-top: var(--sp-3);
@@ -249,29 +222,32 @@
    sits inside its canvas with some air around it, so the negative margin is
    what lines its left edge up with the text underneath.
 
-   The bob is a few pixels over a few seconds, just enough that these aren't
-   the one still thing on a page of moving recordings. Each starts at its own
-   point in the cycle, so a row doesn't rise and fall in unison. */
+   The bob is an easy float, on a sine so there's no corner at the top or
+   bottom of it. Its own layer, so it moves on the compositor rather than
+   repainting. Each starts at its own point in the cycle, so a row doesn't rise
+   and fall in unison. */
 .st-trio-icon {
+  --bob: 6px;
   display: block;
   width: 96px;
   height: 96px;
   margin-left: -10px;
   image-rendering: pixelated;
-  animation: st-bob 3.4s ease-in-out infinite alternate;
+  will-change: transform;
+  animation: st-bob 1.15s cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
 }
 .st-trio li:nth-child(2) .st-trio-icon {
-  animation-delay: -1.3s;
+  animation-delay: -0.4s;
 }
 .st-trio li:nth-child(3) .st-trio-icon {
-  animation-delay: -2.5s;
+  animation-delay: -0.8s;
 }
 @keyframes st-bob {
   from {
-    transform: translateY(2px);
+    transform: translateY(var(--bob));
   }
   to {
-    transform: translateY(-3px);
+    transform: translateY(calc(var(--bob) * -1));
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -426,22 +402,8 @@
 /* ---------- no margin to sit in: the rail runs across the top ----------
    Sub-items stay behind. A strip of the main parts is enough to move around
    with, and sixteen links across a narrow screen is a scroller nobody would
-   use. The bar and the strip stack into one solid band, since the controls
-   cross the whole width here and text would otherwise run behind them. */
+   use. It stacks under the bar as one solid band (ProjectPage.css). */
 @media (max-width: 1259px) {
-  .pp-page.is-story {
-    padding-top: 0;
-  }
-  .pp-page.is-story .pp-topbar {
-    top: 0;
-    flex-wrap: nowrap;
-    margin-inline: calc(var(--gutter) * -1);
-    padding: 10px var(--gutter);
-    background: var(--paper);
-  }
-  .pp-page.is-story .pp-topbar-end {
-    width: auto;
-  }
   .st-rail {
     position: sticky;
     top: 70px;
@@ -469,12 +431,23 @@
   }
   .st-rail-link {
     padding: 4px 0;
+    white-space: nowrap;
   }
   .st-rail li.is-current > .st-rail-link {
     font-weight: 600;
   }
   .st-anchor {
     scroll-margin-top: 130px;
+  }
+}
+
+/* a toggle pushes the bar to two rows on a phone, so the strip sits lower */
+@media (max-width: 700px) {
+  .pp-page.has-toggle .st-rail {
+    top: 122px;
+  }
+  .pp-page.has-toggle .st-anchor {
+    scroll-margin-top: 186px;
   }
 }
 
@@ -508,6 +481,7 @@
     align-items: start;
   }
   .st-trio-icon {
+    --bob: 4px;
     grid-row: span 2;
     width: 64px;
     height: 64px;

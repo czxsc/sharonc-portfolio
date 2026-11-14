@@ -1,0 +1,168 @@
+/* ============================================================
+   Lightbox — an image, bigger, over the page. The ground is the
+   espresso pool from the hero rather than a grey scrim, so the
+   screenshots sit on something that belongs to the site, and it's
+   flat: no blur, and no shadow under the picture.
+   ============================================================ */
+
+/* ---------- on the page ----------
+   Takes the place of the image in whatever layout it's in, and adds nothing
+   to it: same box, no padding. */
+.zoom {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: var(--radius);
+}
+/* shown on the way to clicking, so a page of pictures doesn't wear a row of
+   little icons all the time */
+.zoom-hint {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity var(--dur-quick) var(--ease),
+    transform var(--dur-quick) var(--ease);
+  pointer-events: none;
+}
+.zoom-hint svg {
+  width: 13px;
+  height: 13px;
+}
+.zoom:hover .zoom-hint,
+.zoom:focus-visible .zoom-hint {
+  opacity: 1;
+  transform: none;
+}
+/* no hover to reveal it on a touch screen, and tapping is less of a guess */
+@media (hover: none) {
+  .zoom-hint {
+    opacity: 0.9;
+    transform: none;
+  }
+}
+
+/* ---------- the viewer ---------- */
+.lb {
+  position: fixed;
+  inset: 0;
+  z-index: 400; /* over the case study (300) and its flight (320) */
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--liquid) 95%, transparent);
+  overscroll-behavior: contain;
+}
+/* The page keeps a gutter for its scrollbar (scrollbar-gutter on html), and a
+   fixed box can't paint into it, which left a pale stripe down the side of the
+   dark ground. The gutter shows the root's own background, so that darkens with
+   the viewer. It starts out explicitly paper, since a root that's transparent
+   partway through a transition would show white behind it. */
+html {
+  background-color: var(--paper);
+  transition: background-color 0.3s var(--ease);
+}
+html.lb-open {
+  background-color: color-mix(in srgb, var(--liquid) 95%, var(--paper));
+}
+.lb-figure {
+  margin: 0;
+  /* clicks beside the picture reach the ground, which closes it */
+  max-width: 100%;
+}
+.lb-img {
+  display: block;
+  border-radius: var(--radius);
+  /* a cut-out reads as it does on the page, rather than floating on the dark */
+  background: var(--paper);
+  transform-origin: center;
+}
+.lb-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: 12px;
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--on-liquid-soft);
+}
+.lb-count {
+  flex: none;
+  color: var(--on-liquid-faint);
+  font-variant-numeric: tabular-nums;
+}
+.lb-btn {
+  position: fixed;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--on-liquid-line);
+  border-radius: 50%;
+  color: var(--on-liquid);
+  transition:
+    background var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+.lb-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.lb-btn:hover,
+.lb-btn:focus-visible {
+  background: var(--on-liquid);
+  border-color: var(--on-liquid);
+  color: var(--liquid);
+}
+.lb-close {
+  top: 20px;
+  right: 20px;
+}
+.lb-prev,
+.lb-next {
+  top: 50%;
+  margin-top: -22px;
+}
+.lb-prev {
+  left: 20px;
+}
+.lb-next {
+  right: 20px;
+}
+
+/* no margin beside the picture on a phone, so the arrows drop to its foot */
+@media (max-width: 700px) {
+  .lb-close {
+    top: 12px;
+    right: 12px;
+  }
+  .lb-prev,
+  .lb-next {
+    top: auto;
+    bottom: 16px;
+    margin-top: 0;
+  }
+  .lb-prev {
+    left: 12px;
+  }
+  .lb-next {
+    right: 12px;
+  }
+}

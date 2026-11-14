@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+import { Zoomable } from './Lightbox.jsx';
 import './DesignBoard.css';
 
 /* ------------------------------------------------------------------
@@ -32,12 +33,15 @@ export default function DesignBoard({ board }) {
       {reference && (
         <div className="db-col">
           <span className="db-label">{reference.label}</span>
-          <img
-            className="db-ref"
-            src={reference.src}
-            alt={reference.alt}
-            loading="lazy"
-          />
+          {/* a wall of tiny references, so it's all small details */}
+          <Zoomable items={[{ src: reference.src, alt: reference.alt, label: reference.label }]}>
+            <img
+              className="db-ref"
+              src={reference.src}
+              alt={reference.alt}
+              loading="lazy"
+            />
+          </Zoomable>
         </div>
       )}
 

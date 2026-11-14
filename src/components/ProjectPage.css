@@ -64,11 +64,27 @@
   overscroll-behavior: contain;
 }
 
+/* The column tops out at 960px at any window size. The page's max-width is
+   that plus whichever side padding applies, since the padding counts toward
+   it: the rail's reserved margin, or the usual gutter under 1260px. */
 .pp-page {
   width: 100%;
-  max-width: 1080px;
+  max-width: calc(960px + 2 * var(--gutter));
   margin-inline: auto;
   padding: 26px var(--gutter) var(--sp-7);
+}
+.pp-main {
+  min-width: 0;
+}
+/* The rail sits out at the window's edge, fixed rather than a column of the
+   page, and this padding is what keeps the two apart. It's on both sides so
+   the column stays centred. Under this width there's no margin left to sit
+   in, and the rail moves to the top (see the end of this file). */
+@media (min-width: 1260px) {
+  .pp-page {
+    max-width: calc(960px + 2 * 220px);
+    padding-inline: 220px;
+  }
 }
 
 /* ---------- entrance ----------
@@ -363,10 +379,15 @@
   width: auto;
   max-width: 100%;
   height: auto;
-  max-height: 540px;
+  max-height: 720px;
   aspect-ratio: auto;
   display: block;
   margin-inline: auto;
+}
+/* the hero takes the column, always */
+.pp-hero.is-fit img {
+  width: 100%;
+  max-height: none;
 }
 .pp-media figcaption {
   margin-top: 10px;
@@ -417,16 +438,18 @@
 
 /* ---------- intro + link chips ---------- */
 .pp-intro {
-  margin-top: var(--sp-5);
+  margin-top: var(--sp-4);
 }
 .pp-intro p {
-  font-size: clamp(1rem, 0.121vw + 0.9545rem, 1.1rem);
+  color: var(--ink-soft);
   line-height: 1.7;
 }
 .pp-links {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
+}
+.pp-intro p + .pp-links {
   margin-top: var(--sp-3);
 }
 .pp-chip {
@@ -462,7 +485,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--sp-4);
-  margin: var(--sp-5) 0 0;
+  margin: var(--sp-4) 0 0;
   padding-top: var(--sp-4);
   border-top: 1px solid var(--line);
 }
@@ -759,23 +782,26 @@
    from the last one's screenshots; the visual it argues about is
    pulled up tight underneath, so each pass reads as a block. */
 .pp-pass-head {
-  margin-top: var(--sp-6);
+  margin-top: var(--sp-5);
+}
+.pp-pass-head:focus {
+  outline: none;
 }
 .pp-pass-eyebrow {
   display: block;
   margin-bottom: 10px;
   font-family: var(--mono);
   font-size: var(--fs-label);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-faint);
 }
 .pp-pass-head h3 {
   font-family: var(--serif);
-  font-size: 1.35rem;
+  font-size: clamp(1.3rem, 0.45vw + 1.05rem, 1.6rem);
   font-weight: 600;
   letter-spacing: -0.01em;
-  line-height: 1.3;
+  line-height: 1.25;
   text-wrap: balance;
 }
 .pp-pass-p {
@@ -824,7 +850,7 @@
      hair instead of losing its modal edge */
   aspect-ratio: 8 / 5;
   object-fit: cover;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   border: 1px solid var(--line-soft);
   background: var(--paper-2);
 }
@@ -894,7 +920,7 @@
   opacity: 0.55;
 }
 .pp-sub h3 {
-  font-size: 1.1rem;
+  font-size: clamp(1.2rem, 0.3vw + 1.05rem, 1.4rem);
   font-weight: 600;
   line-height: 1.3;
   text-wrap: balance;
@@ -970,8 +996,10 @@
   padding-top: 14px;
 }
 .pp-fact h3 {
-  font-size: 1.12rem;
+  font-family: var(--grot);
+  font-size: 1.05rem;
   font-weight: 600;
+  letter-spacing: 0;
   margin-bottom: 6px;
 }
 .pp-fact p {
@@ -1084,15 +1112,30 @@
   color: var(--paper);
 }
 /* ---------- responsive ---------- */
+/* No margin for the rail to sit in, so it runs across the top (see
+   CaseStory.css), and the bar and the strip stack into one solid band, since
+   the controls cross the whole width here and text would otherwise run behind
+   them. */
+@media (max-width: 1259px) {
+  .pp-page {
+    padding-top: 0;
+  }
+  .pp-topbar {
+    top: 0;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 10px var(--gutter);
+    background: var(--paper);
+  }
+}
 @media (max-width: 700px) {
   /* back on its own line, toggle and arrows sharing the next one —
      three controls won't fit across a phone without the toggle's
      labels shrinking to nothing */
-  .pp-topbar {
+  .pp-page.has-toggle .pp-topbar {
     flex-wrap: wrap;
     row-gap: var(--sp-2);
   }
-  .pp-topbar-end {
+  .pp-page.has-toggle .pp-topbar-end {
     width: 100%;
   }
   .pp-head {

@@ -314,3 +314,11 @@
     transition: none;
   }
 }
+
+/* the hit area for enlarging a panel: over the stacked layers, under nothing */
+.lwz-cell .lwz-zoom {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: auto;
+}
